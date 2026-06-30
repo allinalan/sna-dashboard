@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sharp Ninja Academy — Mentee Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#F7F5F0; --ink:#16140F; --ink-soft:#5A554B;
+    --line:#DED9CE; --line-soft:#EBE7DD;
+    --accent:#B4451F; --accent-soft:#F0E2D8;
+    --good:#3E6B4B; --good-bg:#DFEAE0;
+    --warn:#C99700; --warn-bg:#F7ECCF;
+    --bad:#B4451F;  --bad-bg:#F3DBD2;
+    --card:#FFFFFF;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{-webkit-text-size-adjust:100%}
+  body{background:var(--paper);color:var(--ink);font-family:"Geist Mono",ui-monospace,monospace;line-height:1.5;-webkit-font-smoothing:antialiased;padding:0 0 80px}
+  .wrap{max-width:1100px;margin:0 auto;padding:0 24px}
+  .serif{font-family:"Fraunces",Georgia,serif}
+  .eyebrow{font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--ink-soft);font-weight:500}
+
+  header{border-bottom:1px solid var(--line);background:var(--paper);position:sticky;top:0;z-index:30}
+  .head-inner{display:flex;align-items:center;justify-content:space-between;padding:16px 24px;max-width:1100px;margin:0 auto;flex-wrap:wrap;gap:12px}
+  .brand{display:flex;align-items:center;gap:14px}
+  .mark{width:38px;height:38px;border:1.5px solid var(--ink);border-radius:50%;display:grid;place-items:center;font-family:"Fraunces";font-weight:600;font-size:18px;flex:none}
+  .brand h1{font-family:"Fraunces";font-size:19px;font-weight:600;letter-spacing:-.01em;line-height:1.1}
+  .brand .sub{font-size:11px;color:var(--ink-soft);letter-spacing:.04em}
+  .head-right{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+  .status{font-size:11px;color:var(--ink-soft);display:flex;align-items:center;gap:6px}
+  .dot{width:7px;height:7px;border-radius:50%;background:var(--good)}
+  .dot.seed{background:var(--warn)}
+  .toggle{display:flex;border:1px solid var(--line);border-radius:999px;overflow:hidden;background:var(--card)}
+  .toggle button{font-family:"Geist Mono";font-size:12px;padding:8px 16px;border:none;background:none;cursor:pointer;color:var(--ink-soft);letter-spacing:.03em}
+  .toggle button.on{background:var(--ink);color:var(--paper)}
+
+  .period{padding:20px 0 6px}
+  .period .big{font-family:"Fraunces";font-size:clamp(28px,5vw,42px);font-weight:600;letter-spacing:-.02em;line-height:1.05}
+  .period .frame{font-size:12px;color:var(--ink-soft);margin-top:6px;letter-spacing:.02em}
+  .period .frame b{color:var(--accent);font-weight:600}
+
+  .kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-top:22px}
+  .kpi{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px}
+  .kpi .lab{font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-soft)}
+  .kpi .val{font-family:"Fraunces";font-size:29px;font-weight:600;letter-spacing:-.02em;margin-top:8px;line-height:1}
+  .kpi .meta{font-size:11px;color:var(--ink-soft);margin-top:6px}
+  .kpi.alert .val{color:var(--accent)}
+
+  .section{margin-top:40px}
+  .section-head{display:flex;align-items:baseline;justify-content:space-between;border-bottom:1px solid var(--line);padding-bottom:10px;margin-bottom:18px;gap:12px;flex-wrap:wrap}
+  .section-head h2{font-family:"Fraunces";font-size:20px;font-weight:600;letter-spacing:-.01em}
+  .section-head .hint{font-size:11px;color:var(--ink-soft)}
+  select{font-family:"Geist Mono";font-size:12px;padding:7px 30px 7px 12px;border:1px solid var(--line);border-radius:8px;background:var(--card) url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'><path d='M1 1l4 4 4-4' stroke='%235A554B' stroke-width='1.4' fill='none'/></svg>") no-repeat right 11px center;color:var(--ink);cursor:pointer;-webkit-appearance:none;appearance:none}
+
+  .lb{background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+  .lb-row{display:grid;grid-template-columns:34px 1fr 110px 92px;align-items:center;gap:10px;padding:12px 18px;border-bottom:1px solid var(--line-soft)}
+  .lb-row:last-child{border-bottom:none}
+  .lb-row.h{font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-soft);padding:11px 18px}
+  .lb-rank{font-family:"Fraunces";font-weight:600;font-size:15px;color:var(--ink-soft)}
+  .lb-rank.top{color:var(--accent)}
+  .lb-name{font-size:13px;font-weight:500}
+  .lb-name .tag{font-size:10px;color:var(--ink-soft);margin-left:7px;border:1px solid var(--line);border-radius:5px;padding:1px 5px}
+  .lb-bar-wrap{height:7px;background:var(--line-soft);border-radius:99px;overflow:hidden}
+  .lb-bar{height:100%;background:var(--accent);border-radius:99px}
+  .lb-val{font-size:13px;font-weight:600;text-align:right;font-variant-numeric:tabular-nums}
+
+  /* heatmap */
+  .heat-legend{display:flex;gap:16px;font-size:11px;color:var(--ink-soft);margin-bottom:14px;flex-wrap:wrap}
+  .heat-legend span{display:flex;align-items:center;gap:6px}
+  .sw{width:12px;height:12px;border-radius:3px}
+  .sw.all{background:var(--good)}.sw.some{background:var(--warn)}.sw.miss{background:var(--bad)}.sw.none{background:var(--line-soft);border:1px solid var(--line)}
+  .heat-scroll{overflow-x:auto;border:1px solid var(--line);border-radius:14px;background:var(--card)}
+  .heat{border-collapse:separate;border-spacing:0;width:100%;min-width:760px}
+  .heat th{font-size:9.5px;color:var(--ink-soft);font-weight:500;padding:8px 0;text-align:center}
+  .heat th.name,.heat td.name{text-align:left;padding-left:16px;white-space:nowrap;font-size:12px}
+  .heat td.name{font-weight:500}
+  .heat td.pct{font-size:11px;text-align:right;padding-right:16px;font-variant-numeric:tabular-nums;color:var(--ink-soft)}
+  .heat th.pct{text-align:right;padding-right:16px}
+  .heat tbody tr:nth-child(even){background:#FCFBF8}
+  .cell{width:20px;height:20px;padding:2px}
+  .cell .box{width:100%;height:16px;border-radius:3px;margin:0 auto}
+  .box.all{background:var(--good)}.box.some{background:var(--warn)}.box.miss{background:var(--bad)}.box.none{background:var(--line-soft)}
+
+  /* channel mix */
+  .mix{display:grid;gap:10px}
+  .mix-row{display:grid;grid-template-columns:160px 1fr 120px;align-items:center;gap:14px}
+  .mix-lab{font-size:12px;color:var(--ink-soft)}
+  .mix-track{height:10px;background:var(--line-soft);border-radius:99px;overflow:hidden}
+  .mix-fill{height:100%;border-radius:99px;background:var(--accent)}
+  .mix-val{font-size:11px;text-align:right;font-weight:500}
+  .mix-val.await{color:var(--warn)}
+
+  .rep-pick{display:flex;align-items:center;gap:12px;margin:22px 0 4px;flex-wrap:wrap}
+  .rep-pick select{font-size:14px;padding:10px 36px 10px 14px;min-width:240px}
+  .rep-context{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+  .chip{font-size:11px;border:1px solid var(--line);border-radius:999px;padding:5px 12px;color:var(--ink-soft);background:var(--card)}
+  .chip b{color:var(--ink);font-weight:600}
+  .chip.tier{border-color:var(--accent);color:var(--accent)}
+  .chip.new{border-color:var(--warn);color:#8a6800;background:#FBF4E4}
+
+  .hero{display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:12px;margin-top:18px}
+  .hero-big{background:var(--ink);color:var(--paper);border-radius:16px;padding:20px}
+  .hero-big .lab{font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;opacity:.7}
+  .hero-big .val{font-family:"Fraunces";font-size:38px;font-weight:600;letter-spacing:-.02em;margin-top:10px;line-height:1}
+  .hero-big .meta{font-size:11.5px;opacity:.75;margin-top:8px}
+  .mini{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px}
+  .mini .lab{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft)}
+  .mini .val{font-family:"Fraunces";font-size:25px;font-weight:600;margin-top:8px;line-height:1}
+  .mini .val.muted{color:var(--line)}
+  .mini .meta{font-size:11px;color:var(--ink-soft);margin-top:5px}
+  .mini .meta.await{color:var(--warn)}
+
+  .summary{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+  .sum-col h3{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:12px}
+  .sum-item{display:flex;gap:10px;align-items:flex-start;font-size:13px;margin-bottom:10px;line-height:1.45}
+  .sum-item .pip{flex:none;width:6px;height:6px;border-radius:50%;margin-top:7px}
+  .pip.good{background:var(--good)}.pip.warn{background:var(--bad)}
+  .sum-empty{font-size:12px;color:var(--ink-soft);font-style:italic}
+
+  .chart-card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px}
+  .chart-legend{display:flex;gap:18px;font-size:11px;color:var(--ink-soft);margin-bottom:8px;flex-wrap:wrap}
+  .chart-legend span{display:flex;align-items:center;gap:6px}
+  .lg-line{width:16px;height:2px;background:var(--accent)}
+  .lg-base{width:16px;height:0;border-top:2px dashed var(--ink-soft)}
+  svg{display:block;width:100%;height:auto;overflow:visible}
+
+  .grid5{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}
+  .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+  .bucket{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px}
+  .bucket .lab{font-size:11px;color:var(--ink-soft)}
+  .bucket .val{font-family:"Fraunces";font-size:23px;font-weight:600;margin-top:8px;line-height:1}
+  .bucket .val.muted{color:var(--line)}
+  .bucket .meta{font-size:10.5px;color:var(--ink-soft);margin-top:6px}
+  .bucket .meta.await{color:var(--warn)}
+
+  .ctable{width:100%;border-collapse:collapse;background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+  .ctable th{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft);font-weight:500;text-align:right;padding:11px 16px;border-bottom:1px solid var(--line)}
+  .ctable th:first-child{text-align:left}
+  .ctable td{font-size:13px;text-align:right;padding:11px 16px;border-bottom:1px solid var(--line-soft);font-variant-numeric:tabular-nums}
+  .ctable td.cn{text-align:left;color:var(--ink-soft)}
+  .ctable td.cn .evt{font-size:9.5px;color:var(--accent);border:1px solid var(--accent-soft);border-radius:5px;padding:1px 5px;margin-left:6px}
+  .ctable tfoot td{font-weight:600;border-top:1px solid var(--line);border-bottom:none;background:#FCFBF8}
+  .ctable tfoot td.cn{color:var(--ink)}
+  .aw{color:var(--warn);font-size:11px}
+  .strip{display:flex;gap:4px;flex-wrap:wrap;margin-top:4px}
+  .strip .box{width:22px;height:22px;border-radius:4px;display:grid;place-items:center;font-size:9px;color:rgba(255,255,255,.85)}
+
+  .notes .note{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px}
+  .note .wk{font-size:10.5px;color:var(--accent);letter-spacing:.08em;text-transform:uppercase}
+  .note .row{font-size:12.5px;margin-top:6px;color:var(--ink-soft)}
+  .note .row b{color:var(--ink);font-weight:600}
+
+  .hidden{display:none}
+  .foot{margin-top:48px;border-top:1px solid var(--line);padding-top:18px;font-size:11px;color:var(--ink-soft);line-height:1.7}
+  .foot b{color:var(--ink)}
+
+  @media(max-width:880px){
+    .kpis{grid-template-columns:repeat(2,1fr)}
+    .hero{grid-template-columns:1fr 1fr}
+    .summary{grid-template-columns:1fr}
+    .grid5{grid-template-columns:1fr 1fr}
+    .lb-row{grid-template-columns:28px 1fr 74px}.lb-bar-wrap{display:none}
+    .mix-row{grid-template-columns:110px 1fr 90px}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="head-inner">
+    <div class="brand">
+      <div class="mark serif">忍</div>
+      <div>
+        <h1>Sharp Ninja Academy</h1>
+        <div class="sub">All in on sales. All in on life. — Mentee Performance</div>
+      </div>
+    </div>
+    <div class="head-right">
+      <div class="toggle">
+        <button id="btn-team" class="on" onclick="setView('team')">Team</button>
+        <button id="btn-rep" onclick="setView('rep')">Rep</button>
+      </div>
+      <div class="status"><span class="dot seed" id="src-dot"></span><span id="src-label">Seed data</span></div>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <!-- ════ TEAM ════ -->
+  <div id="view-team">
+    <div class="period">
+      <div class="eyebrow">Campaign Snapshot</div>
+      <div class="big serif" id="period-title">Fall 2025</div>
+      <div class="frame" id="period-frame"></div>
+    </div>
+
+    <div class="kpis" id="kpis"></div>
+
+    <div class="section">
+      <div class="section-head">
+        <h2 class="serif">Leaderboard</h2>
+        <select id="lb-metric" onchange="renderLeaderboard()">
+          <option value="sales">Total sales</option>
+          <option value="apptsCompleted">Appointments completed</option>
+          <option value="standards">Standards met %</option>
+          <option value="avgWeek">Avg weekly sales</option>
+        </select>
+      </div>
+      <div class="lb" id="leaderboard"></div>
+    </div>
+
+    <div class="section">
+      <div class="section-head">
+        <h2 class="serif">Standards Heatmap</h2>
+        <span class="hint">who's holding the line — read left→right for momentum</span>
+      </div>
+      <div class="heat-legend">
+        <span><span class="sw all"></span> All met</span>
+        <span><span class="sw some"></span> Some missed</span>
+        <span><span class="sw miss"></span> Missed</span>
+        <span><span class="sw none"></span> Not enrolled</span>
+      </div>
+      <div class="heat-scroll"><table class="heat" id="heat"></table></div>
+    </div>
+
+    <div class="section">
+      <div class="section-head">
+        <h2 class="serif">Sales by Channel</h2>
+        <span class="hint">populated once the weekly form is live</span>
+      </div>
+      <div class="mix" id="mix"></div>
+    </div>
+  </div>
+
+  <!-- ════ REP ════ -->
+  <div id="view-rep" class="hidden">
+    <div class="rep-pick">
+      <div class="eyebrow">Mentee</div>
+      <select id="rep-select" onchange="renderRep()"></select>
+    </div>
+    <div class="rep-context" id="rep-context"></div>
+
+    <div class="hero" id="rep-hero"></div>
+
+    <div class="section">
+      <div class="section-head"><h2 class="serif">Performance Summary</h2></div>
+      <div class="summary">
+        <div class="sum-col"><h3>Strengths</h3><div id="sum-good"></div></div>
+        <div class="sum-col"><h3>Watch</h3><div id="sum-warn"></div></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-head">
+        <h2 class="serif">Weekly Trend</h2>
+        <select id="chart-metric" onchange="renderChart()">
+          <option value="sales">Sales</option>
+          <option value="standards">Standards (1=all, .5=some, 0=miss)</option>
+        </select>
+      </div>
+      <div class="chart-card">
+        <div class="chart-legend"><span><span class="lg-line"></span> This rep</span><span><span class="lg-base"></span> Team avg</span></div>
+        <div id="chart"></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-head"><h2 class="serif">Sales by Channel</h2><span class="hint">orders · sales · avg order — weekly form</span></div>
+      <div id="channels"></div>
+    </div>
+
+    <div class="section">
+      <div class="section-head"><h2 class="serif">Channel Diagnostics</h2><span class="hint">every rate computes automatically from raw counts</span></div>
+      <div class="heat-scroll"><table class="ctable" id="diagnostics"></table></div>
+    </div>
+
+    <div class="section">
+      <div class="section-head"><h2 class="serif">Standards</h2></div>
+      <div id="standards-block"></div>
+    </div>
+
+    <div class="section">
+      <div class="section-head"><h2 class="serif">Check-In Notes</h2></div>
+      <div class="notes" id="notes"></div>
+    </div>
+  </div>
+
+  <div class="foot">
+    <b>What's real vs awaiting:</b> total weekly sales and the standards heatmap come from your Fall sheet (reconciled). The full per-channel stat line — calls, booked, completed, orders, sales, recs, event shifts — reads <b>—</b> until the form is live. Every <b>rate</b> (avg order, closing %, reached %, call→book, avg recs, shift average, orders/day) is then computed from those raw counts — never typed.<br>
+    <b>Going live:</b> in the CONFIG block at the top of this file, paste your Sheet ID and set <b>USE_LIVE_DATA = true</b>. The dashboard reads the Roster + Weekly tabs directly; add/remove a rep by editing a Roster row; form submissions appear on refresh (auto every 60s). Public read-only link — no server, no login.
+  </div>
+</div>
+
+<script>
+/* ═══════════════ CONFIG — flip to go live ═══════════════ */
+const CONFIG = {
+  USE_LIVE_DATA: true,
+  SHEET_ID: "1tFedrarhfz2_iQ7gYEa5Foh08SawwV9MhrtAjENAlfE",
+  ROSTER_TAB: "Roster",
+  WEEKLY_TAB: "Weekly",
+  REFRESH_MS: 60000
+};
+
+/* Five CUTCO sales channels reported on the weekly form. Rename/reorder freely. */
+const CHANNELS = [
+  {key:"demos",     label:"Demos"},
+  {key:"svc",       label:"Service Calls"},
+  {key:"events",    label:"Event Sales"},
+  {key:"marketing", label:"Marketing Sales"},
+  {key:"bizgift",   label:"Biz Gift / RLT"}
+];
+const PERIOD = { title:"Fall 2025", weeks:17 };
+
+/* ═══════════════ SEED DATA (real Fall 2025) ═══════════════
+   sales[] / acct[] are weekly (wk1..wk17). apptsCompleted = real Fall total.
+   standards are DERIVED from acct[] for the seed (1→all, partial→some, 0→miss).
+   the per-channel stat object (calls/booked/done/orders/cpo/recs, shifts, leads)
+   is absent in the seed → all channel & diagnostic cells render "—" until the form is live.
+   joinWeek>1 = mid-campaign joiner (pre-join weeks render "—"). */
+const SEED = [
+ {id:"r01",name:"Arri McDonald",region:"Evansville",manager:"Self-managed",tier:"Path",pay:"4%",goal:"$80k (200k career)",joinWeek:1,apptsCompleted:47,recs:85,
+  sales:[5488,4949,6932,2647,4872,0,9029,7198,5046,6256,1493,3936,6497,9213,2022,null,null],
+  acct:[0,0,1,1,1,1,1,.5,1,.5,1,.5,1,.25,.25,0,0]},
+ {id:"r02",name:"Cameron Couts",region:"E Valley",manager:"Dani Kalil",tier:"Masters",pay:"5%",goal:"—",joinWeek:1,apptsCompleted:18,recs:8,
+  sales:[4180,-286,0,6112,1113,-1747,11565,2864,3152,6750,4405,3563,4079,6315,5207,5041,5710],
+  acct:[1,.5,.5,1,1,.5,1,.5,1,.5,.5,.5,1,.5,.5,0,0]},
+ {id:"r03",name:"Jason Guerrero",region:"Oregon",manager:"Jeremy Bell",tier:"Path",pay:"4%",goal:"$40,000 (silver cup)",joinWeek:1,apptsCompleted:29,recs:20,
+  sales:[4369,4270,2658,2051,480,2372,2989,977,3379,3222,5861,6047,1998,3150,3641,4245,9147],
+  acct:[.25,.25,.25,.25,.25,.25,.25,.25,.25,.25,.25,.25,.25,.25,.25,0,0]},
+ {id:"r04",name:"Daenelmar Mendoza",region:"Oregon",manager:"Jeremy Bell",tier:"Path",pay:"4%",goal:"$40,000",joinWeek:1,apptsCompleted:27,recs:83,
+  sales:[1078,4638,809,2834,223,424,183,-176,1808,4042,737,0,1162,1270,4063,2098,2271],
+  acct:[1,1,1,1,.5,1,1,.5,1,1,.5,.25,.25,.25,1,.5,0]},
+ {id:"r05",name:"Jillene Bouwmeester",region:"Lakeview",manager:"Jake Dougherty",tier:"Path",pay:"$299",goal:"$85k",joinWeek:1,apptsCompleted:null,recs:null,
+  sales:[3633,16020,798,4009,5409,0,3127,3695,408,1252,315,4659,4509,557,1925,798,0],
+  acct:[.5,.5,.5,.5,.5,.5,1,1,1,1,.25,1,1,1,0,0,0]},
+ {id:"r06",name:"Orly Gonzalez",region:"Wilco",manager:"Stacy Campbell",tier:"Path",pay:"$450",goal:"—",joinWeek:1,apptsCompleted:40,recs:1,
+  sales:[8406,1141,0,2494,1761,3910,4161,832,86,1294,1932,399,6116,1401,297,2274.25,1451],
+  acct:[.5,.5,.5,.5,.5,.5,.5,.5,1,.5,1,.5,1,.5,.5,.5,1]},
+ {id:"r07",name:"Matthew Aragon",region:"South West Valley",manager:"Riley Efros",tier:"Path",pay:"4%",goal:"$40k (100k career)",joinWeek:1,apptsCompleted:14,recs:0,
+  sales:[872,46,1015,4176,1152,9149,2479,0,518,262,0,3728,1395,5155,1670,7017,1719],
+  acct:[1,1,1,1,1,1,1,.5,1,1,1,1,1,.25,0,.25,0]},
+ {id:"r08",name:"Tanner House",region:"San Marcos",manager:"Demian Scopp",tier:"Path",pay:"4%",goal:"$1k+ every week",joinWeek:1,apptsCompleted:56,recs:63,
+  sales:[1031,1516,2654,6758,255,-980,405,0,602,428,1671,3342,2182,2938,2636,0,5779],
+  acct:[1,1,1,1,1,.5,.5,.5,.5,.5,.5,1,1,1,1,1,0]},
+ {id:"r09",name:"Kendall Gooch",region:"E Valley",manager:"Dani Kalil",tier:"Path",pay:"4%",goal:"$30k",joinWeek:1,apptsCompleted:8,recs:8,
+  sales:[0,142,1376,669,0,2195,1312,0,0,1112,2817,5880,3489,4161,4216,841,92],
+  acct:[.5,.5,.5,.25,.25,.25,.25,.25,.25,.25,1,.25,.25,.25,.25,.25,0]},
+ {id:"r10",name:"Gianni Griffith",region:"San Marcos",manager:"Demian Scopp",tier:"Path",pay:"4%",goal:"—",joinWeek:1,apptsCompleted:null,recs:null,
+  sales:[2353,0,1158,240,1264,-463,3847,506,1452,1822,1626,5128,0,2577,552,1527,0],
+  acct:[0,.5,.5,.5,.5,.5,.5,.5,.5,0,0,.25,0,0,0,0,0]},
+ {id:"r11",name:"Dami Makuolo",region:"—",manager:"Ben Lee",tier:"Path",pay:"4%",goal:"—",joinWeek:1,apptsCompleted:null,recs:null,
+  sales:[2794,293,0,1053,1875,299,1073,1255,1601,581,1241,1470,1215,1182,4500,1842,3623],
+  acct:[1,.25,.25,.25,.25,.25,.25,.25,.25,.25,.25,.25,.25,.25,.25,.25,1]},
+ {id:"r12",name:"Logan Precord",region:"Lubbock",manager:"Gerardo Luera",tier:"Path",pay:"4%",goal:"$77k (150k career)",joinWeek:1,apptsCompleted:9,recs:28,
+  sales:[0,1002,139,0,3514,1054,1226,-913,1561,0,0,0,3856,3954,501,1683,2730],
+  acct:[1,1,.5,1,1,1,.25,.25,.25,.25,.25,.25,.25,.25,.25,0,0]},
+ {id:"r13",name:"Carter Jolly",region:"Monmouth County",manager:"Greg",tier:"Path",pay:"$450",goal:"—",joinWeek:1,apptsCompleted:8,recs:18,
+  sales:[1543,0,4100,0,0,0,0,648,0,0,2598,0,0,2390,0,0,0],
+  acct:[1,1,1,.5,.5,.5,.5,1,.5,.5,1,.5,.5,1,.25,0,0]},
+ {id:"r14",name:"Seth Beneze",region:"Granbury",manager:"Mackenzie Cooper",tier:"Path",pay:"4%",goal:"$50k",joinWeek:1,apptsCompleted:12,recs:9,
+  sales:[3,0,389,0,769,0,1343,0,751,138,5453,113,1885,613,-665,2474,529],
+  acct:[.5,.5,0,0,.5,1,1,.5,.5,.5,1,.5,.5,.5,.5,.25,0]},
+ {id:"r15",name:"Everett Stone",region:"Plano",manager:"Mack Patterson",tier:"Path",pay:"3%",goal:"$20k",joinWeek:1,apptsCompleted:14,recs:30,
+  sales:[1059,140,1421,294,2236,1250,0,548,0,0,989,0,168,379,0,2073,170],
+  acct:[.5,1,1,.5,1,1,.5,.25,.25,.5,.25,.5,.5,.5,.25,.25,.25]},
+ {id:"r16",name:"Blake McNally",region:"—",manager:"—",tier:"Path",pay:"3%",goal:"—",joinWeek:1,apptsCompleted:null,recs:null,
+  sales:[3268,2516,97,132,1462,55,366,542,0,114,0,0,0,2513,0,0,27],
+  acct:[0,.5,.5,.5,.5,.5,.5,.5,.5,.5,.5,.5,.5,.5,1,0,0]},
+ {id:"r17",name:"Jenelle Jacobs",region:"South Tulsa",manager:"Bronc Berry",tier:"Path",pay:"3%",goal:"150k before Jan 1",joinWeek:1,apptsCompleted:6,recs:12,
+  sales:[383,400,0,80,0,0,0,0,0,1310,0,0,2154,0,757,1104,0],
+  acct:[1,.5,.5,.25,.25,.25,.25,.25,.25,1,.5,.5,0,0,0,0,0]},
+ {id:"r18",name:"Seth Charboneux",region:"Norman",manager:"Tytus Russell",tier:"Path",pay:"3%",goal:"—",joinWeek:1,apptsCompleted:null,recs:null,
+  sales:[0,0,0,0,0,369,0,663,166,80,885,0,0,0,0,0,0],
+  acct:[0,0,1,.25,.25,.25,.25,.25,.25,.25,0,0,0,0,0,0,0]},
+ {id:"r19",name:"Austin Shumsky",region:"Edmond",manager:"Nick Matlack",tier:"Path",pay:"3%",goal:"$30k (10k income)",joinWeek:3,apptsCompleted:5,recs:33,
+  sales:[null,null,766,325,114,785,0,0,0,0,0,0,201,47,534,188,214],
+  acct:[null,null,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0]},
+ {id:"r20",name:"Jovin Villegas",region:"—",manager:"Gerardo Luera",tier:"Path",pay:"3%",goal:"—",joinWeek:1,apptsCompleted:null,recs:null,
+  sales:[0,0,94,77,0,0,145,0,0,0,0,0,915,0,-107,668,1365],
+  acct:[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]},
+ {id:"r21",name:"Kai Lewin",region:"North",manager:"Ethan Campbell",tier:"Path",pay:"4%",goal:"—",joinWeek:1,apptsCompleted:7,recs:5,
+  sales:[0,0,0,0,90,0,0,0,0,0,0,0,0,0,454,0,0],
+  acct:[.5,.5,.25,.25,.25,.25,.25,.25,.25,.25,.25,.25,.25,.25,.25,0,0]},
+ {id:"r22",name:"Savannah Siqueiros",region:"Cedar Falls",manager:"Trenton Cielocha",tier:"Path",pay:"$299",goal:"—",joinWeek:3,apptsCompleted:1,recs:11,
+  sales:[null,null,0,256,0,0,0,0,0,0,0,0,0,0,0,0,0],
+  acct:[null,null,1,.5,.5,.5,.5,.5,.5,.5,1,0,0,0,0,0,0]},
+ {id:"r23",name:"Alex Cada",region:"Irvine",manager:"Tim Lazo",tier:"Path",pay:"4%",goal:"$26k",joinWeek:3,apptsCompleted:null,recs:null,
+  sales:[null,null,0,0,0,370,0,0,0,0,0,0,0,0,0,0,0],
+  acct:[null,null,0,0,0,0,0,null,null,null,null,null,null,null,null,null,null]}
+];
+
+/* ═══════════════ DATA LOAD ═══════════════ */
+let DATA=[];
+async function loadData(){
+  if(!CONFIG.USE_LIVE_DATA){DATA=SEED;setSource(false);return;}
+  try{DATA=await fetchFromSheet();setSource(true);}
+  catch(e){console.warn("Live fetch failed; using seed:",e);DATA=SEED;setSource(false);}
+}
+function setSource(live){
+  document.getElementById("src-dot").className="dot"+(live?"":" seed");
+  document.getElementById("src-label").textContent=live?"Live · refreshes 60s":"Seed data";
+}
+async function fetchFromSheet(){
+  const base=`https://docs.google.com/spreadsheets/d/${CONFIG.SHEET_ID}/gviz/tq?tqx=out:json&headers=1&sheet=`;
+  const roster=await gviz(base+encodeURIComponent(CONFIG.ROSTER_TAB));
+  const weekly=await gviz(base+encodeURIComponent(CONFIG.WEEKLY_TAB));
+  return mergeSheet(roster,weekly);
+}
+async function gviz(url){
+  const txt=await (await fetch(url)).text();
+  const json=JSON.parse(txt.match(/setResponse\(([\s\S]*)\);?$/)[1]);
+  const cols=json.table.cols.map(c=>(c.label||"").trim());
+  return json.table.rows.map(r=>{const o={};r.c.forEach((cell,i)=>o[cols[i]]=cell?cell.v:null);return o;});
+}
+function mergeSheet(roster,weekly){
+  return roster.filter(p=>String(p.Active).toUpperCase()!=="N").map(p=>{
+    const subs=weekly.filter(w=>String(w.RepID)===String(p.RepID));
+    const wk=k=>Array.from({length:PERIOD.weeks},(_,i)=>{const s=subs.find(w=>+w.Week===i+1);return s?(s[k]??null):null;});
+    const chSum=k=>{const v=subs.map(s=>s[k]).filter(x=>x!=null);return v.length?v.reduce((a,b)=>a+(+b||0),0):null;};
+    const cpoCols=["Demos_CPO","SVC_CPO","Event_CPO","Mktg_CPO","BizGift_CPO"];
+    const salesWk=Array.from({length:PERIOD.weeks},(_,i)=>{
+      const s=subs.find(w=>+w.Week===i+1); if(!s)return null;
+      return cpoCols.reduce((t,c)=>t+(+s[c]||0),0);
+    });
+    const g=(ch,f)=>chSum(ch+"_"+f);
+    return {id:p.RepID,name:p.Name,region:p.Region,manager:p.Manager,tier:p.Tier,pay:p.Pay,goal:p.Goal,
+      joinWeek:+p.JoinWeek||1, sales:salesWk, acct:wk("StandardsScore"),
+      stat:{
+        demos:{calls:g("Demos","Calls"),sched:g("Demos","Sched"),done:g("Demos","Done"),orders:g("Demos","Orders"),cpo:g("Demos","CPO"),recs:g("Demos","Recs")},
+        svc:{calls:g("SVC","Calls"),sched:g("SVC","Sched"),done:g("SVC","Done"),orders:g("SVC","Orders"),cpo:g("SVC","CPO"),recs:g("SVC","Recs")},
+        events:{shifts:g("Event","Shifts"),orders:g("Event","Orders"),cpo:g("Event","CPO"),leads:g("Event","Leads")},
+        marketing:{calls:g("Mktg","Calls"),followups:g("Mktg","Followups"),orders:g("Mktg","Orders"),cpo:g("Mktg","CPO")},
+        bizgift:{calls:g("BizGift","Calls"),orders:g("BizGift","Orders"),cpo:g("BizGift","CPO"),recs:g("BizGift","Recs")}
+      }};
+  });
+}
+
+/* ═══════════════ HELPERS ═══════════════ */
+const $=id=>document.getElementById(id);
+const money=n=>n==null?"—":"$"+Math.round(n).toLocaleString();
+const num=n=>n==null?"—":n.toLocaleString();
+const sum=a=>a.filter(x=>x!=null).reduce((p,c)=>p+c,0);
+const activeWeeks=r=>r.sales.filter(x=>x!=null).length;
+const totalSales=r=>sum(r.sales);
+const avgWeek=r=>{const w=activeWeeks(r);return w?Math.round(totalSales(r)/w):0;};
+/* per-channel stat accessors (null when no form data) */
+const st=(r,k)=>r.stat?r.stat[k]:null;
+const chSales=(r,k)=>{const s=st(r,k);return s&&s.cpo!=null?s.cpo:null;};
+const chOrders=(r,k)=>{const s=st(r,k);return s&&s.orders!=null?s.orders:null;};
+const ratio=(a,b)=>(a!=null&&b)?a/b:null;             // safe divide, null if no denominator
+const avgOrder=(sales,orders)=>{const v=ratio(sales,orders);return v==null?null:Math.round(v);};
+const totalOrders=r=>{if(!r.stat)return null;const v=CHANNELS.map(c=>chOrders(r,c.key)).filter(x=>x!=null);return v.length?v.reduce((a,b)=>a+b,0):null;};
+const shiftAverage=r=>{const e=st(r,"events");return e?avgOrder(e.cpo,e.shifts):null;};
+const ordersPerDay=r=>{const e=st(r,"events");const v=ratio(e&&e.orders,e&&e.shifts);return v==null?null:+v.toFixed(1);};
+const closingPct=(r,k)=>{const s=st(r,k);const v=ratio(s&&s.orders,s&&s.done);return v==null?null:Math.round(v*100);};
+const reachedPct=(r,k)=>{const s=st(r,k);const v=ratio(s&&s.done,s&&s.sched);return v==null?null:Math.round(v*100);};
+const callToBook=(r,k)=>{const s=st(r,k);const v=ratio(s&&s.calls,s&&s.sched);return v==null?null:+v.toFixed(1);};
+const avgRecs=(r,k)=>{const s=st(r,k);const v=ratio(s&&s.recs,s&&s.done);return v==null?null:+v.toFixed(1);};
+function stStatus(v){return v==null?null:v>=0.5?"all":v>0?"some":"miss";}
+function stMetPct(r){const a=r.acct.filter(x=>x!=null);if(!a.length)return null;return a.filter(x=>x>=0.5).length/a.length;}
+function teamAvgWeekly(metricArrFn){
+  return Array.from({length:PERIOD.weeks},(_,i)=>{
+    const vals=DATA.map(r=>metricArrFn(r)[i]).filter(x=>x!=null);
+    return vals.length?vals.reduce((a,b)=>a+b,0)/vals.length:0;});
+}
+
+function setView(v){
+  $("view-team").classList.toggle("hidden",v!=="team");
+  $("view-rep").classList.toggle("hidden",v!=="rep");
+  $("btn-team").classList.toggle("on",v==="team");
+  $("btn-rep").classList.toggle("on",v==="rep");
+}
+
+/* ═══════════════ TEAM ═══════════════ */
+function renderPeriod(){
+  $("period-title").textContent=PERIOD.title;
+  $("period-frame").innerHTML=`${DATA.length} mentees · weeks 1–${PERIOD.weeks} · <b>same-window comparisons only</b>`;
+}
+function renderKPIs(){
+  const totSales=sum(DATA.map(totalSales));
+  const totAppt=sum(DATA.map(r=>r.apptsCompleted));
+  const active=DATA.filter(r=>activeWeeks(r)>0).length;
+  const allW=sum(DATA.map(r=>r.acct.filter(x=>x!=null&&x>=0.5).length));
+  const actW=sum(DATA.map(r=>r.acct.filter(x=>x!=null).length));
+  const stPct=actW?Math.round(allW/actW*100):0;
+  const atRisk=DATA.filter(r=>{const p=stMetPct(r);return p!=null&&p<0.45&&r.acct.filter(x=>x!=null).length>4;}).length;
+  const tiles=[
+    {lab:"Total sales",val:money(totSales),meta:PERIOD.title},
+    {lab:"Appts completed",val:num(totAppt),meta:"campaign total"},
+    {lab:"Standards met",val:stPct+"%",meta:"of weeks, all-met"},
+    {lab:"At-risk",val:atRisk,meta:"below 45% standards",alert:atRisk>0},
+    {lab:"Active mentees",val:active,meta:"with data this period"}
+  ];
+  $("kpis").innerHTML=tiles.map(t=>`<div class="kpi${t.alert?' alert':''}"><div class="lab">${t.lab}</div><div class="val">${t.val}</div><div class="meta">${t.meta}</div></div>`).join("");
+}
+function renderLeaderboard(){
+  const m=$("lb-metric").value;
+  const get={sales:totalSales,apptsCompleted:r=>r.apptsCompleted??0,standards:r=>stMetPct(r)??0,avgWeek:avgWeek}[m];
+  const fmt={sales:money,apptsCompleted:num,standards:v=>Math.round(v*100)+"%",avgWeek:money}[m];
+  const rows=[...DATA].sort((a,b)=>get(b)-get(a));
+  const max=Math.max(...rows.map(get),0.0001);
+  let html=`<div class="lb-row h"><div>#</div><div>Mentee</div><div></div><div style="text-align:right">${$("lb-metric").selectedOptions[0].text}</div></div>`;
+  html+=rows.map((r,i)=>`<div class="lb-row"><div class="lb-rank ${i<3?'top':''}">${i+1}</div><div class="lb-name">${r.name}<span class="tag">${r.tier}</span></div><div class="lb-bar-wrap"><div class="lb-bar" style="width:${Math.max(get(r)/max*100,0)}%"></div></div><div class="lb-val">${fmt(get(r))}</div></div>`).join("");
+  $("leaderboard").innerHTML=html;
+}
+function renderHeat(){
+  const rows=[...DATA].sort((a,b)=>totalSales(b)-totalSales(a));
+  let head=`<thead><tr><th class="name">Mentee</th>`;
+  for(let i=1;i<=PERIOD.weeks;i++)head+=`<th>${i}</th>`;
+  head+=`<th class="pct">All%</th></tr></thead>`;
+  let body="<tbody>";
+  rows.forEach(r=>{
+    body+=`<tr><td class="name">${r.name}</td>`;
+    r.acct.forEach(v=>{const s=stStatus(v)||"none";body+=`<td class="cell"><div class="box ${s}"></div></td>`;});
+    const p=stMetPct(r);body+=`<td class="pct">${p==null?"—":Math.round(p*100)+"%"}</td></tr>`;
+  });
+  body+="</tbody>";
+  $("heat").innerHTML=head+body;
+}
+function renderMix(){
+  $("mix").innerHTML=CHANNELS.map(c=>`<div class="mix-row"><div class="mix-lab">${c.label}</div><div class="mix-track"><div class="mix-fill" style="width:0%"></div></div><div class="mix-val await">awaiting form</div></div>`).join("");
+}
+
+/* ═══════════════ REP ═══════════════ */
+function fillRepSelect(){
+  $("rep-select").innerHTML=[...DATA].sort((a,b)=>a.name.localeCompare(b.name)).map(r=>`<option value="${r.id}">${r.name}</option>`).join("");
+}
+const currentRep=()=>DATA.find(r=>r.id===$("rep-select").value);
+
+function renderRepContext(r){
+  const chips=[
+    `<span class="chip tier"><b>${r.tier}</b> · ${r.pay}</span>`,
+    `<span class="chip">Region <b>${r.region}</b></span>`,
+    `<span class="chip">Manager <b>${r.manager}</b></span>`,
+    `<span class="chip">Goal <b>${r.goal}</b></span>`
+  ];
+  if(r.joinWeek>1)chips.push(`<span class="chip new">Joined week ${r.joinWeek} · partial campaign</span>`);
+  $("rep-context").innerHTML=chips.join("");
+}
+function renderHero(r){
+  const w=activeWeeks(r), p=stMetPct(r);
+  const oAvg=avgOrder(totalSales(r),totalOrders(r)), sAvg=shiftAverage(r);
+  const cards=[
+    {big:true,lab:"Total sales · "+PERIOD.title,val:money(totalSales(r)),meta:`${w} active weeks · avg ${money(avgWeek(r))}/wk`},
+    {lab:"Standards met",val:p==null?"—":Math.round(p*100)+"%",meta:"weeks all-met"},
+    {lab:"Avg order",val:oAvg==null?"—":money(oAvg),meta:oAvg==null?"awaiting form":"sales ÷ orders",await:oAvg==null},
+    {lab:"Shift average",val:sAvg==null?"—":money(sAvg),meta:sAvg==null?"awaiting form":"event sales ÷ shifts",await:sAvg==null}
+  ];
+  $("rep-hero").innerHTML=cards.map(c=>c.big?
+    `<div class="hero-big"><div class="lab">${c.lab}</div><div class="val">${c.val}</div><div class="meta">${c.meta}</div></div>`:
+    `<div class="mini"><div class="lab">${c.lab}</div><div class="val${c.await?' muted':''}">${c.val}</div><div class="meta${c.await?' await':''}">${c.meta}</div></div>`).join("");
+}
+function renderSummary(r){
+  const good=[],warn=[];
+  const avg=avgWeek(r), teamAvg=sum(DATA.map(avgWeek))/DATA.length;
+  const p=stMetPct(r), w=r.acct.filter(x=>x!=null).length;
+  const rank=[...DATA].sort((a,b)=>totalSales(b)-totalSales(a)).findIndex(x=>x.id===r.id)+1;
+  if(rank<=5)good.push(`Top ${rank} in total sales across ${DATA.length} mentees.`);
+  if(avg>teamAvg*1.15)good.push(`Weekly pace (${money(avg)}) runs ${Math.round((avg/teamAvg-1)*100)}% above team average.`);
+  if(p!=null&&p>=0.6)good.push(`Holds standards — all-met in ${Math.round(p*100)}% of weeks.`);
+  const compA=(r.apptsCompleted!=null)?r.apptsCompleted:(()=>{const d=st(r,"demos"),s=st(r,"svc");const v=[d&&d.done,s&&s.done].filter(x=>x!=null);return v.length?v.reduce((a,b)=>a+b,0):null;})();
+  if(compA!=null&&compA>=25)good.push(`High activity: ${compA} appointments completed.`);
+  if(p!=null&&p<0.45&&w>4)warn.push(`Standards slipping — all-met only ${Math.round(p*100)}% of weeks.`);
+  if(avg<teamAvg*0.6)warn.push(`Weekly pace (${money(avg)}) well below team average — coaching candidate.`);
+  const recent=r.sales.slice(-5,-1).filter(x=>x!=null);
+  if(recent.length>=3&&sum(recent)/recent.length<avg*0.7)warn.push(`Recent weeks trending below their own average.`);
+  if(r.joinWeek>1)warn.push(`Mid-campaign joiner (week ${r.joinWeek}) — totals not comparable to full-campaign reps.`);
+  $("sum-good").innerHTML=good.length?good.slice(0,4).map(t=>`<div class="sum-item"><span class="pip good"></span><span>${t}</span></div>`).join(""):`<div class="sum-empty">No standout strengths flagged this period.</div>`;
+  $("sum-warn").innerHTML=warn.length?warn.slice(0,3).map(t=>`<div class="sum-item"><span class="pip warn"></span><span>${t}</span></div>`).join(""):`<div class="sum-empty">Nothing flagged — steady.</div>`;
+}
+function renderChart(){
+  const r=currentRep(), metric=$("chart-metric").value;
+  const series = metric==="sales"? r.sales.map(x=>x) : r.acct.map(x=>x);
+  const base = metric==="sales"? teamAvgWeekly(x=>x.sales) : teamAvgWeekly(x=>x.acct);
+  const W=940,H=300,padL=46,padR=14,padT=14,padB=28,n=PERIOD.weeks;
+  const allVals=[...series.filter(x=>x!=null),...base];
+  const maxV=Math.max(...allVals, metric==="standards"?1:1), minV=Math.min(...allVals,0);
+  const x=i=>padL+(W-padL-padR)*(i/(n-1));
+  const y=v=>padT+(H-padT-padB)*(1-(v-minV)/(maxV-minV||1));
+  const fmtY=v=>metric==="sales"?"$"+(v>=1000?(v/1000).toFixed(0)+"k":Math.round(v)):v.toFixed(1);
+  let grid="";for(let i=0;i<=4;i++){const v=minV+(maxV-minV)*i/4,yy=y(v);
+    grid+=`<line x1="${padL}" y1="${yy}" x2="${W-padR}" y2="${yy}" stroke="var(--line-soft)"/><text x="${padL-8}" y="${yy+4}" text-anchor="end" font-size="10" fill="var(--ink-soft)" font-family="Geist Mono">${fmtY(v)}</text>`;}
+  let xlab="";for(let i=0;i<n;i+=2)xlab+=`<text x="${x(i)}" y="${H-8}" text-anchor="middle" font-size="9.5" fill="var(--ink-soft)" font-family="Geist Mono">w${i+1}</text>`;
+  const baseLine=base.map((v,i)=>`${i?'L':'M'}${x(i)},${y(v)}`).join(" ");
+  let repPath="",started=false,dots="";
+  series.forEach((v,i)=>{if(v==null){started=false;return;}repPath+=(started?"L":"M")+x(i)+","+y(v)+" ";started=true;dots+=`<circle cx="${x(i)}" cy="${y(v)}" r="3" fill="var(--accent)"/>`;});
+  $("chart").innerHTML=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="weekly trend">${grid}<path d="${baseLine}" fill="none" stroke="var(--ink-soft)" stroke-width="1.6" stroke-dasharray="5 4" opacity=".55"/><path d="${repPath}" fill="none" stroke="var(--accent)" stroke-width="2.4" stroke-linejoin="round"/>${dots}${xlab}</svg>`;
+}
+function renderChannels(r){
+  const awc=`<span class="aw">—</span>`;
+  const rows=CHANNELS.map(c=>{
+    const s=chSales(r,c.key), o=chOrders(r,c.key), a=avgOrder(s,o);
+    const evt=c.key==="events"?' <span class="evt">+shifts</span>':'';
+    return `<tr><td class="cn">${c.label}${evt}</td>`+
+      `<td>${o==null?awc:num(o)}</td><td>${s==null?awc:money(s)}</td><td>${a==null?awc:money(a)}</td></tr>`;
+  }).join("");
+  const tot=totalSales(r), tord=totalOrders(r), tavg=avgOrder(tot,tord);
+  $("channels").innerHTML=`<table class="ctable">
+    <thead><tr><th>Channel</th><th>Orders</th><th>Sales</th><th>Avg order</th></tr></thead>
+    <tbody>${rows}</tbody>
+    <tfoot><tr><td class="cn">Total</td><td>${tord==null?awc:num(tord)}</td><td>${money(tot)}</td><td>${tavg==null?awc:money(tavg)}</td></tr></tfoot>
+  </table>`;
+}
+/* Channel Diagnostics — mirrors the old Stats-tab summary box (no upserve). */
+function renderDiagnostics(r){
+  const awc=`<span class="aw">—</span>`, na=`<span style="color:var(--line)">·</span>`;
+  const cols=CHANNELS; // demos, svc, events, marketing, bizgift
+  // metric def: label, fn(r,key)->value|null, applicable(key), fmt
+  const pct=v=>v==null?null:v+"%";
+  const metrics=[
+    {lab:"Calls made", apply:k=>k!=="events", fn:(r,k)=>{const s=st(r,k);return s&&s.calls!=null?s.calls:null;}, fmt:num},
+    {lab:"Booked",     apply:k=>["demos","svc"].includes(k), fn:(r,k)=>{const s=st(r,k);return s&&s.sched!=null?s.sched:null;}, fmt:num},
+    {lab:"Completed",  apply:k=>["demos","svc"].includes(k), fn:(r,k)=>{const s=st(r,k);return s&&s.done!=null?s.done:null;}, fmt:num},
+    {lab:"Reached %",  apply:k=>["demos","svc"].includes(k), fn:(r,k)=>reachedPct(r,k), fmt:pct},
+    {lab:"Closing %",  apply:k=>["demos","svc"].includes(k), fn:(r,k)=>closingPct(r,k), fmt:pct},
+    {lab:"Call→book",  apply:k=>["demos","svc","marketing"].includes(k), fn:(r,k)=>callToBook(r,k), fmt:v=>v==null?null:v+":1"},
+    {lab:"Avg recs",   apply:k=>["demos","svc","bizgift"].includes(k), fn:(r,k)=>avgRecs(r,k), fmt:num},
+    {lab:"Shift avg",  apply:k=>k==="events", fn:(r,k)=>shiftAverage(r), fmt:money},
+    {lab:"Orders/day", apply:k=>k==="events", fn:(r,k)=>ordersPerDay(r), fmt:num},
+    {lab:"Follow-ups", apply:k=>k==="marketing", fn:(r,k)=>{const s=st(r,k);return s&&s.followups!=null?s.followups:null;}, fmt:num}
+  ];
+  let head=`<thead><tr><th>Metric</th>`+cols.map(c=>`<th>${c.label}</th>`).join("")+`</tr></thead>`;
+  let body="<tbody>";
+  metrics.forEach(m=>{
+    body+=`<tr><td class="cn">${m.lab}</td>`;
+    cols.forEach(c=>{
+      if(!m.apply(c.key)){body+=`<td>${na}</td>`;return;}
+      const v=m.fn(r,c.key); body+=`<td>${v==null?awc:m.fmt(v)}</td>`;
+    });
+    body+="</tr>";
+  });
+  body+="</tbody>";
+  $("diagnostics").innerHTML=head+body;
+}
+function renderStandards(r){
+  const counts={all:0,some:0,miss:0};
+  r.acct.forEach(v=>{const s=stStatus(v);if(s)counts[s]++;});
+  // current streak of "all" from the latest non-null week backward
+  let streak=0;for(let i=r.acct.length-1;i>=0;i--){const s=stStatus(r.acct[i]);if(s==null)continue;if(s==="all")streak++;else break;}
+  const p=stMetPct(r);
+  const strip=r.acct.map((v,i)=>{const s=stStatus(v)||"none";const col=s==="all"?"var(--good)":s==="some"?"var(--warn)":s==="miss"?"var(--bad)":"var(--line-soft)";return `<div class="box" style="background:${col}" title="Week ${i+1}: ${s}">${i+1}</div>`;}).join("");
+  $("standards-block").innerHTML=`
+    <div class="grid3" style="margin-bottom:16px">
+      <div class="bucket"><div class="lab">All-met rate</div><div class="val">${p==null?"—":Math.round(p*100)+"%"}</div><div class="meta">${counts.all} of ${counts.all+counts.some+counts.miss} weeks</div></div>
+      <div class="bucket"><div class="lab">Current streak</div><div class="val">${streak}</div><div class="meta">consecutive all-met weeks</div></div>
+      <div class="bucket"><div class="lab">Missed weeks</div><div class="val">${counts.miss}</div><div class="meta">${counts.some} partial</div></div>
+    </div>
+    <div class="strip">${strip}</div>`;
+}
+function renderNotes(){
+  $("notes").innerHTML=`<div class="note"><div class="wk">Awaiting weekly form</div><div class="row">Each submission's <b>win</b>, <b>obstacle</b>, and <b>next-week commitment</b> will list here, newest first — so a coach preps a call in 10 seconds.</div></div>`;
+}
+function renderRep(){
+  const r=currentRep();
+  renderRepContext(r);renderHero(r);renderSummary(r);renderChart();renderChannels(r);renderDiagnostics(r);renderStandards(r);renderNotes();
+}
+
+/* ═══════════════ INIT ═══════════════ */
+async function init(){
+  await loadData();
+  renderPeriod();renderKPIs();renderLeaderboard();renderHeat();renderMix();
+  fillRepSelect();renderRep();
+  if(CONFIG.USE_LIVE_DATA)setInterval(async()=>{await loadData();renderKPIs();renderLeaderboard();renderHeat();renderMix();renderRep();},CONFIG.REFRESH_MS);
+}
+init();
+</script>
+</body>
+</html>
