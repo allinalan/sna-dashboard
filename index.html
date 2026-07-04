@@ -68,6 +68,19 @@
   .lb-bar{height:100%;background:var(--accent);border-radius:99px}
   .lb-val{font-size:13px;font-weight:600;text-align:right;font-variant-numeric:tabular-nums}
 
+  /* check-ins */
+  .ci-lead{font-size:12px;color:var(--ink-soft);margin-bottom:14px}
+  .ci-lead b{color:var(--ink)}
+  .ci-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:8px}
+  .ci-item{display:flex;align-items:center;gap:9px;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 13px;font-size:12.5px;font-weight:500}
+  .ci-item .st{width:8px;height:8px;border-radius:50%;flex:none}
+  .ci-item.in .st{background:var(--good)}
+  .ci-item.out .st{background:var(--bad)}
+  .ci-item.out{background:var(--bad-bg);border-color:#E4C4B6}
+  .ci-item .lab2{margin-left:auto;font-size:10px;letter-spacing:.06em;text-transform:uppercase;font-weight:600}
+  .ci-item.in .lab2{color:var(--good)}
+  .ci-item.out .lab2{color:var(--bad)}
+
   /* heatmap */
   .heat-legend{display:flex;gap:16px;font-size:11px;color:var(--ink-soft);margin-bottom:14px;flex-wrap:wrap}
   .heat-legend span{display:flex;align-items:center;gap:6px}
@@ -200,6 +213,15 @@
     </div>
 
     <div class="kpis" id="kpis"></div>
+
+    <div class="section hidden" id="ci-section">
+      <div class="section-head">
+        <h2 class="serif">This Week's Check-Ins</h2>
+        <span class="hint">for coaches — reminders go out Mon &amp; Tue</span>
+      </div>
+      <div class="ci-lead" id="ci-lead"></div>
+      <div class="ci-grid" id="ci-grid"></div>
+    </div>
 
     <div class="section">
       <div class="section-head">
@@ -405,10 +427,12 @@ function setSource(live){
   document.getElementById("src-dot").className="dot"+(live?"":" seed");
   document.getElementById("src-label").textContent=live?"Live · refreshes 60s":"Seed data";
 }
+let WEEKLY_RAW=[];
 async function fetchFromSheet(){
   const base=`https://docs.google.com/spreadsheets/d/${CONFIG.SHEET_ID}/gviz/tq?tqx=out:json&headers=1&sheet=`;
   const roster=await gviz(base+encodeURIComponent(CONFIG.ROSTER_TAB));
   const weekly=await gviz(base+encodeURIComponent(CONFIG.WEEKLY_TAB));
+  WEEKLY_RAW=weekly;
   return mergeSheet(roster,weekly);
 }
 async function gviz(url){
@@ -524,6 +548,36 @@ function renderHeat(){
   body+="</tbody>";
   $("heat").innerHTML=head+body;
 }
+/* ── This Week's Check-Ins (coach view) ──
+   "submitted" = a Weekly row with a Timestamp on/after the most recent
+   Wednesday 00:00 — same window the Mon/Tue reminder texts use. */
+function ciWindowStart(){const d=new Date();d.setHours(0,0,0,0);while(d.getDay()!==3)d.setDate(d.getDate()-1);return d;}
+function ciParseDate(v){
+  if(v==null)return null;
+  if(v instanceof Date)return v;
+  const m=String(v).match(/Date\((\d+),(\d+),(\d+)(?:,(\d+),(\d+),(\d+))?\)/);
+  if(m)return new Date(+m[1],+m[2],+m[3],+(m[4]||0),+(m[5]||0),+(m[6]||0));
+  const d=new Date(v);return isNaN(d)?null:d;
+}
+function renderCheckins(){
+  const sec=$("ci-section");
+  if(!CONFIG.USE_LIVE_DATA||!DATA.length){sec.classList.add("hidden");return;}
+  sec.classList.remove("hidden");
+  const ws=ciWindowStart(), done=new Set();
+  WEEKLY_RAW.forEach(w=>{const t=ciParseDate(w.Timestamp);if(t&&t>=ws)done.add(String(w.RepID));});
+  const rows=[...DATA].sort((a,b)=>{
+    const d=(done.has(String(a.id))?1:0)-(done.has(String(b.id))?1:0);
+    return d!==0?d:a.name.localeCompare(b.name);
+  });
+  const n=rows.filter(r=>done.has(String(r.id))).length;
+  const wsLab=ws.toLocaleDateString(undefined,{weekday:'short',month:'short',day:'numeric'});
+  $("ci-lead").innerHTML=`<b>${n} of ${rows.length}</b> mentees have submitted since ${wsLab}.`;
+  $("ci-grid").innerHTML=rows.map(r=>{
+    const ok=done.has(String(r.id));
+    return `<div class="ci-item ${ok?'in':'out'}"><span class="st"></span>${r.name}<span class="lab2">${ok?'Submitted':'Not yet'}</span></div>`;
+  }).join("");
+}
+
 function renderMix(){
   $("mix").innerHTML=CHANNELS.map(c=>`<div class="mix-row"><div class="mix-lab">${c.label}</div><div class="mix-track"><div class="mix-fill" style="width:0%"></div></div><div class="mix-val await">awaiting form</div></div>`).join("");
 }
@@ -665,9 +719,9 @@ function renderRep(){
 /* ═══════════════ INIT ═══════════════ */
 async function init(){
   await loadData();
-  renderPeriod();renderKPIs();renderLeaderboard();renderHeat();renderMix();
+  renderPeriod();renderKPIs();renderCheckins();renderLeaderboard();renderHeat();renderMix();
   fillRepSelect();renderRep();
-  if(CONFIG.USE_LIVE_DATA)setInterval(async()=>{await loadData();renderKPIs();renderLeaderboard();renderHeat();renderMix();renderRep();},CONFIG.REFRESH_MS);
+  if(CONFIG.USE_LIVE_DATA)setInterval(async()=>{await loadData();renderKPIs();renderCheckins();renderLeaderboard();renderHeat();renderMix();renderRep();},CONFIG.REFRESH_MS);
 }
 init();
 </script>
