@@ -235,10 +235,13 @@
 
   <!-- ════ TEAM ════ -->
   <div id="view-team">
-    <div class="period">
-      <div class="eyebrow">Campaign Snapshot</div>
-      <div class="big serif" id="period-title">Fall 2025</div>
-      <div class="frame" id="period-frame"></div>
+    <div class="period" style="display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap">
+      <div>
+        <div class="eyebrow">Campaign Snapshot</div>
+        <div class="big serif" id="period-title">Summer 2026</div>
+        <div class="frame" id="period-frame"></div>
+      </div>
+      <select id="campaign-select" onchange="onCampaignChange()" title="View any campaign — history is kept forever"></select>
     </div>
 
     <div class="kpis" id="kpis"></div>
@@ -367,7 +370,16 @@ const CHANNELS = [
   {key:"marketing", label:"Marketing Sales"},
   {key:"bizgift",   label:"Biz Gift / RLT"}
 ];
-const PERIOD = { title:"Summer 2026", weeks:18 };
+const PERIOD = { weeks:18 };  // every campaign runs weeks 1–18
+
+/* ── Campaigns: Spring (I) Jan–Apr · Summer (II) May–Aug · Fall (III) Sep–Dec.
+   Every Weekly row is stamped with its campaign at submit time, so week
+   numbers can restart at 1 each campaign without colliding. History is
+   kept forever — pick any past campaign from the selector. ── */
+const ROMAN = {Spring:"I", Summer:"II", Fall:"III"};
+const seasonOf = d => d.getMonth()<=3 ? "Spring" : d.getMonth()<=7 ? "Summer" : "Fall";
+const currentCampaign = () => { const d=new Date(); return seasonOf(d)+" "+d.getFullYear(); };
+let SELECTED_CAMPAIGN = currentCampaign();
 
 /* ═══════════════ SEED DATA (real Fall 2025) ═══════════════
    sales[] / acct[] are weekly (wk1..wk17). apptsCompleted = real Fall total.
@@ -448,24 +460,54 @@ const SEED = [
 ];
 
 /* ═══════════════ DATA LOAD ═══════════════ */
-let DATA=[];
+let DATA=[], ROSTER_RAW=[];
 async function loadData(){
   if(!CONFIG.USE_LIVE_DATA){DATA=SEED;setSource(false);return;}
-  try{DATA=await fetchFromSheet();setSource(true);}
+  try{
+    const base=`https://docs.google.com/spreadsheets/d/${CONFIG.SHEET_ID}/gviz/tq?tqx=out:json&headers=1&sheet=`;
+    ROSTER_RAW=await gviz(base+encodeURIComponent(CONFIG.ROSTER_TAB));
+    WEEKLY_RAW=await gviz(base+encodeURIComponent(CONFIG.WEEKLY_TAB));
+    applyCampaign();
+    setSource(true);
+  }
   catch(e){console.warn("Live fetch failed; using seed:",e);DATA=SEED;setSource(false);}
+}
+/* rows are stamped with their campaign at submit time; unstamped rows fall back to the timestamp */
+function rowCampaign(w){
+  if(w.Campaign)return String(w.Campaign).trim();
+  const t=ciParseDate(w.Timestamp);
+  return t?seasonOf(t)+" "+t.getFullYear():currentCampaign();
+}
+function applyCampaign(){
+  DATA=mergeSheet(ROSTER_RAW, WEEKLY_RAW.filter(w=>rowCampaign(w)===SELECTED_CAMPAIGN));
+}
+function campaignOptions(){
+  const set=new Set([currentCampaign()]);
+  WEEKLY_RAW.forEach(w=>set.add(rowCampaign(w)));
+  const ord={Spring:0,Summer:1,Fall:2};
+  return [...set].sort((a,b)=>{
+    const [sa,ya]=a.split(" "),[sb,yb]=b.split(" ");
+    return (+yb-+ya)||(ord[sb]-ord[sa]);
+  });
+}
+function renderCampaignSelect(){
+  const el=$("campaign-select");
+  el.innerHTML=campaignOptions().map(c=>{
+    const r=ROMAN[c.split(" ")[0]]||"";
+    return `<option value="${c}" ${c===SELECTED_CAMPAIGN?"selected":""}>${c} · Campaign ${r}</option>`;
+  }).join("");
+}
+function onCampaignChange(){
+  SELECTED_CAMPAIGN=$("campaign-select").value;
+  applyCampaign();
+  renderPeriod();renderKPIs();renderCheckins();renderLeaderboard();renderHeat();renderMix();
+  fillRepSelect();renderRep();
 }
 function setSource(live){
   document.getElementById("src-dot").className="dot"+(live?"":" seed");
   document.getElementById("src-label").textContent=live?"Live · refreshes 60s":"Seed data";
 }
 let WEEKLY_RAW=[];
-async function fetchFromSheet(){
-  const base=`https://docs.google.com/spreadsheets/d/${CONFIG.SHEET_ID}/gviz/tq?tqx=out:json&headers=1&sheet=`;
-  const roster=await gviz(base+encodeURIComponent(CONFIG.ROSTER_TAB));
-  const weekly=await gviz(base+encodeURIComponent(CONFIG.WEEKLY_TAB));
-  WEEKLY_RAW=weekly;
-  return mergeSheet(roster,weekly);
-}
 async function gviz(url){
   const txt=await (await fetch(url)).text();
   const json=JSON.parse(txt.match(/setResponse\(([\s\S]*)\);?$/)[1]);
@@ -535,8 +577,9 @@ function setView(v){
 
 /* ═══════════════ TEAM ═══════════════ */
 function renderPeriod(){
-  $("period-title").textContent=PERIOD.title;
-  $("period-frame").innerHTML=`${DATA.length} mentees · weeks 1–${PERIOD.weeks} · <b>same-window comparisons only</b>`;
+  $("period-title").textContent=SELECTED_CAMPAIGN;
+  const r=ROMAN[SELECTED_CAMPAIGN.split(" ")[0]]||"";
+  $("period-frame").innerHTML=`Campaign ${r} · ${DATA.length} mentees · weeks 1–${PERIOD.weeks} · <b>same-window comparisons only</b>`;
 }
 function renderKPIs(){
   const totSales=sum(DATA.map(totalSales));
@@ -547,7 +590,7 @@ function renderKPIs(){
   const stPct=actW?Math.round(allW/actW*100):0;
   const atRisk=DATA.filter(r=>{const p=stMetPct(r);return p!=null&&p<0.45&&r.acct.filter(x=>x!=null).length>4;}).length;
   const tiles=[
-    {lab:"Total sales",val:money(totSales),meta:PERIOD.title},
+    {lab:"Total sales",val:money(totSales),meta:SELECTED_CAMPAIGN},
     {lab:"Appts completed",val:num(totAppt),meta:"campaign total"},
     {lab:"Standards met",val:stPct+"%",meta:"of weeks, all-met"},
     {lab:"At-risk",val:atRisk,meta:"below 45% standards",alert:atRisk>0},
@@ -592,7 +635,8 @@ function ciParseDate(v){
 }
 function renderCheckins(){
   const sec=$("ci-section");
-  if(!CONFIG.USE_LIVE_DATA||!DATA.length){sec.classList.add("hidden");return;}
+  // operational view — only meaningful for the campaign happening right now
+  if(!CONFIG.USE_LIVE_DATA||!DATA.length||SELECTED_CAMPAIGN!==currentCampaign()){sec.classList.add("hidden");return;}
   sec.classList.remove("hidden");
   const ws=ciWindowStart(), done=new Set();
   WEEKLY_RAW.forEach(w=>{const t=ciParseDate(w.Timestamp);if(t&&t>=ws)done.add(String(w.RepID));});
@@ -635,7 +679,7 @@ function renderHero(r){
   const w=activeWeeks(r), p=stMetPct(r);
   const oAvg=avgOrder(totalSales(r),totalOrders(r)), sAvg=shiftAverage(r);
   const cards=[
-    {big:true,lab:"Total sales · "+PERIOD.title,val:money(totalSales(r)),meta:`${w} active weeks · avg ${money(avgWeek(r))}/wk`},
+    {big:true,lab:"Total sales · "+SELECTED_CAMPAIGN,val:money(totalSales(r)),meta:`${w} active weeks · avg ${money(avgWeek(r))}/wk`},
     {lab:"Standards met",val:p==null?"—":Math.round(p*100)+"%",meta:"weeks all-met"},
     {lab:"Avg order",val:oAvg==null?"—":money(oAvg),meta:oAvg==null?"awaiting form":"sales ÷ orders",await:oAvg==null},
     {lab:"Shift average",val:sAvg==null?"—":money(sAvg),meta:sAvg==null?"awaiting form":"event sales ÷ shifts",await:sAvg==null}
@@ -752,9 +796,10 @@ function renderRep(){
 /* ═══════════════ INIT ═══════════════ */
 async function init(){
   await loadData();
+  renderCampaignSelect();
   renderPeriod();renderKPIs();renderCheckins();renderLeaderboard();renderHeat();renderMix();
   fillRepSelect();renderRep();
-  if(CONFIG.USE_LIVE_DATA)setInterval(async()=>{await loadData();renderKPIs();renderCheckins();renderLeaderboard();renderHeat();renderMix();renderRep();},CONFIG.REFRESH_MS);
+  if(CONFIG.USE_LIVE_DATA)setInterval(async()=>{await loadData();renderCampaignSelect();renderPeriod();renderKPIs();renderCheckins();renderLeaderboard();renderHeat();renderMix();renderRep();},CONFIG.REFRESH_MS);
 }
 init();
 </script>
