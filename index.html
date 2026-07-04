@@ -4,9 +4,15 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Sharp Ninja Academy — Mentee Dashboard</title>
+<meta name="description" content="Sharp Ninja Academy mentee performance — weekly check-ins, standards, and sales by channel. Live coach dashboard.">
+<meta name="theme-color" content="#F7F5F0">
+<meta property="og:title" content="Sharp Ninja Academy — Mentee Dashboard">
+<meta property="og:description" content="Weekly check-ins, standards, and sales by channel — live coach view.">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='29' fill='%23F7F5F0' stroke='%2316140F' stroke-width='4'/%3E%3Ctext x='32' y='43' font-size='30' text-anchor='middle' font-family='Hiragino Mincho ProN,Yu Mincho,serif' fill='%2316140F'%3E忍%3C/text%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   :root{
     --paper:#F7F5F0; --ink:#16140F; --ink-soft:#5A554B;
@@ -19,7 +25,11 @@
   }
   *{box-sizing:border-box;margin:0;padding:0}
   html{-webkit-text-size-adjust:100%}
-  body{background:var(--paper);color:var(--ink);font-family:"Geist Mono",ui-monospace,monospace;line-height:1.5;-webkit-font-smoothing:antialiased;padding:0 0 80px}
+  body{background:var(--paper);color:var(--ink);font-family:"Geist",-apple-system,"Helvetica Neue",sans-serif;line-height:1.5;-webkit-font-smoothing:antialiased;padding:0 0 80px}
+  .mono{font-family:"Geist Mono",ui-monospace,monospace}
+  ::selection{background:var(--accent-soft)}
+  a{color:var(--accent)}
+  :focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:4px}
   .wrap{max-width:1100px;margin:0 auto;padding:0 24px}
   .serif{font-family:"Fraunces",Georgia,serif}
   .eyebrow{font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--ink-soft);font-weight:500}
@@ -171,6 +181,24 @@
   .foot{margin-top:48px;border-top:1px solid var(--line);padding-top:18px;font-size:11px;color:var(--ink-soft);line-height:1.7}
   .foot b{color:var(--ink)}
 
+  /* ── polish pass: type roles, elevation, interaction ── */
+  .eyebrow,.status,.kpi .lab,.mini .lab,.hero-big .lab,.bucket .lab,
+  .lb-row.h,.lb-name .tag,.chip,.heat th,.heat td.pct,.ctable th,
+  .sum-col h3,.note .wk,.ci-item .lab2,.period .frame{font-family:"Geist Mono",ui-monospace,monospace}
+  .lb-val,.ctable td,.kpi .val,.mini .val,.bucket .val,.hero-big .val{font-variant-numeric:tabular-nums}
+  .kpi,.lb,.heat-scroll,.chart-card,.mini,.bucket,.notes .note,.ctable{box-shadow:0 1px 2px rgba(22,20,15,.03),0 10px 28px -18px rgba(22,20,15,.16)}
+  .hero-big{box-shadow:0 14px 34px -18px rgba(22,20,15,.45)}
+  .lb-row:not(.h){transition:background .12s ease}
+  .lb-row:not(.h):hover{background:#FCFBF8}
+  .ci-item{transition:transform .12s ease,box-shadow .12s ease}
+  .ci-item:hover{transform:translateY(-1px);box-shadow:0 6px 16px -10px rgba(22,20,15,.25)}
+  select:hover,.toggle button:hover{border-color:var(--ink-soft)}
+  select:focus{border-color:var(--accent);outline:none}
+  .form-btn{font-family:"Geist Mono",ui-monospace,monospace;font-size:11.5px;letter-spacing:.03em;text-decoration:none;color:var(--paper);background:var(--ink);border:1px solid var(--ink);border-radius:999px;padding:8px 16px;transition:opacity .12s ease}
+  .form-btn:hover{opacity:.85}
+  .foot-grid{display:flex;justify-content:space-between;gap:24px;flex-wrap:wrap;align-items:baseline}
+  .foot a{text-decoration:none;border-bottom:1px solid var(--accent-soft)}
+
   @media(max-width:880px){
     .kpis{grid-template-columns:repeat(2,1fr)}
     .hero{grid-template-columns:1fr 1fr}
@@ -198,6 +226,7 @@
         <button id="btn-rep" onclick="setView('rep')">Rep</button>
       </div>
       <div class="status"><span class="dot seed" id="src-dot"></span><span id="src-label">Seed data</span></div>
+      <a class="form-btn" href="https://docs.google.com/forms/d/e/1FAIpQLSdIAf_SaV1m2ASTN4YzEBeVxp7o-gkIBXqhCCbO5vmuNh7cTQ/viewform" target="_blank" rel="noopener">Weekly Form ↗</a>
     </div>
   </div>
 </header>
@@ -313,8 +342,10 @@
   </div>
 
   <div class="foot">
-    <b>What's real vs awaiting:</b> total weekly sales and the standards heatmap come from your Fall sheet (reconciled). The full per-channel stat line — calls, booked, completed, orders, sales, recs, event shifts — reads <b>—</b> until the form is live. Every <b>rate</b> (avg order, closing %, reached %, call→book, avg recs, shift average, orders/day) is then computed from those raw counts — never typed.<br>
-    <b>Going live:</b> in the CONFIG block at the top of this file, paste your Sheet ID and set <b>USE_LIVE_DATA = true</b>. The dashboard reads the Roster + Weekly tabs directly; add/remove a rep by editing a Roster row; form submissions appear on refresh (auto every 60s). Public read-only link — no server, no login.
+    <div class="foot-grid">
+      <div><b>Sharp Ninja Academy</b> · Mentee Performance<br>Fed live by the weekly check-in form — every rate is computed from raw counts, never typed.</div>
+      <div style="text-align:right">Auto-refreshes every 60s<br><a href="https://docs.google.com/forms/d/e/1FAIpQLSdIAf_SaV1m2ASTN4YzEBeVxp7o-gkIBXqhCCbO5vmuNh7cTQ/viewform" target="_blank" rel="noopener">Weekly check-in form ↗</a></div>
+    </div>
   </div>
 </div>
 
@@ -336,7 +367,7 @@ const CHANNELS = [
   {key:"marketing", label:"Marketing Sales"},
   {key:"bizgift",   label:"Biz Gift / RLT"}
 ];
-const PERIOD = { title:"Fall 2025", weeks:17 };
+const PERIOD = { title:"Summer 2026", weeks:18 };
 
 /* ═══════════════ SEED DATA (real Fall 2025) ═══════════════
    sales[] / acct[] are weekly (wk1..wk17). apptsCompleted = real Fall total.
@@ -570,8 +601,10 @@ function renderCheckins(){
     return d!==0?d:a.name.localeCompare(b.name);
   });
   const n=rows.filter(r=>done.has(String(r.id))).length;
+  const miss=rows.length-n;
   const wsLab=ws.toLocaleDateString(undefined,{weekday:'short',month:'short',day:'numeric'});
-  $("ci-lead").innerHTML=`<b>${n} of ${rows.length}</b> mentees have submitted since ${wsLab}.`;
+  $("ci-lead").innerHTML=`<b>${n} of ${rows.length}</b> mentees have submitted since ${wsLab} · `+
+    (miss?`<b style="color:var(--bad)">${miss} still missing</b>`:`<b style="color:var(--good)">everyone is in</b>`);
   $("ci-grid").innerHTML=rows.map(r=>{
     const ok=done.has(String(r.id));
     return `<div class="ci-item ${ok?'in':'out'}"><span class="st"></span>${r.name}<span class="lab2">${ok?'Submitted':'Not yet'}</span></div>`;
