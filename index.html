@@ -428,8 +428,10 @@ function mergeSheet(roster,weekly){
       return cpoCols.reduce((t,c)=>t+(+s[c]||0),0);
     });
     const g=(ch,f)=>chSum(ch+"_"+f);
+    const doneV=[g("Demos","Done"),g("SVC","Done")].filter(x=>x!=null);
+    const apptsCompleted=doneV.length?doneV.reduce((a,b)=>a+b,0):null;
     return {id:p.RepID,name:p.Name,region:p.Region,manager:p.Manager,tier:p.Tier,pay:p.Pay,goal:p.Goal,
-      joinWeek:+p.JoinWeek||1, sales:salesWk, acct:wk("StandardsScore"),
+      joinWeek:+p.JoinWeek||1, sales:salesWk, acct:wk("StandardsScore"), apptsCompleted,
       stat:{
         demos:{calls:g("Demos","Calls"),sched:g("Demos","Sched"),done:g("Demos","Done"),orders:g("Demos","Orders"),cpo:g("Demos","CPO"),recs:g("Demos","Recs")},
         svc:{calls:g("SVC","Calls"),sched:g("SVC","Sched"),done:g("SVC","Done"),orders:g("SVC","Orders"),cpo:g("SVC","CPO"),recs:g("SVC","Recs")},
