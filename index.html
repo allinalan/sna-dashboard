@@ -87,9 +87,16 @@
   .ci-item.in .st{background:var(--good)}
   .ci-item.out .st{background:var(--bad)}
   .ci-item.out{background:var(--bad-bg);border-color:#E4C4B6}
-  .ci-item .lab2{margin-left:auto;font-size:10px;letter-spacing:.06em;text-transform:uppercase;font-weight:600}
+  .ci-item .lab2{margin-left:auto;font-size:10px;letter-spacing:.06em;text-transform:uppercase;font-weight:600;flex:none}
   .ci-item.in .lab2{color:var(--good)}
   .ci-item.out .lab2{color:var(--bad)}
+  .ci-main{display:flex;flex-direction:column;gap:4px;min-width:0}
+  .ci-hist{display:flex;align-items:center;gap:3px}
+  .ci-hist i{width:7px;height:7px;border-radius:2px;display:block}
+  .ci-hist i.y{background:var(--good)}
+  .ci-hist i.n{background:var(--bad);opacity:.4}
+  .ci-hist i.na{background:var(--line)}
+  .ci-hist span{font-family:"Geist Mono",ui-monospace,monospace;font-size:9.5px;color:var(--ink-soft);margin-left:4px}
 
   /* heatmap */
   .heat-legend{display:flex;gap:16px;font-size:11px;color:var(--ink-soft);margin-bottom:14px;flex-wrap:wrap}
@@ -656,6 +663,18 @@ function ciStreaks(done,ws){
   });
   return out;
 }
+/* last 6 reporting windows for one rep, oldest→newest: true=submitted, false=missed, null=pre-launch */
+function ciHistory(repId,ws){
+  const times=WEEKLY_RAW.filter(w=>String(w.RepID)===String(repId))
+    .map(w=>ciParseDate(w.Timestamp)).filter(Boolean);
+  const hist=[];
+  let end=new Date(),start=ws;
+  for(let i=0;i<6;i++){
+    hist.unshift(start<CI_GO_LIVE?null:times.some(t=>t>=start&&t<end));
+    end=start;start=new Date(start.getTime()-7*86400000);
+  }
+  return hist;
+}
 function renderCheckins(){
   const sec=$("ci-section");
   // operational view — only meaningful for the campaign happening right now
@@ -677,7 +696,14 @@ function renderCheckins(){
     const ok=done.has(String(r.id));
     const st=streaks[r.id]||0;
     const lab=ok?'Submitted':(st>=2?st+' wks missing':'Not yet');
-    return `<div class="ci-item ${ok?'in':'out'}"><span class="st"></span>${r.name}<span class="lab2">${lab}</span></div>`;
+    const hist=ciHistory(r.id,ws);
+    const counted=hist.filter(h=>h!==null);
+    const dots=hist.map(h=>`<i class="${h===null?'na':h?'y':'n'}"></i>`).join("");
+    const tally=`${counted.filter(Boolean).length}/${counted.length} wks`;
+    return `<div class="ci-item ${ok?'in':'out'}"><span class="st"></span>`+
+      `<div class="ci-main"><div>${r.name}</div>`+
+      `<div class="ci-hist" title="last 6 weeks, oldest first">${dots}<span>${tally}</span></div></div>`+
+      `<span class="lab2">${lab}</span></div>`;
   }).join("");
 }
 
