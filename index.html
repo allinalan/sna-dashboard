@@ -472,11 +472,14 @@ async function loadData(){
   }
   catch(e){console.warn("Live fetch failed; using seed:",e);DATA=SEED;setSource(false);}
 }
-/* rows are stamped with their campaign at submit time; unstamped rows fall back to the timestamp */
+/* rows are stamped with their campaign at submit time; unstamped rows fall back to the
+   timestamp − 6 days (check-ins cover the PREVIOUS week, so a Sep 1 submission is Summer's) */
 function rowCampaign(w){
   if(w.Campaign)return String(w.Campaign).trim();
   const t=ciParseDate(w.Timestamp);
-  return t?seasonOf(t)+" "+t.getFullYear():currentCampaign();
+  if(!t)return currentCampaign();
+  const c=new Date(t.getTime()-6*86400000);
+  return seasonOf(c)+" "+c.getFullYear();
 }
 function applyCampaign(){
   DATA=mergeSheet(ROSTER_RAW, WEEKLY_RAW.filter(w=>rowCampaign(w)===SELECTED_CAMPAIGN));
@@ -633,6 +636,26 @@ function ciParseDate(v){
   if(m)return new Date(+m[1],+m[2],+m[3],+(m[4]||0),+(m[5]||0),+(m[6]||0));
   const d=new Date(v);return isNaN(d)?null:d;
 }
+const CI_GO_LIVE=new Date(2026,6,1); // first reporting window — don't count "missed" weeks before launch
+/* consecutive reporting windows missed per rep, INCLUDING the current one (0 = submitted) */
+function ciStreaks(done,ws){
+  const out={};
+  DATA.forEach(r=>{
+    if(done.has(String(r.id))){out[r.id]=0;return;}
+    let s=0,end=new Date(),start=ws;
+    while(start>=CI_GO_LIVE){
+      const hit=WEEKLY_RAW.some(w=>{
+        if(String(w.RepID)!==String(r.id))return false;
+        const t=ciParseDate(w.Timestamp);
+        return t&&t>=start&&t<end;
+      });
+      if(hit)break;
+      s++;end=start;start=new Date(start.getTime()-7*86400000);
+    }
+    out[r.id]=Math.max(s,1);
+  });
+  return out;
+}
 function renderCheckins(){
   const sec=$("ci-section");
   // operational view — only meaningful for the campaign happening right now
@@ -640,9 +663,10 @@ function renderCheckins(){
   sec.classList.remove("hidden");
   const ws=ciWindowStart(), done=new Set();
   WEEKLY_RAW.forEach(w=>{const t=ciParseDate(w.Timestamp);if(t&&t>=ws)done.add(String(w.RepID));});
+  const streaks=ciStreaks(done,ws);
   const rows=[...DATA].sort((a,b)=>{
     const d=(done.has(String(a.id))?1:0)-(done.has(String(b.id))?1:0);
-    return d!==0?d:a.name.localeCompare(b.name);
+    return d!==0?d:(streaks[b.id]-streaks[a.id])||a.name.localeCompare(b.name);
   });
   const n=rows.filter(r=>done.has(String(r.id))).length;
   const miss=rows.length-n;
@@ -651,7 +675,9 @@ function renderCheckins(){
     (miss?`<b style="color:var(--bad)">${miss} still missing</b>`:`<b style="color:var(--good)">everyone is in</b>`);
   $("ci-grid").innerHTML=rows.map(r=>{
     const ok=done.has(String(r.id));
-    return `<div class="ci-item ${ok?'in':'out'}"><span class="st"></span>${r.name}<span class="lab2">${ok?'Submitted':'Not yet'}</span></div>`;
+    const st=streaks[r.id]||0;
+    const lab=ok?'Submitted':(st>=2?st+' wks missing':'Not yet');
+    return `<div class="ci-item ${ok?'in':'out'}"><span class="st"></span>${r.name}<span class="lab2">${lab}</span></div>`;
   }).join("");
 }
 
