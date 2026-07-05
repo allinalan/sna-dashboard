@@ -538,7 +538,7 @@ function mergeSheet(roster,weekly){
     const doneV=[g("Demos","Done"),g("SVC","Done")].filter(x=>x!=null);
     const apptsCompleted=doneV.length?doneV.reduce((a,b)=>a+b,0):null;
     return {id:p.RepID,name:p.Name,region:p.Region,manager:p.Manager,tier:p.Tier,pay:p.Pay,goal:p.Goal,
-      joinWeek:+p.JoinWeek||1, sales:salesWk, acct:wk("StandardsScore"), apptsCompleted,
+      joinWeek:+p.JoinWeek||1, joined:ciParseDate(p.Joined), sales:salesWk, acct:wk("StandardsScore"), apptsCompleted,
       stat:{
         demos:{calls:g("Demos","Calls"),sched:g("Demos","Sched"),done:g("Demos","Done"),orders:g("Demos","Orders"),cpo:g("Demos","CPO"),recs:g("Demos","Recs")},
         svc:{calls:g("SVC","Calls"),sched:g("SVC","Sched"),done:g("SVC","Done"),orders:g("SVC","Orders"),cpo:g("SVC","CPO"),recs:g("SVC","Recs")},
@@ -645,12 +645,16 @@ function ciParseDate(v){
 }
 const CI_GO_LIVE=new Date(2026,6,1); // first reporting window — don't count "missed" weeks before launch
 /* consecutive reporting windows missed per rep, INCLUDING the current one (0 = submitted) */
+/* accountability starts at CI_GO_LIVE or the rep's Joined date, whichever is later —
+   a mid-campaign addition never carries pre-join missed weeks */
+function ciBound(r){return (r&&r.joined&&r.joined>CI_GO_LIVE)?r.joined:CI_GO_LIVE;}
 function ciStreaks(done,ws){
   const out={};
   DATA.forEach(r=>{
     if(done.has(String(r.id))){out[r.id]=0;return;}
+    const bound=ciBound(r);
     let s=0,end=new Date(),start=ws;
-    while(start>=CI_GO_LIVE){
+    while(start>=bound){
       const hit=WEEKLY_RAW.some(w=>{
         if(String(w.RepID)!==String(r.id))return false;
         const t=ciParseDate(w.Timestamp);
@@ -663,14 +667,15 @@ function ciStreaks(done,ws){
   });
   return out;
 }
-/* last 6 reporting windows for one rep, oldest→newest: true=submitted, false=missed, null=pre-launch */
-function ciHistory(repId,ws){
-  const times=WEEKLY_RAW.filter(w=>String(w.RepID)===String(repId))
+/* last 6 reporting windows for one rep, oldest→newest: true=submitted, false=missed, null=pre-launch/pre-join */
+function ciHistory(rep,ws){
+  const bound=ciBound(rep);
+  const times=WEEKLY_RAW.filter(w=>String(w.RepID)===String(rep.id))
     .map(w=>ciParseDate(w.Timestamp)).filter(Boolean);
   const hist=[];
   let end=new Date(),start=ws;
   for(let i=0;i<6;i++){
-    hist.unshift(start<CI_GO_LIVE?null:times.some(t=>t>=start&&t<end));
+    hist.unshift(start<bound?null:times.some(t=>t>=start&&t<end));
     end=start;start=new Date(start.getTime()-7*86400000);
   }
   return hist;
@@ -696,7 +701,7 @@ function renderCheckins(){
     const ok=done.has(String(r.id));
     const st=streaks[r.id]||0;
     const lab=ok?'Submitted':(st>=2?st+' wks missing':'Not yet');
-    const hist=ciHistory(r.id,ws);
+    const hist=ciHistory(r,ws);
     const counted=hist.filter(h=>h!==null);
     const dots=hist.map(h=>`<i class="${h===null?'na':h?'y':'n'}"></i>`).join("");
     const tally=`${counted.filter(Boolean).length}/${counted.length} wks`;
