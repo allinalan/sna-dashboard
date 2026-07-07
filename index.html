@@ -206,7 +206,66 @@
   .foot-grid{display:flex;justify-content:space-between;gap:24px;flex-wrap:wrap;align-items:baseline}
   .foot a{text-decoration:none;border-bottom:1px solid var(--accent-soft)}
 
+  /* ── coaching call card (rep) ── */
+  .call-card{border-radius:16px;padding:20px;border:1px solid var(--line);background:var(--card);display:flex;gap:16px;align-items:center;flex-wrap:wrap;box-shadow:0 1px 2px rgba(22,20,15,.03),0 10px 28px -18px rgba(22,20,15,.16)}
+  .call-card .cc-dot{width:12px;height:12px;border-radius:50%;flex:none}
+  .call-card.s-none{border-color:#E4C4B6;background:var(--bad-bg)}
+  .call-card.s-none .cc-dot{background:var(--bad)}
+  .call-card.s-booked .cc-dot{background:var(--ink-soft)}
+  .call-card.s-survey{border-color:#E8D9A8;background:var(--warn-bg)}
+  .call-card.s-survey .cc-dot{background:var(--warn)}
+  .call-card.s-done{border-color:#BFD4C4;background:var(--good-bg)}
+  .call-card.s-done .cc-dot{background:var(--good)}
+  .call-card .cc-main{flex:1;min-width:220px}
+  .call-card .cc-title{font-family:"Fraunces";font-size:18px;font-weight:600}
+  .call-card .cc-sub{font-size:12px;color:var(--ink-soft);margin-top:4px}
+  .cc-notes{margin-top:10px;display:grid;gap:8px}
+  .cc-note{font-size:12.5px;background:rgba(255,255,255,.65);border:1px solid var(--line-soft);border-radius:10px;padding:10px 12px;line-height:1.5}
+  .cc-note b{font-family:"Geist Mono";font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-soft);display:block;margin-bottom:2px}
+
+  /* ── planner ── */
+  .plan-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:14px}
+  .plan-hero{grid-column:span 2;background:var(--ink);color:var(--paper);border-radius:14px;padding:16px}
+  .plan-hero .lab{font-family:"Geist Mono";font-size:10px;letter-spacing:.1em;text-transform:uppercase;opacity:.7}
+  .plan-hero .val{font-family:"Fraunces";font-size:27px;font-weight:600;margin-top:7px}
+  .plan-hero .meta{font-size:11px;opacity:.75;margin-top:5px}
+  .plan-hero.ahead{background:var(--good)}
+  .plan-hero.behind{background:var(--accent)}
+  .ptable{width:100%;border-collapse:collapse;background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden;box-shadow:0 1px 2px rgba(22,20,15,.03),0 10px 28px -18px rgba(22,20,15,.16)}
+  .ptable th{font-family:"Geist Mono";font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-soft);font-weight:500;text-align:right;padding:10px 14px;border-bottom:1px solid var(--line)}
+  .ptable th:first-child,.ptable td:first-child{text-align:left}
+  .ptable td{font-size:12.5px;text-align:right;padding:10px 14px;border-bottom:1px solid var(--line-soft);font-variant-numeric:tabular-nums}
+  .ptable tbody tr:last-child td{border-bottom:none}
+  .ptable td .up{color:var(--good);font-weight:600}
+  .ptable td .down{color:var(--bad);font-weight:600}
+  .ptable .rowbtn{font-family:"Geist Mono";font-size:10.5px;border:1px solid var(--line);background:none;border-radius:7px;padding:3px 9px;cursor:pointer;color:var(--ink-soft)}
+  .ptable .rowbtn:hover{border-color:var(--accent);color:var(--accent)}
+  .plan-empty{font-size:12.5px;color:var(--ink-soft);background:var(--card);border:1px dashed var(--line);border-radius:14px;padding:18px;text-align:center}
+
+  /* ── admin calls board ── */
+  .calls-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:8px}
+  .call-row{display:flex;align-items:center;gap:9px;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 13px;font-size:12.5px;font-weight:500}
+  .call-row .st{width:8px;height:8px;border-radius:50%;flex:none}
+  .call-row.s-none .st{background:var(--bad)}
+  .call-row.s-booked .st{background:var(--ink-soft)}
+  .call-row.s-survey .st{background:var(--warn)}
+  .call-row.s-done .st{background:var(--good)}
+  .call-row.od{background:var(--bad-bg);border-color:#E4C4B6}
+  .call-row .cr-lab{margin-left:auto;font-family:"Geist Mono";font-size:9.5px;letter-spacing:.05em;text-transform:uppercase;font-weight:600;color:var(--ink-soft);text-align:right}
+  .call-row .linkbtn{font-size:11px;border:none;background:none;cursor:pointer;color:var(--ink-soft);padding:2px}
+  .call-row .linkbtn:hover{color:var(--accent)}
+
+  /* ── dialog ── */
+  dialog{border:1px solid var(--line);border-radius:16px;padding:22px;max-width:520px;width:92vw;background:var(--card);color:var(--ink)}
+  dialog::backdrop{background:rgba(22,20,15,.35)}
+  .pd-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+  #plan-form label{font-family:"Geist Mono";font-size:10px;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-soft);display:flex;flex-direction:column;gap:4px}
+  #plan-form input,#plan-form textarea{font-family:"Geist Mono";font-size:12.5px;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:var(--paper);color:var(--ink);width:100%}
+  #plan-form input:focus,#plan-form textarea:focus{border-color:var(--accent);outline:none}
+
   @media(max-width:880px){
+    .plan-grid{grid-template-columns:1fr 1fr}
+    .plan-hero{grid-column:span 2}
     .kpis{grid-template-columns:repeat(2,1fr)}
     .hero{grid-template-columns:1fr 1fr}
     .summary{grid-template-columns:1fr}
@@ -292,17 +351,40 @@
     <div class="section">
       <div class="section-head">
         <h2 class="serif">Sales by Channel</h2>
-        <span class="hint">populated once the weekly form is live</span>
+        <span class="hint">team totals — computed from the weekly form</span>
       </div>
       <div class="mix" id="mix"></div>
     </div>
+
+    <div class="section">
+      <div class="section-head">
+        <h2 class="serif">Campaign Planner — Team</h2>
+        <span class="hint">every mentee's goal → pace · edit any plan</span>
+      </div>
+      <div id="admin-planner"></div>
+    </div>
+
+    <div class="section">
+      <div class="section-head">
+        <h2 class="serif">Coaching Calls — <span id="calls-month"></span></h2>
+        <span class="hint">Path 1/mo · Masters 2/mo · formal 1-on-1s, separate from the weekly standard</span>
+      </div>
+      <div id="admin-calls"></div>
+      <div class="feed-h eyebrow" style="margin:22px 0 10px">Recent takeaways &amp; action steps</div>
+      <div class="notes" id="calls-feed" style="display:grid;gap:10px"></div>
+    </div>
   </div>
 
-  <!-- ════ REP ════ -->
+  <!-- ════ REP (admin deep-dive AND the locked rep page share this) ════ -->
   <div id="view-rep" class="hidden">
+    <div class="section hidden" id="rep-call-sec" style="margin-top:24px">
+      <div id="rep-call-card"></div>
+    </div>
+
     <div class="rep-pick">
       <div class="eyebrow">Mentee</div>
       <select id="rep-select" onchange="renderRep()"></select>
+      <div class="serif hidden" id="rep-name-lock" style="font-size:26px;font-weight:600;letter-spacing:-.01em"></div>
     </div>
     <div class="rep-context" id="rep-context"></div>
 
@@ -347,9 +429,76 @@
 
     <div class="section">
       <div class="section-head"><h2 class="serif">Check-In Notes</h2></div>
-      <div class="notes" id="notes"></div>
+      <div class="notes" id="notes" style="display:grid;gap:10px"></div>
+    </div>
+
+    <div class="section" id="rep-planner-sec">
+      <div class="section-head">
+        <h2 class="serif" id="rp-title">Campaign Planner</h2>
+        <button class="form-btn" id="rp-edit-btn" onclick="openPlannerEditor(currentRep().id)" style="cursor:pointer">Edit plan</button>
+      </div>
+      <div id="rep-planner"></div>
+    </div>
+
+    <!-- team aggregates + leaderboard — the ONLY peer visibility in rep mode -->
+    <div id="rep-team-block" class="hidden">
+      <div class="section">
+        <div class="section-head"><h2 class="serif">Team Pulse</h2><span class="hint">the whole academy, live</span></div>
+        <div class="kpis" id="team-kpis-rep" style="grid-template-columns:repeat(4,1fr)"></div>
+      </div>
+      <div class="section">
+        <div class="section-head">
+          <h2 class="serif">Leaderboard</h2>
+          <select id="lb-metric-rep" onchange="renderLeaderboard('leaderboard-rep','lb-metric-rep')">
+            <option value="sales">Total sales</option>
+            <option value="apptsCompleted">Appointments completed</option>
+            <option value="standards">Standards met %</option>
+            <option value="avgWeek">Avg weekly sales</option>
+          </select>
+        </div>
+        <div class="lb" id="leaderboard-rep"></div>
+      </div>
+      <div class="section">
+        <div class="section-head"><h2 class="serif">Team Sales by Channel</h2><span class="hint">aggregates only</span></div>
+        <div class="mix" id="mix-rep"></div>
+      </div>
     </div>
   </div>
+
+  <!-- lockout: unknown ?rep= id -->
+  <div id="lockout" class="hidden" style="text-align:center;padding:90px 20px">
+    <div class="mark serif" style="margin:0 auto 18px;width:52px;height:52px;font-size:24px">忍</div>
+    <div class="serif" style="font-size:26px;font-weight:600">This link isn't active</div>
+    <div style="font-size:13px;color:var(--ink-soft);margin-top:10px;line-height:1.7">
+      Your personal dashboard link couldn't be matched to an active mentee.<br>
+      Text Alan for a fresh link.
+    </div>
+  </div>
+
+  <!-- planner editor -->
+  <dialog id="plan-dlg">
+    <form method="dialog" id="plan-form" onsubmit="return savePlanner(event)">
+      <div class="serif" style="font-size:19px;font-weight:600" id="pd-title">Edit Campaign Plan</div>
+      <div class="pd-grid">
+        <label>CPO Goal ($)<input name="CPOGoal" type="number" min="0" step="500" required></label>
+        <label>Weeks<input name="Weeks" type="number" min="1" max="18" value="18"></label>
+        <label>Campaign start<input name="CampaignStart" type="date"></label>
+        <label>Days off<input name="DaysOff" type="number" min="0" value="0"></label>
+        <label>Event shifts<input name="EventShifts" type="number" min="0" value="0"></label>
+        <label>Appt days<input name="ApptDays" type="number" min="0" value="0"></label>
+        <label>Avg order ($)<input name="AvgOrder" type="number" min="0" step="10"></label>
+        <label>Closing %<input name="ClosingPct" type="number" min="0" max="100" step="1"></label>
+      </div>
+      <label style="display:block;margin-top:12px">Events — one per line: <span class="mono" style="font-size:10.5px">week | name | days | expected CPO</span>
+        <textarea name="EventsText" rows="4" placeholder="3 | Wilcox Wine Festival | 1 | 1000"></textarea>
+      </label>
+      <div id="pd-msg" style="font-size:11.5px;color:var(--ink-soft);margin-top:10px"></div>
+      <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:14px">
+        <button type="button" class="form-btn" style="background:var(--card);color:var(--ink)" onclick="document.getElementById('plan-dlg').close()">Cancel</button>
+        <button type="submit" class="form-btn" id="pd-save">Save plan</button>
+      </div>
+    </form>
+  </dialog>
 
   <div class="foot">
     <div class="foot-grid">
@@ -366,8 +515,21 @@ const CONFIG = {
   SHEET_ID: "1tFedrarhfz2_iQ7gYEa5Foh08SawwV9MhrtAjENAlfE",
   ROSTER_TAB: "Roster",
   WEEKLY_TAB: "Weekly",
+  CALLS_TAB: "Calls",           // RepID · Month · Status · CallDateTime · Coach
+  SURVEY_TAB: "CallSurvey",     // Timestamp · RepID · Month · Takeaways · ActionSteps
+  PLANNER_TAB: "Planner",       // per rep per campaign planner inputs
+  CALENDLY_URL: "https://calendly.com/sharp-ninja-academy",
+  SURVEY_FORM_URL: "",          // post-call survey form — paste URL when the form is built
+  WEBAPP_URL: "https://script.google.com/macros/s/AKfycbyNFDkgEAUT5IDNw4wvCHLQZoe70XxVwgAZmG8bNTmlkY8t0d-wL2eKa53kgke2AOCHPQ/exec",
+  CALL_CUTOFF_DAY: 20,          // after this day of month, an unfinished call shows OVERDUE
   REFRESH_MS: 60000
 };
+
+/* ── Identity: ?rep=<RepID> locks the page to that one rep (their personal link).
+   Bare URL = Admin (coach) view. No picker fallback — an unknown id shows a lockout. ── */
+const REP_PARAM=(new URLSearchParams(location.search).get("rep")||"").trim();
+let MODE=REP_PARAM?"pending":"admin";   // resolved to rep|locked after first data load
+let ME=null;                            // the locked rep's merged data row (rep mode)
 
 /* Five CUTCO sales channels reported on the weekly form. Rename/reorder freely. */
 const CHANNELS = [
@@ -466,18 +628,31 @@ const SEED = [
   acct:[null,null,0,0,0,0,0,null,null,null,null,null,null,null,null,null,null]}
 ];
 
-/* ═══════════════ DATA LOAD ═══════════════ */
-let DATA=[], ROSTER_RAW=[];
+/* ═══════════════ DATA LOAD — one fetch feeds every view ═══════════════ */
+let DATA=[], ROSTER_RAW=[], CALLS_RAW=[], SURVEY_RAW=[], PLANNER_RAW=[];
 async function loadData(){
-  if(!CONFIG.USE_LIVE_DATA){DATA=SEED;setSource(false);return;}
+  if(!CONFIG.USE_LIVE_DATA){DATA=SEED;setSource(false);resolveIdentity();return;}
   try{
     const base=`https://docs.google.com/spreadsheets/d/${CONFIG.SHEET_ID}/gviz/tq?tqx=out:json&headers=1&sheet=`;
-    ROSTER_RAW=await gviz(base+encodeURIComponent(CONFIG.ROSTER_TAB));
-    WEEKLY_RAW=await gviz(base+encodeURIComponent(CONFIG.WEEKLY_TAB));
+    const tab=async(name,optional)=>{ // optional tabs return [] until they exist
+      try{return await gviz(base+encodeURIComponent(name));}
+      catch(e){if(optional)return [];throw e;}
+    };
+    ROSTER_RAW=await tab(CONFIG.ROSTER_TAB);
+    WEEKLY_RAW=await tab(CONFIG.WEEKLY_TAB);
+    CALLS_RAW=await tab(CONFIG.CALLS_TAB,true);
+    SURVEY_RAW=await tab(CONFIG.SURVEY_TAB,true);
+    PLANNER_RAW=await tab(CONFIG.PLANNER_TAB,true);
     applyCampaign();
     setSource(true);
   }
   catch(e){console.warn("Live fetch failed; using seed:",e);DATA=SEED;setSource(false);}
+  resolveIdentity();
+}
+function resolveIdentity(){
+  if(!REP_PARAM){MODE="admin";ME=null;return;}
+  ME=DATA.find(r=>String(r.id).toLowerCase()===REP_PARAM.toLowerCase())||null;
+  MODE=ME?"rep":"locked";
 }
 /* rows are stamped with their campaign at submit time; unstamped rows fall back to the
    timestamp − 6 days (check-ins cover the PREVIOUS week, so a Sep 1 submission is Summer's) */
@@ -510,8 +685,8 @@ function renderCampaignSelect(){
 function onCampaignChange(){
   SELECTED_CAMPAIGN=$("campaign-select").value;
   applyCampaign();
-  renderPeriod();renderKPIs();renderCheckins();renderLeaderboard();renderHeat();renderMix();
-  fillRepSelect();renderRep();
+  resolveIdentity();
+  renderAll();
 }
 function setSource(live){
   document.getElementById("src-dot").className="dot"+(live?"":" seed");
@@ -537,8 +712,12 @@ function mergeSheet(roster,weekly){
     const g=(ch,f)=>chSum(ch+"_"+f);
     const doneV=[g("Demos","Done"),g("SVC","Done")].filter(x=>x!=null);
     const apptsCompleted=doneV.length?doneV.reduce((a,b)=>a+b,0):null;
+    const notes=subs.filter(s=>s.Win||s.Obstacle||s.Commitment)
+      .sort((a,b)=>(+b.Week||0)-(+a.Week||0)).slice(0,6)
+      .map(s=>({week:+s.Week||null,win:s.Win||"",obs:s.Obstacle||"",commit:s.Commitment||""}));
     return {id:p.RepID,name:p.Name,region:p.Region,manager:p.Manager,tier:p.Tier,pay:p.Pay,goal:p.Goal,
       joinWeek:+p.JoinWeek||1, joined:ciParseDate(p.Joined), sales:salesWk, acct:wk("StandardsScore"), apptsCompleted,
+      evtCpoWk:wk("Event_CPO"), notes,
       stat:{
         demos:{calls:g("Demos","Calls"),sched:g("Demos","Sched"),done:g("Demos","Done"),orders:g("Demos","Orders"),cpo:g("Demos","CPO"),recs:g("Demos","Recs")},
         svc:{calls:g("SVC","Calls"),sched:g("SVC","Sched"),done:g("SVC","Done"),orders:g("SVC","Orders"),cpo:g("SVC","CPO"),recs:g("SVC","Recs")},
@@ -578,6 +757,85 @@ function teamAvgWeekly(metricArrFn){
     return vals.length?vals.reduce((a,b)=>a+b,0)/vals.length:0;});
 }
 
+/* ── team aggregates — the ONE place team math lives ── */
+function teamStats(){
+  const totSales=sum(DATA.map(totalSales));
+  const totAppt=sum(DATA.map(r=>r.apptsCompleted));
+  const n=DATA.length;
+  return {totSales, totAppt, mentees:n,
+    salesPerMentee:n?totSales/n:null, apptsPerMentee:n?totAppt/n:null};
+}
+
+/* ── coaching calls (current month) — Path 1/mo · Masters 2/mo ──
+   This formal 1-on-1 is separate from the weekly "coaching interaction" standard. */
+const monthKey=d=>d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0");
+const monthName=()=>new Date().toLocaleDateString(undefined,{month:"long"});
+const callsRequired=r=>/masters/i.test(String(r.tier||""))?2:1;
+function callState(r){
+  const mk=monthKey(new Date());
+  const mine=CALLS_RAW.filter(c=>String(c.RepID)===String(r.id)&&String(c.Month||"").trim()===mk);
+  const surveys=SURVEY_RAW.filter(s=>String(s.RepID)===String(r.id)&&String(s.Month||"").trim()===mk);
+  const req=callsRequired(r);
+  const norm=c=>String(c.Status||"").trim().toLowerCase();
+  const completed=mine.filter(c=>norm(c)==="completed"||norm(c)==="survey_done").length;
+  const surveyed=surveys.length;
+  const upcoming=mine.filter(c=>norm(c)==="booked").map(c=>ciParseDate(c.CallDateTime)).filter(Boolean).sort((a,b)=>a-b);
+  let status="none";
+  if(completed>=req&&surveyed>=req)status="done";
+  else if(completed>surveyed)status="survey";       // a finished call is missing its survey
+  else if(upcoming.length)status="booked";
+  const overdue=status!=="done"&&new Date().getDate()>CONFIG.CALL_CUTOFF_DAY;
+  return {req,completed,surveyed,upcoming:upcoming[0]||null,status,overdue,surveys};
+}
+
+/* ── campaign planner — one math source for Rep card AND Admin board ── */
+function campaignStartDefault(campaign){
+  const [season,year]=campaign.split(" ");
+  const y=+year;
+  // week grids anchor on Tuesdays (matches the team's planner sheet: Summer 2026 = Apr 28)
+  const firstTueOnOrAfter=d=>{while(d.getDay()!==2)d.setDate(d.getDate()+1);return d;};
+  if(season==="Spring")return firstTueOnOrAfter(new Date(y,0,1));
+  if(season==="Summer")return firstTueOnOrAfter(new Date(y,3,25));
+  return firstTueOnOrAfter(new Date(y,8,1));
+}
+function plannerFor(r){
+  const row=PLANNER_RAW.find(p=>String(p.RepID)===String(r.id)&&String(p.Campaign||"").trim()===SELECTED_CAMPAIGN);
+  if(!row)return null;
+  let events=[];try{events=JSON.parse(row.EventsJSON||"[]")||[];}catch(e){}
+  const weeks=+row.Weeks||PERIOD.weeks;
+  const start=ciParseDate(row.CampaignStart)||campaignStartDefault(SELECTED_CAMPAIGN);
+  const inp={cpoGoal:+row.CPOGoal||null, weeks, start,
+    daysOff:+row.DaysOff||0, eventShifts:+row.EventShifts||0, apptDays:+row.ApptDays||0,
+    avgOrder:+row.AvgOrder||null, closingPct:+row.ClosingPct||null, events};
+  // derived — every number computed, never typed
+  const ordersNeeded=ratio(inp.cpoGoal,inp.avgOrder);
+  const apptsNeeded=ratio(ordersNeeded,inp.closingPct?inp.closingPct/100:null);
+  const apptPerWk=ratio(apptsNeeded,weeks);
+  const apptPerDay=ratio(apptsNeeded,inp.apptDays||null);
+  const weeklyExpCPO=ratio(inp.cpoGoal,weeks);
+  const wkNow=Math.min(weeks,Math.max(1,Math.floor((Date.now()-start.getTime())/(7*86400000))+1));
+  const expectedToDate=weeklyExpCPO!=null?weeklyExpCPO*wkNow:null;
+  const actualToDate=totalSales(r);
+  const ahead=expectedToDate!=null?actualToDate-expectedToDate:null;
+  // actual (real) rates from live data — planner assumptions vs reality
+  const realAvgOrder=avgOrder(totalSales(r),totalOrders(r));
+  const realClosing=closingPct(r,"demos");
+  const eventsView=events.map(e=>({...e,
+    actual:(e.wk&&r.evtCpoWk&&r.evtCpoWk[e.wk-1]!=null)?r.evtCpoWk[e.wk-1]:null}));
+  return {inp,ordersNeeded,apptsNeeded,apptPerWk,apptPerDay,weeklyExpCPO,
+    wkNow,expectedToDate,actualToDate,ahead,realAvgOrder,realClosing,events:eventsView,row};
+}
+function plannerTeam(){
+  const rows=DATA.map(r=>({rep:r,plan:plannerFor(r)})).filter(x=>x.plan&&x.plan.inp.cpoGoal);
+  const t=(fn)=>rows.length?rows.map(fn).filter(x=>x!=null).reduce((a,b)=>a+b,0):null;
+  return {rows,
+    goal:t(x=>x.plan.inp.cpoGoal), expected:t(x=>x.plan.expectedToDate),
+    actual:t(x=>x.plan.actualToDate), ahead:t(x=>x.plan.ahead)};
+}
+
+/* rep link for the admin board — how each mentee's personal URL is formed */
+const repLink=id=>location.origin+location.pathname+"?rep="+encodeURIComponent(id);
+
 function setView(v){
   $("view-team").classList.toggle("hidden",v!=="team");
   $("view-rep").classList.toggle("hidden",v!=="rep");
@@ -592,31 +850,46 @@ function renderPeriod(){
   $("period-frame").innerHTML=`Campaign ${r} · ${DATA.length} mentees · weeks 1–${PERIOD.weeks} · <b>same-window comparisons only</b>`;
 }
 function renderKPIs(){
-  const totSales=sum(DATA.map(totalSales));
-  const totAppt=sum(DATA.map(r=>r.apptsCompleted));
+  const ts=teamStats();
   const active=DATA.filter(r=>activeWeeks(r)>0).length;
   const allW=sum(DATA.map(r=>r.acct.filter(x=>x!=null&&x>=0.5).length));
   const actW=sum(DATA.map(r=>r.acct.filter(x=>x!=null).length));
   const stPct=actW?Math.round(allW/actW*100):0;
   const atRisk=DATA.filter(r=>{const p=stMetPct(r);return p!=null&&p<0.45&&r.acct.filter(x=>x!=null).length>4;}).length;
   const tiles=[
-    {lab:"Total sales",val:money(totSales),meta:SELECTED_CAMPAIGN},
-    {lab:"Appts completed",val:num(totAppt),meta:"campaign total"},
+    {lab:"Total sales",val:money(ts.totSales),meta:SELECTED_CAMPAIGN},
+    {lab:"Appts completed",val:num(ts.totAppt),meta:"campaign total"},
+    {lab:"Sales / mentee",val:money(ts.salesPerMentee),meta:`across ${ts.mentees} active`},
+    {lab:"Appts / mentee",val:ts.apptsPerMentee==null?"—":(Math.round(ts.apptsPerMentee*10)/10).toLocaleString(),meta:`across ${ts.mentees} active`},
     {lab:"Standards met",val:stPct+"%",meta:"of weeks, all-met"},
     {lab:"At-risk",val:atRisk,meta:"below 45% standards",alert:atRisk>0},
     {lab:"Active mentees",val:active,meta:"with data this period"}
   ];
   $("kpis").innerHTML=tiles.map(t=>`<div class="kpi${t.alert?' alert':''}"><div class="lab">${t.lab}</div><div class="val">${t.val}</div><div class="meta">${t.meta}</div></div>`).join("");
 }
-function renderLeaderboard(){
-  const m=$("lb-metric").value;
+/* team KPI strip on the rep page — same teamStats source, fewer tiles */
+function renderTeamKpisRep(){
+  const ts=teamStats();
+  const tiles=[
+    {lab:"Team sales",val:money(ts.totSales),meta:SELECTED_CAMPAIGN},
+    {lab:"Team appts",val:num(ts.totAppt),meta:"completed"},
+    {lab:"Sales / mentee",val:money(ts.salesPerMentee),meta:`${ts.mentees} mentees`},
+    {lab:"Appts / mentee",val:ts.apptsPerMentee==null?"—":(Math.round(ts.apptsPerMentee*10)/10).toLocaleString(),meta:`${ts.mentees} mentees`}
+  ];
+  $("team-kpis-rep").innerHTML=tiles.map(t=>`<div class="kpi"><div class="lab">${t.lab}</div><div class="val">${t.val}</div><div class="meta">${t.meta}</div></div>`).join("");
+}
+function renderLeaderboard(target="leaderboard",selId="lb-metric"){
+  const m=$(selId).value;
   const get={sales:totalSales,apptsCompleted:r=>r.apptsCompleted??0,standards:r=>stMetPct(r)??0,avgWeek:avgWeek}[m];
   const fmt={sales:money,apptsCompleted:num,standards:v=>Math.round(v*100)+"%",avgWeek:money}[m];
   const rows=[...DATA].sort((a,b)=>get(b)-get(a));
   const max=Math.max(...rows.map(get),0.0001);
-  let html=`<div class="lb-row h"><div>#</div><div>Mentee</div><div></div><div style="text-align:right">${$("lb-metric").selectedOptions[0].text}</div></div>`;
-  html+=rows.map((r,i)=>`<div class="lb-row"><div class="lb-rank ${i<3?'top':''}">${i+1}</div><div class="lb-name">${r.name}<span class="tag">${r.tier}</span></div><div class="lb-bar-wrap"><div class="lb-bar" style="width:${Math.max(get(r)/max*100,0)}%"></div></div><div class="lb-val">${fmt(get(r))}</div></div>`).join("");
-  $("leaderboard").innerHTML=html;
+  let html=`<div class="lb-row h"><div>#</div><div>Mentee</div><div></div><div style="text-align:right">${$(selId).selectedOptions[0].text}</div></div>`;
+  html+=rows.map((r,i)=>{
+    const me=ME&&r.id===ME.id?' style="background:var(--accent-soft)"':'';
+    return `<div class="lb-row"${me}><div class="lb-rank ${i<3?'top':''}">${i+1}</div><div class="lb-name">${r.name}<span class="tag">${r.tier}</span></div><div class="lb-bar-wrap"><div class="lb-bar" style="width:${Math.max(get(r)/max*100,0)}%"></div></div><div class="lb-val">${fmt(get(r))}</div></div>`;
+  }).join("");
+  $(target).innerHTML=html;
 }
 function renderHeat(){
   const rows=[...DATA].sort((a,b)=>totalSales(b)-totalSales(a));
@@ -712,15 +985,172 @@ function renderCheckins(){
   }).join("");
 }
 
-function renderMix(){
-  $("mix").innerHTML=CHANNELS.map(c=>`<div class="mix-row"><div class="mix-lab">${c.label}</div><div class="mix-track"><div class="mix-fill" style="width:0%"></div></div><div class="mix-val await">awaiting form</div></div>`).join("");
+function renderMix(target="mix"){
+  const sums=CHANNELS.map(c=>{
+    const v=DATA.map(r=>chSales(r,c.key)).filter(x=>x!=null);
+    return {label:c.label, val:v.length?v.reduce((a,b)=>a+b,0):null};
+  });
+  const max=Math.max(...sums.map(s=>s.val||0),0.0001);
+  $(target).innerHTML=sums.map(s=>
+    `<div class="mix-row"><div class="mix-lab">${s.label}</div>`+
+    `<div class="mix-track"><div class="mix-fill" style="width:${s.val?Math.max(s.val/max*100,2):0}%"></div></div>`+
+    (s.val==null?`<div class="mix-val await">awaiting form</div>`:`<div class="mix-val">${money(s.val)}</div>`)+
+    `</div>`).join("");
+}
+
+/* ═══════════════ CAMPAIGN PLANNER (render) ═══════════════ */
+function pace(p){
+  if(p.ahead==null)return {cls:"",word:"—"};
+  return p.ahead>=0?{cls:"ahead",word:money(p.ahead)+" ahead"}:{cls:"behind",word:money(-p.ahead)+" behind"};
+}
+function renderRepPlanner(r){
+  $("rp-title").textContent=(MODE==="rep"?"Your ":"")+"Campaign Planner · "+SELECTED_CAMPAIGN;
+  const p=plannerFor(r);
+  if(!p||!p.inp.cpoGoal){
+    $("rep-planner").innerHTML=`<div class="plan-empty">No plan set for ${SELECTED_CAMPAIGN} yet — hit <b>Edit plan</b> to set the CPO goal, avg order, and closing %. Appointments needed and weekly pace compute automatically.</div>`;
+    return;
+  }
+  const pc=pace(p);
+  const cells=[
+    {lab:"Appts needed",val:p.apptsNeeded==null?"—":Math.ceil(p.apptsNeeded).toLocaleString(),meta:p.apptPerWk==null?"":`${(Math.round(p.apptPerWk*10)/10)}/wk`+(p.apptPerDay?` · ${(Math.round(p.apptPerDay*10)/10)}/day`:"")},
+    {lab:"Weekly expected",val:money(p.weeklyExpCPO),meta:`week ${p.wkNow} of ${p.inp.weeks}`},
+    {lab:"Plan vs reality",val:p.realAvgOrder==null?"—":money(p.realAvgOrder),meta:`real avg order vs ${money(p.inp.avgOrder)} planned`+(p.realClosing!=null?` · closing ${p.realClosing}% vs ${p.inp.closingPct}%`:"")}
+  ];
+  let html=`<div class="plan-grid">
+    <div class="plan-hero ${pc.cls}"><div class="lab">Campaign goal pace</div><div class="val">${pc.word}</div>
+      <div class="meta">${money(p.actualToDate)} actual vs ${money(p.expectedToDate)} expected · goal ${money(p.inp.cpoGoal)}</div></div>`+
+    cells.map(c=>`<div class="kpi"><div class="lab">${c.lab}</div><div class="val" style="font-size:22px">${c.val}</div><div class="meta">${c.meta}</div></div>`).join("")+
+  `</div>`;
+  if(p.events.length){
+    html+=`<table class="ptable"><thead><tr><th>Event</th><th>Wk</th><th>Days</th><th>Expected</th><th>Actual</th><th>Δ</th></tr></thead><tbody>`+
+      p.events.map(e=>{
+        const d=(e.actual!=null&&e.exp!=null)?e.actual-e.exp:null;
+        return `<tr><td>${e.name||"—"}</td><td>${e.wk||"—"}</td><td>${e.days||"—"}</td><td>${money(e.exp)}</td><td>${money(e.actual)}</td>`+
+          `<td>${d==null?"—":`<span class="${d>=0?'up':'down'}">${d>=0?"+":""}${money(d).replace("$-","-$")}</span>`}</td></tr>`;
+      }).join("")+`</tbody></table>`;
+  }
+  $("rep-planner").innerHTML=html;
+}
+function renderAdminPlanner(){
+  const t=plannerTeam();
+  if(!t.rows.length){
+    $("admin-planner").innerHTML=`<div class="plan-empty">No campaign plans yet for ${SELECTED_CAMPAIGN}. Open any mentee (Rep toggle) and hit <b>Edit plan</b> — or click a name below once plans exist.</div>`;
+    return;
+  }
+  const rows=t.rows.sort((a,b)=>(b.plan.ahead??-9e9)-(a.plan.ahead??-9e9)).map(({rep,plan})=>{
+    const pc=pace(plan);
+    return `<tr><td>${rep.name}</td><td>${money(plan.inp.cpoGoal)}</td><td>${money(plan.weeklyExpCPO)}</td>`+
+      `<td>${money(plan.expectedToDate)}</td><td>${money(plan.actualToDate)}</td>`+
+      `<td><span class="${plan.ahead>=0?'up':'down'}">${pc.word}</span></td>`+
+      `<td><button class="rowbtn" onclick="openPlannerEditor('${rep.id}')">edit</button></td></tr>`;
+  }).join("");
+  const tp=pace({ahead:t.ahead});
+  $("admin-planner").innerHTML=`<table class="ptable">
+    <thead><tr><th>Mentee</th><th>Goal</th><th>Exp/wk</th><th>Expected</th><th>Actual</th><th>Pace</th><th></th></tr></thead>
+    <tbody>${rows}</tbody>
+    <tfoot><tr style="font-weight:600;background:#FCFBF8"><td>Team</td><td>${money(t.goal)}</td><td></td><td>${money(t.expected)}</td><td>${money(t.actual)}</td><td><span class="${(t.ahead??0)>=0?'up':'down'}">${tp.word}</span></td><td></td></tr></tfoot>
+  </table>`;
+}
+
+/* ═══════════════ COACHING CALLS (render) ═══════════════ */
+function callCardBits(cs){
+  const month=monthName();
+  if(cs.status==="done")return {title:`${month} call${cs.req>1?"s":""} done 🎉`,sub:`${cs.completed}/${cs.req} completed · survey in`,btn:null};
+  if(cs.status==="survey")return {title:"Complete your call survey",sub:`Your ${month} call happened — lock in the takeaways while they're fresh`,btn:CONFIG.SURVEY_FORM_URL?{lab:"Open survey ↗",url:CONFIG.SURVEY_FORM_URL}:null};
+  if(cs.status==="booked")return {title:`Booked for ${cs.upcoming.toLocaleDateString(undefined,{weekday:"long",month:"short",day:"numeric"})}`,sub:cs.upcoming.toLocaleTimeString(undefined,{hour:"numeric",minute:"2-digit"})+(cs.req>1?` · ${cs.completed}/${cs.req} this month`:""),btn:null};
+  return {title:`Book your ${month} call`,sub:`${cs.req}/month for your tier · this is your formal 1-on-1, separate from weekly standards`,btn:{lab:"Book on Calendly ↗",url:CONFIG.CALENDLY_URL}};
+}
+function renderRepCallCard(r){
+  const sec=$("rep-call-sec");
+  if(MODE!=="rep"){sec.classList.add("hidden");return;}
+  sec.classList.remove("hidden");
+  const cs=callState(r), b=callCardBits(cs);
+  let notes="";
+  if(cs.status==="done"&&cs.surveys.length){
+    notes=`<div class="cc-notes">`+cs.surveys.slice(-cs.req).map(s=>
+      `<div class="cc-note"><b>Your takeaways</b>${(s.Takeaways||"—")}</div>`+
+      `<div class="cc-note"><b>Your action steps</b>${(s.ActionSteps||"—")}</div>`).join("")+`</div>`;
+  }
+  $("rep-call-card").innerHTML=`<div class="call-card s-${cs.status}">
+    <span class="cc-dot"></span>
+    <div class="cc-main"><div class="cc-title">${b.title}</div><div class="cc-sub">${b.sub}</div>${notes}</div>
+    ${b.btn?`<a class="form-btn" href="${b.btn.url}" target="_blank" rel="noopener">${b.btn.lab}</a>`:""}
+  </div>`;
+}
+function renderAdminCalls(){
+  $("calls-month").textContent=monthName();
+  if(!CALLS_RAW.length&&!SURVEY_RAW.length){
+    $("admin-calls").innerHTML=`<div class="plan-empty">The <b>Calls</b> tab isn't feeding yet — once Calendly + the survey are wired, every mentee's month shows here with overdue flags.</div>`;
+    $("calls-feed").innerHTML="";
+    return;
+  }
+  const rows=[...DATA].map(r=>({r,cs:callState(r)}))
+    .sort((a,b)=>(a.cs.status==="done"?1:0)-(b.cs.status==="done"?1:0)||a.r.name.localeCompare(b.r.name));
+  const statusLab={none:"not booked",booked:"booked",survey:"survey pending",done:"done"};
+  $("admin-calls").innerHTML=`<div class="calls-grid">`+rows.map(({r,cs})=>{
+    const od=cs.overdue?` od`:"";
+    const lab=(cs.overdue?"OVERDUE · ":"")+statusLab[cs.status]+(cs.req>1?` ${Math.min(cs.completed,cs.surveyed)}/${cs.req}`:"");
+    return `<div class="call-row s-${cs.status}${od}"><span class="st"></span>${r.name}`+
+      `<span class="cr-lab">${lab}</span>`+
+      `<button class="linkbtn" title="copy ${r.name}'s personal dashboard link" onclick="navigator.clipboard.writeText(repLink('${r.id}')).then(()=>{this.textContent='✓';setTimeout(()=>this.textContent='🔗',1200)})">🔗</button></div>`;
+  }).join("")+`</div>`;
+  const feed=[...SURVEY_RAW].map(s=>({...s,t:ciParseDate(s.Timestamp)})).filter(s=>s.t)
+    .sort((a,b)=>b.t-a.t).slice(0,8);
+  $("calls-feed").innerHTML=feed.length?feed.map(s=>{
+    const rep=DATA.find(r=>String(r.id)===String(s.RepID));
+    return `<div class="note"><div class="wk">${rep?rep.name:s.RepID} · ${s.t.toLocaleDateString(undefined,{month:"short",day:"numeric"})}</div>`+
+      `<div class="row"><b>Takeaways:</b> ${s.Takeaways||"—"}</div><div class="row"><b>Action steps:</b> ${s.ActionSteps||"—"}</div></div>`;
+  }).join(""):`<div class="sum-empty">No surveys yet this month.</div>`;
+}
+
+/* ═══════════════ PLANNER EDITOR (writes via Apps Script web app) ═══════════════ */
+let EDIT_REP=null;
+function openPlannerEditor(repId){
+  if(MODE==="rep"&&ME&&repId!==ME.id)return;    // reps edit their own plan only
+  EDIT_REP=repId;
+  const r=DATA.find(x=>String(x.id)===String(repId)); if(!r)return;
+  const p=plannerFor(r), f=$("plan-form");
+  $("pd-title").textContent=`${r.name} — ${SELECTED_CAMPAIGN} plan`;
+  const set=(n,v)=>{f.elements[n].value=v==null?"":v;};
+  set("CPOGoal",p?.inp.cpoGoal); set("Weeks",p?.inp.weeks??18);
+  set("CampaignStart",(p?.inp.start||campaignStartDefault(SELECTED_CAMPAIGN)).toISOString().slice(0,10));
+  set("DaysOff",p?.inp.daysOff??0); set("EventShifts",p?.inp.eventShifts??0); set("ApptDays",p?.inp.apptDays??0);
+  set("AvgOrder",p?.inp.avgOrder); set("ClosingPct",p?.inp.closingPct);
+  set("EventsText",(p?.inp.events||[]).map(e=>[e.wk,e.name,e.days,e.exp].join(" | ")).join("\n"));
+  $("pd-msg").textContent=CONFIG.WEBAPP_URL?"":"Saving isn't wired yet — deploy the Apps Script web app and paste its URL into CONFIG.WEBAPP_URL.";
+  $("pd-save").disabled=!CONFIG.WEBAPP_URL;
+  $("plan-dlg").showModal();
+}
+async function savePlanner(ev){
+  ev.preventDefault();
+  const f=$("plan-form");
+  const events=(f.elements.EventsText.value||"").split("\n").map(l=>l.split("|").map(s=>s.trim())).filter(a=>a.length>=2&&a[1])
+    .map(a=>({wk:+a[0]||null,name:a[1],days:+a[2]||null,exp:+a[3]||null}));
+  const body={action:"savePlanner",repId:EDIT_REP,campaign:SELECTED_CAMPAIGN,
+    CPOGoal:+f.elements.CPOGoal.value||0,Weeks:+f.elements.Weeks.value||18,
+    CampaignStart:f.elements.CampaignStart.value,DaysOff:+f.elements.DaysOff.value||0,
+    EventShifts:+f.elements.EventShifts.value||0,ApptDays:+f.elements.ApptDays.value||0,
+    AvgOrder:+f.elements.AvgOrder.value||0,ClosingPct:+f.elements.ClosingPct.value||0,
+    EventsJSON:JSON.stringify(events)};
+  $("pd-msg").textContent="Saving…";$("pd-save").disabled=true;
+  try{
+    const res=await fetch(CONFIG.WEBAPP_URL,{method:"POST",body:JSON.stringify(body)}); // text/plain avoids preflight
+    const j=await res.json();
+    if(!j.ok)throw new Error(j.error||"save failed");
+    $("plan-dlg").close();
+    await loadData();renderAll();
+  }catch(e){$("pd-msg").textContent="Couldn't save: "+e.message;}
+  finally{$("pd-save").disabled=!CONFIG.WEBAPP_URL;}
+  return false;
 }
 
 /* ═══════════════ REP ═══════════════ */
 function fillRepSelect(){
-  $("rep-select").innerHTML=[...DATA].sort((a,b)=>a.name.localeCompare(b.name)).map(r=>`<option value="${r.id}">${r.name}</option>`).join("");
+  const sel=$("rep-select"), prev=sel.value;
+  sel.innerHTML=[...DATA].sort((a,b)=>a.name.localeCompare(b.name)).map(r=>`<option value="${r.id}">${r.name}</option>`).join("");
+  if(prev&&DATA.some(r=>r.id===prev))sel.value=prev;  // keep the coach's selection across refreshes
 }
-const currentRep=()=>DATA.find(r=>r.id===$("rep-select").value);
+const currentRep=()=>MODE==="rep"?ME:DATA.find(r=>r.id===$("rep-select").value);
 
 function renderRepContext(r){
   const chips=[
@@ -842,21 +1272,59 @@ function renderStandards(r){
     </div>
     <div class="strip">${strip}</div>`;
 }
-function renderNotes(){
-  $("notes").innerHTML=`<div class="note"><div class="wk">Awaiting weekly form</div><div class="row">Each submission's <b>win</b>, <b>obstacle</b>, and <b>next-week commitment</b> will list here, newest first — so a coach preps a call in 10 seconds.</div></div>`;
+function renderNotes(r){
+  if(!r.notes||!r.notes.length){
+    $("notes").innerHTML=`<div class="note"><div class="wk">No check-ins yet</div><div class="row">Each submission's <b>win</b>, <b>obstacle</b>, and <b>next-week commitment</b> will list here, newest first — so a coach preps a call in 10 seconds.</div></div>`;
+    return;
+  }
+  $("notes").innerHTML=r.notes.map(n=>
+    `<div class="note"><div class="wk">Week ${n.week??"—"}</div>`+
+    (n.win?`<div class="row"><b>Win:</b> ${n.win}</div>`:"")+
+    (n.obs?`<div class="row"><b>Obstacle:</b> ${n.obs}</div>`:"")+
+    (n.commit?`<div class="row"><b>Commitment:</b> ${n.commit}</div>`:"")+
+    `</div>`).join("");
 }
 function renderRep(){
-  const r=currentRep();
-  renderRepContext(r);renderHero(r);renderSummary(r);renderChart();renderChannels(r);renderDiagnostics(r);renderStandards(r);renderNotes();
+  const r=currentRep(); if(!r)return;
+  renderRepContext(r);renderHero(r);renderSummary(r);renderChart();renderChannels(r);renderDiagnostics(r);renderStandards(r);renderNotes(r);
+  renderRepPlanner(r);renderRepCallCard(r);
 }
 
-/* ═══════════════ INIT ═══════════════ */
-async function init(){
-  await loadData();
+/* ═══════════════ MODE CHROME + INIT ═══════════════ */
+function applyMode(){
+  const isRep=MODE==="rep", locked=MODE==="locked";
+  document.querySelector(".toggle").classList.toggle("hidden",isRep||locked);
+  $("view-team").classList.toggle("hidden",isRep||locked);
+  $("view-rep").classList.toggle("hidden",locked||(!isRep&&!$("btn-rep").classList.contains("on")));
+  $("lockout").classList.toggle("hidden",!locked);
+  $("rep-select").classList.toggle("hidden",isRep);
+  $("rep-name-lock").classList.toggle("hidden",!isRep);
+  $("rep-team-block").classList.toggle("hidden",!isRep);
+  if(isRep){
+    $("rep-name-lock").textContent=ME.name;
+    document.querySelector(".brand .sub").textContent="All in on sales. All in on life. — Your Dashboard";
+  }
+}
+function renderAll(){
+  applyMode();
+  if(MODE==="locked")return;
+  if(MODE==="rep"){
+    renderRep();
+    renderTeamKpisRep();
+    renderLeaderboard("leaderboard-rep","lb-metric-rep");
+    renderMix("mix-rep");
+    return;
+  }
   renderCampaignSelect();
   renderPeriod();renderKPIs();renderCheckins();renderLeaderboard();renderHeat();renderMix();
+  renderAdminPlanner();renderAdminCalls();
   fillRepSelect();renderRep();
-  if(CONFIG.USE_LIVE_DATA)setInterval(async()=>{await loadData();renderCampaignSelect();renderPeriod();renderKPIs();renderCheckins();renderLeaderboard();renderHeat();renderMix();renderRep();},CONFIG.REFRESH_MS);
+}
+async function init(){
+  await loadData();
+  if(MODE==="rep")setView("rep");
+  renderAll();
+  if(CONFIG.USE_LIVE_DATA)setInterval(async()=>{await loadData();renderAll();},CONFIG.REFRESH_MS);
 }
 init();
 </script>
