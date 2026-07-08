@@ -265,6 +265,8 @@
   .ag input{width:100%;font-family:"Geist Mono";font-size:12.5px;padding:6px 8px;margin-top:3px;border:1px solid var(--line);border-radius:7px;background:var(--paper);color:var(--ink)}
   .ag input:focus{border-color:var(--accent);outline:none}
   .ag input::placeholder{color:var(--good);opacity:.9}
+  .a-real{display:block;font-family:"Geist Mono";font-size:9px;letter-spacing:.02em;color:var(--good);margin-top:3px;cursor:pointer;text-transform:none;white-space:nowrap}
+  .a-real:hover{text-decoration:underline}
   .pw-in{width:100%;max-width:70px;font-family:"Geist Mono";font-size:12px;padding:5px 6px;border:1px solid var(--line);border-radius:6px;background:var(--paper);color:var(--ink);text-align:right}
   .pw-in:focus{border-color:var(--accent);outline:none}
   .ptable td.pw-exp,.ptable td.pw-act{font-weight:600}
@@ -1033,22 +1035,31 @@ function renderRepPlanner(r){
   $("rp-title").textContent=(MODE==="rep"?"Your ":"")+"Campaign Planner · "+SELECTED_CAMPAIGN;
   const p=plannerFor(r);
   PLAN_REP=r.id;
+  PLAN_AUTO=p.auto; PLAN_WEEKS=p.weeks;
   const aChip=(n)=>n>=PLAN_MIN_ENTRIES?`<span class="chip-auto">AUTO · ${n} check-ins</span>`:`<span class="hint" style="font-size:9px">auto at 6 (${n}/6)</span>`;
-  const aIn=(f,man,autoVal,ph)=>`<label>${ph}<input class="pa-in" data-f="${f}" type="number" min="0" value="${man??""}" placeholder="${autoVal??"—"}" oninput="planEdit()"></label>`;
+  /* once a section clears 6 check-ins, the rep's REAL stat shows in small green
+     under the field — tap it to use it, or type any number to play with scenarios */
+  const aIn=(f,man,autoVal,ph,isMoney)=>{
+    const fmt=v=>isMoney?money(v):v+"%";
+    const hint=autoVal!=null
+      ?`<span class="a-real" title="tap to use your real stat" onclick="planFill('${f}',${autoVal})">yours: ${fmt(autoVal)}</span>`
+      :"";
+    return `<label>${ph}<input class="pa-in" data-f="${f}" type="number" min="0" value="${man??""}" placeholder="${autoVal??"—"}" oninput="planEdit()">${hint}</label>`;
+  };
   let html=`<div class="assume">
     <div class="ag"><div class="ah">Campaign Goal</div><div class="arow">
-      ${aIn("goal",p.cpoGoal,null,"CPO Goal $")}</div>
+      ${aIn("goal",p.cpoGoal,null,"CPO Goal $",true)}</div>
       <div class="hint" style="font-size:10px;margin-top:6px">week ${p.wkNow} of ${p.weeks} · starts ${p.start.toLocaleDateString(undefined,{month:"numeric",day:"numeric"})}</div></div>
     <div class="ag"><div class="ah">Demos ${aChip(p.auto.demo.n)}</div><div class="arow">
       ${aIn("dc",p.manual.dc,p.auto.demo.comp,"Completion %")}
       ${aIn("dcl",p.manual.dcl,p.auto.demo.close,"Closing %")}
-      ${aIn("dav",p.manual.dav,p.auto.demo.avg,"Avg Order $")}</div></div>
+      ${aIn("dav",p.manual.dav,p.auto.demo.avg,"Avg Order $",true)}</div></div>
     <div class="ag"><div class="ah">Service Calls ${aChip(p.auto.svc.n)}</div><div class="arow">
       ${aIn("sc",p.manual.sc,p.auto.svc.comp,"Completion %")}
       ${aIn("scl",p.manual.scl,p.auto.svc.close,"Closing %")}
-      ${aIn("sav",p.manual.sav,p.auto.svc.avg,"Avg Order $")}</div></div>
+      ${aIn("sav",p.manual.sav,p.auto.svc.avg,"Avg Order $",true)}</div></div>
     <div class="ag"><div class="ah">Events ${aChip(p.auto.ev.n)}</div><div class="arow">
-      ${aIn("sh",p.manual.sh,p.auto.ev.shiftAvg,"Shift Avg $")}</div></div>
+      ${aIn("sh",p.manual.sh,p.auto.ev.shiftAvg,"Shift Avg $",true)}</div></div>
   </div>`;
   const awc=`<span class="aw">—</span>`;
   html+=`<div class="heat-scroll"><table class="ptable" id="plan-grid"><thead><tr>
@@ -1075,20 +1086,57 @@ function planTotals(p){
   $("plan-totals").innerHTML=`<div class="plan-grid">
     <div class="plan-hero ${pc.cls}"><div class="lab">Pace vs your plan</div><div class="val">${pc.word}</div>
       <div class="meta">${money(p.actualToDate)} actual vs ${money(p.expToDate)} planned so far</div></div>
-    <div class="kpi"><div class="lab">Projected total</div><div class="val" style="font-size:22px">${money(p.projected)}</div>
-      <div class="meta">${p.plannedWeeks} of ${p.weeks} weeks planned</div></div>
-    <div class="kpi"><div class="lab">CPO goal</div><div class="val" style="font-size:22px">${money(p.cpoGoal)}</div>
-      <div class="meta">${vsGoal==null?"plan weeks to project":(vsGoal>=0?`plan covers goal +${money(vsGoal)}`:`plan short ${money(-vsGoal)} — add activity`)}</div></div>
+    <div class="kpi"><div class="lab">Projected total</div><div class="val" style="font-size:22px" id="pt-proj">${money(p.projected)}</div>
+      <div class="meta" id="pt-wks">${p.plannedWeeks} of ${p.weeks} weeks planned</div></div>
+    <div class="kpi"><div class="lab">CPO goal</div><div class="val" style="font-size:22px" id="pt-goal">${money(p.cpoGoal)}</div>
+      <div class="meta" id="pt-goalmeta">${vsGoal==null?"plan weeks to project":(vsGoal>=0?`plan covers goal +${money(vsGoal)}`:`plan short ${money(-vsGoal)} — add activity`)}</div></div>
     <div class="kpi"><div class="lab">Actual so far</div><div class="val" style="font-size:22px">${money(p.actualToDate)}</div>
       <div class="meta">from weekly check-ins</div></div>
   </div>`;
 }
 /* ── inline edits: recompute instantly, save after 1.2s of quiet ── */
-let PLAN_REP=null,PLAN_TIMER=null;
+let PLAN_REP=null,PLAN_TIMER=null,PLAN_AUTO=null,PLAN_WEEKS=PERIOD.weeks;
 function planEdit(){
   $("plan-saved").textContent="typing…";
+  planLiveRecalc();
   if(PLAN_TIMER)clearTimeout(PLAN_TIMER);
   PLAN_TIMER=setTimeout(planSave,1200);
+}
+/* tap a "yours: X" stat to drop it into the field */
+function planFill(f,v){
+  const el=document.querySelector(`.pa-in[data-f="${f}"]`);
+  if(!el)return;
+  el.value=v;
+  planEdit();
+}
+/* recompute Expected cells + projections straight from the DOM while typing —
+   blank assumption fields fall back to the rep's auto stats, exactly like a save would */
+function planLiveRecalc(){
+  const root=$("rep-planner"); if(!root||!PLAN_AUTO)return;
+  const g={};
+  root.querySelectorAll(".pa-in").forEach(el=>{const v=el.value.trim();g[el.dataset.f]=v===""?null:+v;});
+  const A={dc:g.dc??PLAN_AUTO.demo.comp, dcl:g.dcl??PLAN_AUTO.demo.close, dav:g.dav??PLAN_AUTO.demo.avg,
+           sc:g.sc??PLAN_AUTO.svc.comp, scl:g.scl??PLAN_AUTO.svc.close, sav:g.sav??PLAN_AUTO.svc.avg,
+           sh:g.sh??PLAN_AUTO.ev.shiftAvg};
+  let projected=null,planned=0;
+  root.querySelectorAll("#plan-grid tbody tr").forEach(tr=>{
+    const val=k=>{const el=tr.querySelector(`.pw-in[data-k="${k}"]`);const v=el?el.value.trim():"";return v===""?null:+v;};
+    const sh=val("sh"),da=val("da"),sa=val("sa");
+    let tot=null;
+    if(sh!=null&&A.sh!=null)tot=(tot||0)+sh*A.sh;
+    if(da!=null&&A.dc!=null&&A.dcl!=null&&A.dav!=null)tot=(tot||0)+da*(A.dc/100)*(A.dcl/100)*A.dav;
+    if(sa!=null&&A.sc!=null&&A.scl!=null&&A.sav!=null)tot=(tot||0)+sa*(A.sc/100)*(A.scl/100)*A.sav;
+    const cell=tr.querySelector(".pw-exp");
+    if(cell)cell.innerHTML=tot==null?`<span class="aw">—</span>`:money(tot);
+    if(tot!=null){projected=(projected||0)+tot;planned++;}
+  });
+  if($("pt-proj"))$("pt-proj").textContent=money(projected);
+  if($("pt-wks"))$("pt-wks").textContent=`${planned} of ${PLAN_WEEKS} weeks planned`;
+  if($("pt-goal"))$("pt-goal").textContent=money(g.goal||null);
+  if($("pt-goalmeta")){
+    const vs=(projected!=null&&g.goal)?projected-g.goal:null;
+    $("pt-goalmeta").textContent=vs==null?"plan weeks to project":(vs>=0?`plan covers goal +${money(vs)}`:`plan short ${money(-vs)} — add activity`);
+  }
 }
 function planReadDom(){
   const root=$("rep-planner");
