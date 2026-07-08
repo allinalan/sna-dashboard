@@ -438,6 +438,14 @@
     </div>
 
     <div class="section">
+      <div class="section-head">
+        <h2 class="serif">Coaching Call Notes</h2>
+        <span class="hint">takeaways &amp; action steps from the post-call survey · newest first</span>
+      </div>
+      <div class="notes" id="call-notes" style="display:grid;gap:10px"></div>
+    </div>
+
+    <div class="section">
       <div class="section-head"><h2 class="serif">Check-In Notes</h2></div>
       <div class="notes" id="notes" style="display:grid;gap:10px"></div>
     </div>
@@ -1431,10 +1439,30 @@ function renderNotes(r){
     (n.commit?`<div class="row"><b>Commitment:</b> ${n.commit}</div>`:"")+
     `</div>`).join("");
 }
+/* latest post-call survey notes for THIS rep — what landed, what they're
+   focusing on before the next call. Rep sees their own; coaches see anyone's. */
+function renderCallNotes(r){
+  const mine=SURVEY_RAW.filter(s=>String(s.RepID)===String(r.id))
+    .map(s=>({...s,t:ciParseDate(s.Timestamp)})).filter(s=>s.t)
+    .sort((a,b)=>b.t-a.t).slice(0,3);
+  if(!mine.length){
+    $("call-notes").innerHTML=`<div class="note"><div class="wk">No call surveys yet</div>`+
+      `<div class="row">After each 1-on-1, the <b>takeaways</b> and <b>action steps</b> from the post-call survey land here — so the next call starts where the last one ended.</div></div>`;
+    return;
+  }
+  $("call-notes").innerHTML=mine.map((s,i)=>{
+    const mp=String(s.Month||"").split("-");
+    const mLab=mp.length===2?new Date(+mp[0],+mp[1]-1,1).toLocaleDateString(undefined,{month:"long",year:"numeric"}):(s.Month||"");
+    return `<div class="note"${i===0?' style="border-color:var(--accent)"':''}>`+
+      `<div class="wk">${mLab} · ${s.t.toLocaleDateString(undefined,{month:"short",day:"numeric"})}${i===0?" · latest call":""}</div>`+
+      `<div class="row"><b>Takeaways:</b> ${s.Takeaways||"—"}</div>`+
+      `<div class="row"><b>Action steps before next call:</b> ${s.ActionSteps||"—"}</div></div>`;
+  }).join("");
+}
 function renderRep(){
   const r=currentRep(); if(!r)return;
   renderRepContext(r);renderHero(r);renderSummary(r);renderChart();renderChannels(r);renderDiagnostics(r);renderStandards(r);renderNotes(r);
-  renderRepPlanner(r);renderRepCallCard(r);
+  renderCallNotes(r);renderRepPlanner(r);renderRepCallCard(r);
 }
 
 /* ═══════════════ MODE CHROME + INIT ═══════════════ */
