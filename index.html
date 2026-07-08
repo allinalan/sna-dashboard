@@ -255,13 +255,21 @@
   .call-row .linkbtn{font-size:11px;border:none;background:none;cursor:pointer;color:var(--ink-soft);padding:2px}
   .call-row .linkbtn:hover{color:var(--accent)}
 
-  /* ── dialog ── */
-  dialog{border:1px solid var(--line);border-radius:16px;padding:22px;max-width:520px;width:92vw;background:var(--card);color:var(--ink)}
-  dialog::backdrop{background:rgba(22,20,15,.35)}
-  .pd-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
-  #plan-form label{font-family:"Geist Mono";font-size:10px;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-soft);display:flex;flex-direction:column;gap:4px}
-  #plan-form input,#plan-form textarea{font-family:"Geist Mono";font-size:12.5px;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:var(--paper);color:var(--ink);width:100%}
-  #plan-form input:focus,#plan-form textarea:focus{border-color:var(--accent);outline:none}
+  /* ── planner v2: assumptions + weekly grid ── */
+  .assume{display:grid;grid-template-columns:1.1fr 1.6fr 1.6fr 1fr;gap:10px;margin-bottom:14px}
+  .ag{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px;box-shadow:0 1px 2px rgba(22,20,15,.03),0 10px 28px -18px rgba(22,20,15,.16)}
+  .ag .ah{font-family:"Geist Mono";font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:9px;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+  .chip-auto{font-family:"Geist Mono";font-size:8.5px;letter-spacing:.04em;border:1px solid var(--good);color:var(--good);background:var(--good-bg);border-radius:5px;padding:1px 5px}
+  .ag .arow{display:flex;gap:8px}
+  .ag label{font-family:"Geist Mono";font-size:9px;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-soft);display:block;flex:1;min-width:0}
+  .ag input{width:100%;font-family:"Geist Mono";font-size:12.5px;padding:6px 8px;margin-top:3px;border:1px solid var(--line);border-radius:7px;background:var(--paper);color:var(--ink)}
+  .ag input:focus{border-color:var(--accent);outline:none}
+  .ag input::placeholder{color:var(--good);opacity:.9}
+  .pw-in{width:100%;max-width:70px;font-family:"Geist Mono";font-size:12px;padding:5px 6px;border:1px solid var(--line);border-radius:6px;background:var(--paper);color:var(--ink);text-align:right}
+  .pw-in:focus{border-color:var(--accent);outline:none}
+  .ptable td.pw-exp,.ptable td.pw-act{font-weight:600}
+  .ptable tr.wk-now td{background:var(--accent-soft)}
+  @media(max-width:880px){.assume{grid-template-columns:1fr 1fr}}
 
   @media(max-width:880px){
     .plan-grid{grid-template-columns:1fr 1fr}
@@ -435,7 +443,7 @@
     <div class="section" id="rep-planner-sec">
       <div class="section-head">
         <h2 class="serif" id="rp-title">Campaign Planner</h2>
-        <button class="form-btn" id="rp-edit-btn" onclick="openPlannerEditor(currentRep().id)" style="cursor:pointer">Edit plan</button>
+        <span class="hint" id="plan-saved">type in the grid — saves automatically</span>
       </div>
       <div id="rep-planner"></div>
     </div>
@@ -475,30 +483,6 @@
     </div>
   </div>
 
-  <!-- planner editor -->
-  <dialog id="plan-dlg">
-    <form method="dialog" id="plan-form" onsubmit="return savePlanner(event)">
-      <div class="serif" style="font-size:19px;font-weight:600" id="pd-title">Edit Campaign Plan</div>
-      <div class="pd-grid">
-        <label>CPO Goal ($)<input name="CPOGoal" type="number" min="0" step="500" required></label>
-        <label>Weeks<input name="Weeks" type="number" min="1" max="18" value="18"></label>
-        <label>Campaign start<input name="CampaignStart" type="date"></label>
-        <label>Days off<input name="DaysOff" type="number" min="0" value="0"></label>
-        <label>Event shifts<input name="EventShifts" type="number" min="0" value="0"></label>
-        <label>Appt days<input name="ApptDays" type="number" min="0" value="0"></label>
-        <label>Avg order ($)<input name="AvgOrder" type="number" min="0" step="10"></label>
-        <label>Closing %<input name="ClosingPct" type="number" min="0" max="100" step="1"></label>
-      </div>
-      <label style="display:block;margin-top:12px">Events — one per line: <span class="mono" style="font-size:10.5px">week | name | days | expected CPO</span>
-        <textarea name="EventsText" rows="4" placeholder="3 | Wilcox Wine Festival | 1 | 1000"></textarea>
-      </label>
-      <div id="pd-msg" style="font-size:11.5px;color:var(--ink-soft);margin-top:10px"></div>
-      <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:14px">
-        <button type="button" class="form-btn" style="background:var(--card);color:var(--ink)" onclick="document.getElementById('plan-dlg').close()">Cancel</button>
-        <button type="submit" class="form-btn" id="pd-save">Save plan</button>
-      </div>
-    </form>
-  </dialog>
 
   <div class="foot">
     <div class="foot-grid">
@@ -798,39 +782,78 @@ function campaignStartDefault(campaign){
   if(season==="Summer")return firstTueOnOrAfter(new Date(y,3,25));
   return firstTueOnOrAfter(new Date(y,8,1));
 }
+/* auto-assumptions from the rep's OWN check-in history (any campaign).
+   A section unlocks only after 6+ check-ins that filled it — enough data to trust. */
+const PLAN_MIN_ENTRIES=6;
+function autoAssumptions(r){
+  const mine=WEEKLY_RAW.filter(w=>String(w.RepID)===String(r.id));
+  const S=k=>mine.reduce((t,w)=>t+(+w[k]||0),0);
+  const cnt=k=>mine.filter(w=>w[k]!=null&&w[k]!=="").length;
+  const mk=(nK,sched,done,ord,cpo)=>{
+    const n=cnt(nK);
+    if(n<PLAN_MIN_ENTRIES)return {n,comp:null,close:null,avg:null};
+    return {n,
+      comp:S(sched)?Math.round(S(done)/S(sched)*100):null,
+      close:S(done)?Math.round(S(ord)/S(done)*100):null,
+      avg:S(ord)?Math.round(S(cpo)/S(ord)):null};
+  };
+  const evN=cnt("Event_Shifts");
+  return {
+    demo:mk("Demos_Done","Demos_Sched","Demos_Done","Demos_Orders","Demos_CPO"),
+    svc:mk("SVC_Done","SVC_Sched","SVC_Done","SVC_Orders","SVC_CPO"),
+    ev:{n:evN, shiftAvg:(evN>=PLAN_MIN_ENTRIES&&S("Event_Shifts"))?Math.round(S("Event_CPO")/S("Event_Shifts")):null}
+  };
+}
+const pnum=x=>{if(x==null||x==="")return null;const v=+x;return isNaN(v)?null:v;};
+const pman=x=>{const v=pnum(x);return v&&v>0?v:null;}; // stored 0/blank = "use auto"
 function plannerFor(r){
-  const row=PLANNER_RAW.find(p=>String(p.RepID)===String(r.id)&&String(p.Campaign||"").trim()===SELECTED_CAMPAIGN);
-  if(!row)return null;
-  let events=[];try{events=JSON.parse(row.EventsJSON||"[]")||[];}catch(e){}
-  const weeks=+row.Weeks||PERIOD.weeks;
-  const start=ciParseDate(row.CampaignStart)||campaignStartDefault(SELECTED_CAMPAIGN);
-  const inp={cpoGoal:+row.CPOGoal||null, weeks, start,
-    daysOff:+row.DaysOff||0, eventShifts:+row.EventShifts||0, apptDays:+row.ApptDays||0,
-    avgOrder:+row.AvgOrder||null, closingPct:+row.ClosingPct||null, events};
-  // derived — every number computed, never typed
-  const ordersNeeded=ratio(inp.cpoGoal,inp.avgOrder);
-  const apptsNeeded=ratio(ordersNeeded,inp.closingPct?inp.closingPct/100:null);
-  const apptPerWk=ratio(apptsNeeded,weeks);
-  const apptPerDay=ratio(apptsNeeded,inp.apptDays||null);
-  const weeklyExpCPO=ratio(inp.cpoGoal,weeks);
-  const wkNow=Math.min(weeks,Math.max(1,Math.floor((Date.now()-start.getTime())/(7*86400000))+1));
-  const expectedToDate=weeklyExpCPO!=null?weeklyExpCPO*wkNow:null;
+  const row=PLANNER_RAW.find(p=>String(p.RepID)===String(r.id)&&String(p.Campaign||"").trim()===SELECTED_CAMPAIGN)||null;
+  const auto=autoAssumptions(r);
+  const weeks=(row&&+row.Weeks)||PERIOD.weeks;
+  const start=(row&&ciParseDate(row.CampaignStart))||campaignStartDefault(SELECTED_CAMPAIGN);
+  const manual={dc:pman(row&&row.DemoCompPct),dcl:pman(row&&row.DemoClosePct),dav:pman(row&&row.DemoAvgOrder),
+                sc:pman(row&&row.SvcCompPct),scl:pman(row&&row.SvcClosePct),sav:pman(row&&row.SvcAvgOrder),
+                sh:pman(row&&row.ShiftAvg)};
+  const A={dc:manual.dc??auto.demo.comp, dcl:manual.dcl??auto.demo.close, dav:manual.dav??auto.demo.avg,
+           sc:manual.sc??auto.svc.comp, scl:manual.scl??auto.svc.close, sav:manual.sav??auto.svc.avg,
+           sh:manual.sh??auto.ev.shiftAvg};
+  let weekly={};try{weekly=JSON.parse((row&&row.WeeklyJSON)||"{}")||{};}catch(e){}
+  const expWk=w=>{ // shifts×shiftAvg + demoAppts×comp%×close%×avgOrder + svcAppts×(same) — null when unplannable
+    if(!w)return null;
+    let tot=null;
+    const sh=pnum(w.sh),da=pnum(w.da),sa=pnum(w.sa);
+    if(sh!=null&&A.sh!=null)tot=(tot||0)+sh*A.sh;
+    if(da!=null&&A.dc!=null&&A.dcl!=null&&A.dav!=null)tot=(tot||0)+da*(A.dc/100)*(A.dcl/100)*A.dav;
+    if(sa!=null&&A.sc!=null&&A.scl!=null&&A.sav!=null)tot=(tot||0)+sa*(A.sc/100)*(A.scl/100)*A.sav;
+    return tot;
+  };
+  const now=new Date();
+  const weeksArr=Array.from({length:weeks},(_,i)=>{
+    const plan=weekly[i+1]||weekly[String(i+1)]||null;
+    const ws=new Date(start.getTime()+i*7*86400000);
+    const we=new Date(ws.getTime()+6*86400000+86399000);
+    return {wk:i+1,ws,we,plan:plan||{},exp:expWk(plan),actual:r.sales[i]??null,
+      past:we<now,current:ws<=now&&now<=we};
+  });
+  const cpoGoal=pman(row&&row.CPOGoal);
+  const planned=weeksArr.filter(w=>w.exp!=null);
+  const projected=planned.length?planned.reduce((t,w)=>t+w.exp,0):null;
+  const wkNow=Math.min(weeks,Math.max(1,Math.floor((now-start.getTime())/(7*86400000))+1));
+  // pace vs YOUR plan when weeks are planned; else even split of the goal
+  const pastPlanned=weeksArr.filter(w=>w.past&&w.exp!=null);
+  const expToDate=pastPlanned.length?pastPlanned.reduce((t,w)=>t+w.exp,0)
+    :(cpoGoal!=null?cpoGoal/weeks*wkNow:null);
   const actualToDate=totalSales(r);
-  const ahead=expectedToDate!=null?actualToDate-expectedToDate:null;
-  // actual (real) rates from live data — planner assumptions vs reality
-  const realAvgOrder=avgOrder(totalSales(r),totalOrders(r));
-  const realClosing=closingPct(r,"demos");
-  const eventsView=events.map(e=>({...e,
-    actual:(e.wk&&r.evtCpoWk&&r.evtCpoWk[e.wk-1]!=null)?r.evtCpoWk[e.wk-1]:null}));
-  return {inp,ordersNeeded,apptsNeeded,apptPerWk,apptPerDay,weeklyExpCPO,
-    wkNow,expectedToDate,actualToDate,ahead,realAvgOrder,realClosing,events:eventsView,row};
+  const ahead=expToDate!=null?actualToDate-expToDate:null;
+  return {row,cpoGoal,weeks,start,manual,auto,A,weeksArr,projected,
+    plannedWeeks:planned.length,wkNow,expToDate,actualToDate,ahead};
 }
 function plannerTeam(){
-  const rows=DATA.map(r=>({rep:r,plan:plannerFor(r)})).filter(x=>x.plan&&x.plan.inp.cpoGoal);
-  const t=(fn)=>rows.length?rows.map(fn).filter(x=>x!=null).reduce((a,b)=>a+b,0):null;
+  const rows=DATA.map(r=>({rep:r,plan:plannerFor(r)})).filter(x=>x.plan.cpoGoal!=null||x.plan.plannedWeeks>0);
+  const t=fn=>rows.length?rows.map(fn).filter(x=>x!=null).reduce((a,b)=>a+b,0):null;
   return {rows,
-    goal:t(x=>x.plan.inp.cpoGoal), expected:t(x=>x.plan.expectedToDate),
-    actual:t(x=>x.plan.actualToDate), ahead:t(x=>x.plan.ahead)};
+    goal:t(x=>x.plan.cpoGoal), projected:t(x=>x.plan.projected),
+    expected:t(x=>x.plan.expToDate), actual:t(x=>x.plan.actualToDate), ahead:t(x=>x.plan.ahead)};
 }
 
 /* rep link for the admin board — how each mentee's personal URL is formed */
@@ -1004,52 +1027,141 @@ function pace(p){
   return p.ahead>=0?{cls:"ahead",word:money(p.ahead)+" ahead"}:{cls:"behind",word:money(-p.ahead)+" behind"};
 }
 function renderRepPlanner(r){
+  const root=$("rep-planner");
+  // don't clobber the grid while someone is typing or a save is pending
+  if(root.contains(document.activeElement)||PLAN_TIMER)return;
   $("rp-title").textContent=(MODE==="rep"?"Your ":"")+"Campaign Planner · "+SELECTED_CAMPAIGN;
   const p=plannerFor(r);
-  if(!p||!p.inp.cpoGoal){
-    $("rep-planner").innerHTML=`<div class="plan-empty">No plan set for ${SELECTED_CAMPAIGN} yet — hit <b>Edit plan</b> to set the CPO goal, avg order, and closing %. Appointments needed and weekly pace compute automatically.</div>`;
-    return;
-  }
+  PLAN_REP=r.id;
+  const aChip=(n)=>n>=PLAN_MIN_ENTRIES?`<span class="chip-auto">AUTO · ${n} check-ins</span>`:`<span class="hint" style="font-size:9px">auto at 6 (${n}/6)</span>`;
+  const aIn=(f,man,autoVal,ph)=>`<label>${ph}<input class="pa-in" data-f="${f}" type="number" min="0" value="${man??""}" placeholder="${autoVal??"—"}" oninput="planEdit()"></label>`;
+  let html=`<div class="assume">
+    <div class="ag"><div class="ah">Campaign Goal</div><div class="arow">
+      ${aIn("goal",p.cpoGoal,null,"CPO Goal $")}</div>
+      <div class="hint" style="font-size:10px;margin-top:6px">week ${p.wkNow} of ${p.weeks} · starts ${p.start.toLocaleDateString(undefined,{month:"numeric",day:"numeric"})}</div></div>
+    <div class="ag"><div class="ah">Demos ${aChip(p.auto.demo.n)}</div><div class="arow">
+      ${aIn("dc",p.manual.dc,p.auto.demo.comp,"Completion %")}
+      ${aIn("dcl",p.manual.dcl,p.auto.demo.close,"Closing %")}
+      ${aIn("dav",p.manual.dav,p.auto.demo.avg,"Avg Order $")}</div></div>
+    <div class="ag"><div class="ah">Service Calls ${aChip(p.auto.svc.n)}</div><div class="arow">
+      ${aIn("sc",p.manual.sc,p.auto.svc.comp,"Completion %")}
+      ${aIn("scl",p.manual.scl,p.auto.svc.close,"Closing %")}
+      ${aIn("sav",p.manual.sav,p.auto.svc.avg,"Avg Order $")}</div></div>
+    <div class="ag"><div class="ah">Events ${aChip(p.auto.ev.n)}</div><div class="arow">
+      ${aIn("sh",p.manual.sh,p.auto.ev.shiftAvg,"Shift Avg $")}</div></div>
+  </div>`;
+  const awc=`<span class="aw">—</span>`;
+  html+=`<div class="heat-scroll"><table class="ptable" id="plan-grid"><thead><tr>
+    <th>Wk</th><th>Dates</th><th>Shifts</th><th>Demo Appts</th><th>Svc Appts</th>
+    <th>Expected</th><th>Actual</th><th>Δ</th></tr></thead><tbody>`;
+  p.weeksArr.forEach(w=>{
+    const d=(w.actual!=null&&w.exp!=null)?w.actual-w.exp:null;
+    const dts=`${w.ws.getMonth()+1}/${w.ws.getDate()}–${w.we.getMonth()+1}/${w.we.getDate()}`;
+    const cell=k=>`<td><input class="pw-in" data-wk="${w.wk}" data-k="${k}" type="number" min="0" value="${w.plan[k]??""}" placeholder="—" oninput="planEdit()"></td>`;
+    html+=`<tr class="${w.current?'wk-now':''}"><td style="font-weight:600">${w.wk}</td>`+
+      `<td style="text-align:left;color:var(--ink-soft);font-size:11px">${dts}</td>`+
+      cell("sh")+cell("da")+cell("sa")+
+      `<td class="pw-exp" id="pexp-${w.wk}">${w.exp==null?awc:money(w.exp)}</td>`+
+      `<td class="pw-act">${w.actual==null?awc:money(w.actual)}</td>`+
+      `<td id="pdel-${w.wk}">${d==null?awc:`<span class="${d>=0?'up':'down'}">${d>=0?"+":"−"}${money(Math.abs(d))}</span>`}</td></tr>`;
+  });
+  html+=`</tbody></table></div><div id="plan-totals" style="margin-top:14px"></div>`;
+  root.innerHTML=html;
+  planTotals(p);
+}
+function planTotals(p){
   const pc=pace(p);
-  const cells=[
-    {lab:"Appts needed",val:p.apptsNeeded==null?"—":Math.ceil(p.apptsNeeded).toLocaleString(),meta:p.apptPerWk==null?"":`${(Math.round(p.apptPerWk*10)/10)}/wk`+(p.apptPerDay?` · ${(Math.round(p.apptPerDay*10)/10)}/day`:"")},
-    {lab:"Weekly expected",val:money(p.weeklyExpCPO),meta:`week ${p.wkNow} of ${p.inp.weeks}`},
-    {lab:"Plan vs reality",val:p.realAvgOrder==null?"—":money(p.realAvgOrder),meta:`real avg order vs ${money(p.inp.avgOrder)} planned`+(p.realClosing!=null?` · closing ${p.realClosing}% vs ${p.inp.closingPct}%`:"")}
-  ];
-  let html=`<div class="plan-grid">
-    <div class="plan-hero ${pc.cls}"><div class="lab">Campaign goal pace</div><div class="val">${pc.word}</div>
-      <div class="meta">${money(p.actualToDate)} actual vs ${money(p.expectedToDate)} expected · goal ${money(p.inp.cpoGoal)}</div></div>`+
-    cells.map(c=>`<div class="kpi"><div class="lab">${c.lab}</div><div class="val" style="font-size:22px">${c.val}</div><div class="meta">${c.meta}</div></div>`).join("")+
-  `</div>`;
-  if(p.events.length){
-    html+=`<table class="ptable"><thead><tr><th>Event</th><th>Wk</th><th>Days</th><th>Expected</th><th>Actual</th><th>Δ</th></tr></thead><tbody>`+
-      p.events.map(e=>{
-        const d=(e.actual!=null&&e.exp!=null)?e.actual-e.exp:null;
-        return `<tr><td>${e.name||"—"}</td><td>${e.wk||"—"}</td><td>${e.days||"—"}</td><td>${money(e.exp)}</td><td>${money(e.actual)}</td>`+
-          `<td>${d==null?"—":`<span class="${d>=0?'up':'down'}">${d>=0?"+":""}${money(d).replace("$-","-$")}</span>`}</td></tr>`;
-      }).join("")+`</tbody></table>`;
-  }
-  $("rep-planner").innerHTML=html;
+  const vsGoal=(p.projected!=null&&p.cpoGoal!=null)?p.projected-p.cpoGoal:null;
+  $("plan-totals").innerHTML=`<div class="plan-grid">
+    <div class="plan-hero ${pc.cls}"><div class="lab">Pace vs your plan</div><div class="val">${pc.word}</div>
+      <div class="meta">${money(p.actualToDate)} actual vs ${money(p.expToDate)} planned so far</div></div>
+    <div class="kpi"><div class="lab">Projected total</div><div class="val" style="font-size:22px">${money(p.projected)}</div>
+      <div class="meta">${p.plannedWeeks} of ${p.weeks} weeks planned</div></div>
+    <div class="kpi"><div class="lab">CPO goal</div><div class="val" style="font-size:22px">${money(p.cpoGoal)}</div>
+      <div class="meta">${vsGoal==null?"plan weeks to project":(vsGoal>=0?`plan covers goal +${money(vsGoal)}`:`plan short ${money(-vsGoal)} — add activity`)}</div></div>
+    <div class="kpi"><div class="lab">Actual so far</div><div class="val" style="font-size:22px">${money(p.actualToDate)}</div>
+      <div class="meta">from weekly check-ins</div></div>
+  </div>`;
+}
+/* ── inline edits: recompute instantly, save after 1.2s of quiet ── */
+let PLAN_REP=null,PLAN_TIMER=null;
+function planEdit(){
+  $("plan-saved").textContent="typing…";
+  if(PLAN_TIMER)clearTimeout(PLAN_TIMER);
+  PLAN_TIMER=setTimeout(planSave,1200);
+}
+function planReadDom(){
+  const root=$("rep-planner");
+  const weekly={};
+  root.querySelectorAll(".pw-in").forEach(el=>{
+    const v=el.value.trim();
+    if(v==="")return;
+    (weekly[el.dataset.wk]=weekly[el.dataset.wk]||{})[el.dataset.k]=+v;
+  });
+  const f={};
+  root.querySelectorAll(".pa-in").forEach(el=>{f[el.dataset.f]=el.value.trim()===""?0:+el.value;});
+  return {weekly,f};
+}
+async function planSave(){
+  PLAN_TIMER=null;
+  if(!PLAN_REP||!CONFIG.WEBAPP_URL)return;
+  const {weekly,f}=planReadDom();
+  const p=plannerFor(DATA.find(x=>x.id===PLAN_REP)||ME);
+  const body={action:"savePlanner",repId:PLAN_REP,campaign:SELECTED_CAMPAIGN,
+    CPOGoal:f.goal||0,Weeks:p.weeks,CampaignStart:p.start.toISOString().slice(0,10),
+    DaysOff:0,EventShifts:0,ApptDays:0,AvgOrder:0,ClosingPct:0,EventsJSON:"[]",
+    DemoCompPct:f.dc||0,DemoClosePct:f.dcl||0,DemoAvgOrder:f.dav||0,
+    SvcCompPct:f.sc||0,SvcClosePct:f.scl||0,SvcAvgOrder:f.sav||0,ShiftAvg:f.sh||0,
+    WeeklyJSON:JSON.stringify(weekly)};
+  $("plan-saved").textContent="saving…";
+  try{
+    const j=await fetch(CONFIG.WEBAPP_URL,{method:"POST",body:JSON.stringify(body)}).then(r=>r.json());
+    if(!j.ok)throw new Error(j.error||"save failed");
+    $("plan-saved").textContent="saved ✓";
+    await loadData();
+    if(!$("rep-planner").contains(document.activeElement)){renderAll();}
+    else{planRefreshComputed();}
+  }catch(e){$("plan-saved").textContent="⚠ not saved — "+e.message;}
+}
+/* update Expected cells + totals from current DOM values without re-rendering inputs */
+function planRefreshComputed(){
+  const r=DATA.find(x=>x.id===PLAN_REP)||ME; if(!r)return;
+  const p=plannerFor(r);
+  p.weeksArr.forEach(w=>{
+    const el=$("pexp-"+w.wk);
+    if(el)el.innerHTML=w.exp==null?`<span class="aw">—</span>`:money(w.exp);
+  });
+  planTotals(p);
 }
 function renderAdminPlanner(){
   const t=plannerTeam();
   if(!t.rows.length){
-    $("admin-planner").innerHTML=`<div class="plan-empty">No campaign plans yet for ${SELECTED_CAMPAIGN}. Open any mentee (Rep toggle) and hit <b>Edit plan</b> — or click a name below once plans exist.</div>`;
+    $("admin-planner").innerHTML=`<div class="plan-empty">No campaign plans yet for ${SELECTED_CAMPAIGN}. Open any mentee (Rep toggle) and plan their weeks — shifts and appointments per week, expected CPO computes automatically.</div>`;
     return;
   }
   const rows=t.rows.sort((a,b)=>(b.plan.ahead??-9e9)-(a.plan.ahead??-9e9)).map(({rep,plan})=>{
     const pc=pace(plan);
-    return `<tr><td>${rep.name}</td><td>${money(plan.inp.cpoGoal)}</td><td>${money(plan.weeklyExpCPO)}</td>`+
-      `<td>${money(plan.expectedToDate)}</td><td>${money(plan.actualToDate)}</td>`+
-      `<td><span class="${plan.ahead>=0?'up':'down'}">${pc.word}</span></td>`+
-      `<td><button class="rowbtn" onclick="openPlannerEditor('${rep.id}')">edit</button></td></tr>`;
+    return `<tr><td>${rep.name}</td><td>${money(plan.cpoGoal)}</td>`+
+      `<td>${plan.plannedWeeks?plan.plannedWeeks+"/"+plan.weeks:"—"}</td>`+
+      `<td>${money(plan.projected)}</td><td>${money(plan.expToDate)}</td><td>${money(plan.actualToDate)}</td>`+
+      `<td><span class="${(plan.ahead??0)>=0?'up':'down'}">${pc.word}</span></td>`+
+      `<td><button class="rowbtn" onclick="openRepPlanner('${rep.id}')">plan</button></td></tr>`;
   }).join("");
   const tp=pace({ahead:t.ahead});
   $("admin-planner").innerHTML=`<table class="ptable">
-    <thead><tr><th>Mentee</th><th>Goal</th><th>Exp/wk</th><th>Expected</th><th>Actual</th><th>Pace</th><th></th></tr></thead>
+    <thead><tr><th>Mentee</th><th>Goal</th><th>Wks planned</th><th>Projected</th><th>Planned so far</th><th>Actual</th><th>Pace</th><th></th></tr></thead>
     <tbody>${rows}</tbody>
-    <tfoot><tr style="font-weight:600;background:#FCFBF8"><td>Team</td><td>${money(t.goal)}</td><td></td><td>${money(t.expected)}</td><td>${money(t.actual)}</td><td><span class="${(t.ahead??0)>=0?'up':'down'}">${tp.word}</span></td><td></td></tr></tfoot>
+    <tfoot><tr style="font-weight:600;background:#FCFBF8"><td>Team</td><td>${money(t.goal)}</td><td></td><td>${money(t.projected)}</td><td>${money(t.expected)}</td><td>${money(t.actual)}</td><td><span class="${(t.ahead??0)>=0?'up':'down'}">${tp.word}</span></td><td></td></tr></tfoot>
   </table>`;
+}
+/* admin: jump straight into a mentee's editable planner */
+function openRepPlanner(repId){
+  if(MODE==="rep")return;
+  setView("rep");
+  $("rep-select").value=repId;
+  renderRep();
+  const sec=document.getElementById("rep-planner-sec");
+  if(sec)sec.scrollIntoView({behavior:"smooth",block:"start"});
 }
 
 /* ═══════════════ COACHING CALLS (render) ═══════════════ */
@@ -1101,47 +1213,6 @@ function renderAdminCalls(){
     return `<div class="note"><div class="wk">${rep?rep.name:s.RepID} · ${s.t.toLocaleDateString(undefined,{month:"short",day:"numeric"})}</div>`+
       `<div class="row"><b>Takeaways:</b> ${s.Takeaways||"—"}</div><div class="row"><b>Action steps:</b> ${s.ActionSteps||"—"}</div></div>`;
   }).join(""):`<div class="sum-empty">No surveys yet this month.</div>`;
-}
-
-/* ═══════════════ PLANNER EDITOR (writes via Apps Script web app) ═══════════════ */
-let EDIT_REP=null;
-function openPlannerEditor(repId){
-  if(MODE==="rep"&&ME&&repId!==ME.id)return;    // reps edit their own plan only
-  EDIT_REP=repId;
-  const r=DATA.find(x=>String(x.id)===String(repId)); if(!r)return;
-  const p=plannerFor(r), f=$("plan-form");
-  $("pd-title").textContent=`${r.name} — ${SELECTED_CAMPAIGN} plan`;
-  const set=(n,v)=>{f.elements[n].value=v==null?"":v;};
-  set("CPOGoal",p?.inp.cpoGoal); set("Weeks",p?.inp.weeks??18);
-  set("CampaignStart",(p?.inp.start||campaignStartDefault(SELECTED_CAMPAIGN)).toISOString().slice(0,10));
-  set("DaysOff",p?.inp.daysOff??0); set("EventShifts",p?.inp.eventShifts??0); set("ApptDays",p?.inp.apptDays??0);
-  set("AvgOrder",p?.inp.avgOrder); set("ClosingPct",p?.inp.closingPct);
-  set("EventsText",(p?.inp.events||[]).map(e=>[e.wk,e.name,e.days,e.exp].join(" | ")).join("\n"));
-  $("pd-msg").textContent=CONFIG.WEBAPP_URL?"":"Saving isn't wired yet — deploy the Apps Script web app and paste its URL into CONFIG.WEBAPP_URL.";
-  $("pd-save").disabled=!CONFIG.WEBAPP_URL;
-  $("plan-dlg").showModal();
-}
-async function savePlanner(ev){
-  ev.preventDefault();
-  const f=$("plan-form");
-  const events=(f.elements.EventsText.value||"").split("\n").map(l=>l.split("|").map(s=>s.trim())).filter(a=>a.length>=2&&a[1])
-    .map(a=>({wk:+a[0]||null,name:a[1],days:+a[2]||null,exp:+a[3]||null}));
-  const body={action:"savePlanner",repId:EDIT_REP,campaign:SELECTED_CAMPAIGN,
-    CPOGoal:+f.elements.CPOGoal.value||0,Weeks:+f.elements.Weeks.value||18,
-    CampaignStart:f.elements.CampaignStart.value,DaysOff:+f.elements.DaysOff.value||0,
-    EventShifts:+f.elements.EventShifts.value||0,ApptDays:+f.elements.ApptDays.value||0,
-    AvgOrder:+f.elements.AvgOrder.value||0,ClosingPct:+f.elements.ClosingPct.value||0,
-    EventsJSON:JSON.stringify(events)};
-  $("pd-msg").textContent="Saving…";$("pd-save").disabled=true;
-  try{
-    const res=await fetch(CONFIG.WEBAPP_URL,{method:"POST",body:JSON.stringify(body)}); // text/plain avoids preflight
-    const j=await res.json();
-    if(!j.ok)throw new Error(j.error||"save failed");
-    $("plan-dlg").close();
-    await loadData();renderAll();
-  }catch(e){$("pd-msg").textContent="Couldn't save: "+e.message;}
-  finally{$("pd-save").disabled=!CONFIG.WEBAPP_URL;}
-  return false;
 }
 
 /* ═══════════════ REP ═══════════════ */
