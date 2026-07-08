@@ -534,6 +534,9 @@ const PERIOD = { weeks:18 };  // every campaign runs weeks 1–18
 const ROMAN = {Spring:"I", Summer:"II", Fall:"III"};
 const seasonOf = d => d.getMonth()<=3 ? "Spring" : d.getMonth()<=7 ? "Summer" : "Fall";
 const currentCampaign = () => { const d=new Date(); return seasonOf(d)+" "+d.getFullYear(); };
+/* the NEXT campaign is always plannable ahead of time — history never moves */
+const nextCampaign = () => { const [s,y]=currentCampaign().split(" ");
+  return s==="Fall"?`Spring ${+y+1}`:(s==="Spring"?`Summer ${y}`:`Fall ${y}`); };
 let SELECTED_CAMPAIGN = currentCampaign();
 
 /* ═══════════════ SEED DATA (real Fall 2025) ═══════════════
@@ -653,8 +656,9 @@ function applyCampaign(){
   DATA=mergeSheet(ROSTER_RAW, WEEKLY_RAW.filter(w=>rowCampaign(w)===SELECTED_CAMPAIGN));
 }
 function campaignOptions(){
-  const set=new Set([currentCampaign()]);
+  const set=new Set([currentCampaign(),nextCampaign()]);
   WEEKLY_RAW.forEach(w=>set.add(rowCampaign(w)));
+  PLANNER_RAW.forEach(p=>{if(p.Campaign)set.add(String(p.Campaign).trim());});
   const ord={Spring:0,Summer:1,Fall:2};
   return [...set].sort((a,b)=>{
     const [sa,ya]=a.split(" "),[sb,yb]=b.split(" ");
@@ -665,7 +669,8 @@ function renderCampaignSelect(){
   const el=$("campaign-select");
   el.innerHTML=campaignOptions().map(c=>{
     const r=ROMAN[c.split(" ")[0]]||"";
-    return `<option value="${c}" ${c===SELECTED_CAMPAIGN?"selected":""}>${c} · Campaign ${r}</option>`;
+    const tag=c===nextCampaign()?" · plan ahead":(c===currentCampaign()?"":" · history");
+    return `<option value="${c}" ${c===SELECTED_CAMPAIGN?"selected":""}>${c} · Campaign ${r}${tag}</option>`;
   }).join("");
 }
 function onCampaignChange(){
@@ -841,14 +846,20 @@ function plannerFor(r){
   const planned=weeksArr.filter(w=>w.exp!=null);
   const projected=planned.length?planned.reduce((t,w)=>t+w.exp,0):null;
   const wkNow=Math.min(weeks,Math.max(1,Math.floor((now-start.getTime())/(7*86400000))+1));
-  // pace vs YOUR plan when weeks are planned; else even split of the goal
-  const pastPlanned=weeksArr.filter(w=>w.past&&w.exp!=null);
-  const expToDate=pastPlanned.length?pastPlanned.reduce((t,w)=>t+w.exp,0)
-    :(cpoGoal!=null?cpoGoal/weeks*wkNow:null);
+  // pace-to-date: planned weeks count at their planned expected; UNPLANNED past
+  // weeks still carry goal-pace (goal ÷ weeks) — an empty plan is not a free pass
+  const goalWk=cpoGoal!=null?cpoGoal/weeks:null;
+  let expToDate=null;
+  weeksArr.filter(w=>w.past).forEach(w=>{
+    const e=w.exp!=null?w.exp:goalWk;
+    if(e!=null)expToDate=(expToDate||0)+e;
+  });
   const actualToDate=totalSales(r);
   const ahead=expToDate!=null?actualToDate-expToDate:null;
+  // plan coverage: how much of the goal the current plan actually accounts for
+  const planShort=cpoGoal!=null?cpoGoal-(projected||0):null;
   return {row,cpoGoal,weeks,start,manual,auto,A,weeksArr,projected,
-    plannedWeeks:planned.length,wkNow,expToDate,actualToDate,ahead};
+    plannedWeeks:planned.length,wkNow,expToDate,actualToDate,ahead,planShort};
 }
 function plannerTeam(){
   const rows=DATA.map(r=>({rep:r,plan:plannerFor(r)})).filter(x=>x.plan.cpoGoal!=null||x.plan.plannedWeeks>0);
@@ -1080,22 +1091,39 @@ function renderRepPlanner(r){
   root.innerHTML=html;
   planTotals(p);
 }
-function planTotals(p){
-  const pc=pace(p);
-  const vsGoal=(p.projected!=null&&p.cpoGoal!=null)?p.projected-p.cpoGoal:null;
-  $("plan-totals").innerHTML=`<div class="plan-grid">
-    <div class="plan-hero ${pc.cls}"><div class="lab">Pace vs your plan</div><div class="val">${pc.word}</div>
-      <div class="meta">${money(p.actualToDate)} actual vs ${money(p.expToDate)} planned so far</div></div>
-    <div class="kpi"><div class="lab">Projected total</div><div class="val" style="font-size:22px" id="pt-proj">${money(p.projected)}</div>
-      <div class="meta" id="pt-wks">${p.plannedWeeks} of ${p.weeks} weeks planned</div></div>
-    <div class="kpi"><div class="lab">CPO goal</div><div class="val" style="font-size:22px" id="pt-goal">${money(p.cpoGoal)}</div>
-      <div class="meta" id="pt-goalmeta">${vsGoal==null?"plan weeks to project":(vsGoal>=0?`plan covers goal +${money(vsGoal)}`:`plan short ${money(-vsGoal)} — add activity`)}</div></div>
-    <div class="kpi"><div class="lab">Actual so far</div><div class="val" style="font-size:22px">${money(p.actualToDate)}</div>
+/* one totals template for both render-time and live-typing recomputes.
+   HERO is state-aware: while the plan doesn't cover the goal, the gap IS the
+   story ("$59,000 short"); once it does, the story becomes pace vs the plan. */
+function planTotalsHtml(v){
+  const ahead=v.expToDate!=null?v.actual-v.expToDate:null;
+  const short=v.goal!=null?v.goal-(v.projected||0):null;
+  const pc=pace({ahead});
+  const paceBits=`${money(v.actual)} actual vs ${money(v.expToDate)} expected by now`;
+  const hero=(short!=null&&short>0.5)
+    ?`<div class="plan-hero behind"><div class="lab">Plan vs goal</div><div class="val">${money(short)} short</div>
+       <div class="meta">plan projects ${money(v.projected||0)} of the ${money(v.goal)} goal — add shifts &amp; appts until it's covered</div></div>`
+    :`<div class="plan-hero ${pc.cls}"><div class="lab">Pace vs your plan</div><div class="val">${pc.word}</div>
+       <div class="meta">${paceBits}</div></div>`;
+  const third=(short!=null&&short>0.5)
+    ?`<div class="kpi"><div class="lab">Pace vs plan</div><div class="val" style="font-size:22px"><span class="${(ahead??0)>=0?'up':'down'}">${pc.word}</span></div>
+       <div class="meta">${paceBits}</div></div>`
+    :`<div class="kpi"><div class="lab">CPO goal</div><div class="val" style="font-size:22px">${money(v.goal)}</div>
+       <div class="meta">${short==null?"set a goal to track coverage":`plan covers goal +${money(-short)}`}</div></div>`;
+  return `<div class="plan-grid">${hero}
+    <div class="kpi"><div class="lab">Projected total</div><div class="val" style="font-size:22px">${money(v.projected)}</div>
+      <div class="meta">${v.planned} of ${v.weeks} weeks planned · goal ${money(v.goal)}</div></div>
+    ${third}
+    <div class="kpi"><div class="lab">Actual so far</div><div class="val" style="font-size:22px">${money(v.actual)}</div>
       <div class="meta">from weekly check-ins</div></div>
   </div>`;
 }
+function planTotals(p){
+  PLAN_START=p.start;PLAN_ACTUAL=p.actualToDate;
+  $("plan-totals").innerHTML=planTotalsHtml({projected:p.projected,planned:p.plannedWeeks,
+    weeks:p.weeks,goal:p.cpoGoal,expToDate:p.expToDate,actual:p.actualToDate});
+}
 /* ── inline edits: recompute instantly, save after 1.2s of quiet ── */
-let PLAN_REP=null,PLAN_TIMER=null,PLAN_AUTO=null,PLAN_WEEKS=PERIOD.weeks;
+let PLAN_REP=null,PLAN_TIMER=null,PLAN_AUTO=null,PLAN_WEEKS=PERIOD.weeks,PLAN_START=null,PLAN_ACTUAL=0;
 function planEdit(){
   $("plan-saved").textContent="typing…";
   planLiveRecalc();
@@ -1118,8 +1146,9 @@ function planLiveRecalc(){
   const A={dc:g.dc??PLAN_AUTO.demo.comp, dcl:g.dcl??PLAN_AUTO.demo.close, dav:g.dav??PLAN_AUTO.demo.avg,
            sc:g.sc??PLAN_AUTO.svc.comp, scl:g.scl??PLAN_AUTO.svc.close, sav:g.sav??PLAN_AUTO.svc.avg,
            sh:g.sh??PLAN_AUTO.ev.shiftAvg};
-  let projected=null,planned=0;
-  root.querySelectorAll("#plan-grid tbody tr").forEach(tr=>{
+  const now=new Date(), goalWk=g.goal?g.goal/PLAN_WEEKS:null;
+  let projected=null,planned=0,expToDate=null;
+  root.querySelectorAll("#plan-grid tbody tr").forEach((tr,i)=>{
     const val=k=>{const el=tr.querySelector(`.pw-in[data-k="${k}"]`);const v=el?el.value.trim():"";return v===""?null:+v;};
     const sh=val("sh"),da=val("da"),sa=val("sa");
     let tot=null;
@@ -1129,14 +1158,13 @@ function planLiveRecalc(){
     const cell=tr.querySelector(".pw-exp");
     if(cell)cell.innerHTML=tot==null?`<span class="aw">—</span>`:money(tot);
     if(tot!=null){projected=(projected||0)+tot;planned++;}
+    if(PLAN_START){ // past weeks: planned expected, or goal-pace when unplanned
+      const we=new Date(PLAN_START.getTime()+i*7*86400000+6*86400000+86399000);
+      if(we<now){const e=tot!=null?tot:goalWk;if(e!=null)expToDate=(expToDate||0)+e;}
+    }
   });
-  if($("pt-proj"))$("pt-proj").textContent=money(projected);
-  if($("pt-wks"))$("pt-wks").textContent=`${planned} of ${PLAN_WEEKS} weeks planned`;
-  if($("pt-goal"))$("pt-goal").textContent=money(g.goal||null);
-  if($("pt-goalmeta")){
-    const vs=(projected!=null&&g.goal)?projected-g.goal:null;
-    $("pt-goalmeta").textContent=vs==null?"plan weeks to project":(vs>=0?`plan covers goal +${money(vs)}`:`plan short ${money(-vs)} — add activity`);
-  }
+  $("plan-totals").innerHTML=planTotalsHtml({projected,planned,weeks:PLAN_WEEKS,
+    goal:g.goal??null,expToDate,actual:PLAN_ACTUAL});
 }
 function planReadDom(){
   const root=$("rep-planner");
