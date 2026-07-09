@@ -792,10 +792,16 @@ function teamStats(){
 const monthKey=d=>d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0");
 const monthName=()=>new Date().toLocaleDateString(undefined,{month:"long"});
 const callsRequired=r=>/masters/i.test(String(r.tier||""))?2:1;
+/* Sheets sometimes stores "2026-07" as a real date — accept either form */
+function monthNorm(v){
+  const d=ciParseDate(v);
+  if(d&&String(v).match(/^Date\(|GMT|\//))return monthKey(d);
+  return String(v||"").trim();
+}
 function callState(r){
   const mk=monthKey(new Date());
-  const mine=CALLS_RAW.filter(c=>String(c.RepID)===String(r.id)&&String(c.Month||"").trim()===mk);
-  const surveys=SURVEY_RAW.filter(s=>String(s.RepID)===String(r.id)&&String(s.Month||"").trim()===mk);
+  const mine=CALLS_RAW.filter(c=>String(c.RepID)===String(r.id)&&monthNorm(c.Month)===mk);
+  const surveys=SURVEY_RAW.filter(s=>String(s.RepID)===String(r.id)&&monthNorm(s.Month)===mk);
   const req=callsRequired(r);
   const norm=c=>String(c.Status||"").trim().toLowerCase();
   const completed=mine.filter(c=>norm(c)==="completed"||norm(c)==="survey_done").length;
