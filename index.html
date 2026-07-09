@@ -255,6 +255,19 @@
   .call-row .linkbtn{font-size:11px;border:none;background:none;cursor:pointer;color:var(--ink-soft);padding:2px}
   .call-row .linkbtn:hover{color:var(--accent)}
 
+  /* ── coach's radar ── */
+  .radar{display:flex;gap:8px;flex-wrap:wrap}
+  .rchip{display:flex;align-items:center;gap:8px;font-family:"Geist Mono",ui-monospace,monospace;font-size:11.5px;color:var(--ink);border:1px solid var(--line);background:var(--card);border-radius:999px;padding:8px 14px;cursor:pointer;transition:transform .12s ease}
+  .rchip:hover{transform:translateY(-1px);border-color:var(--ink-soft)}
+  .rchip .dot2{width:8px;height:8px;border-radius:50%;flex:none}
+  .rchip.bad{border-color:#E4C4B6;background:var(--bad-bg)}
+  .rchip.bad .dot2{background:var(--bad)}
+  .rchip.warn{border-color:#E8D9A8;background:var(--warn-bg)}
+  .rchip.warn .dot2{background:var(--warn)}
+  .rchip.ok{border-color:#BFD4C4;background:var(--good-bg);cursor:default}
+  .rchip.ok .dot2{background:var(--good)}
+  .prep-note{font-size:12px;line-height:1.55;color:var(--ink);margin-top:2px}
+
   /* ── planner v2: assumptions + weekly grid ── */
   .assume{display:grid;grid-template-columns:1.1fr 1.6fr 1.6fr 1fr;gap:10px;margin-bottom:14px}
   .ag{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px;box-shadow:0 1px 2px rgba(22,20,15,.03),0 10px 28px -18px rgba(22,20,15,.16)}
@@ -326,6 +339,9 @@
 
     <div class="kpis" id="kpis"></div>
 
+    <!-- who needs you today — computed from everything below, tap to jump -->
+    <div class="radar" id="radar" style="margin-top:16px"></div>
+
     <div class="section hidden" id="ci-section">
       <div class="section-head">
         <h2 class="serif">This Week's Check-Ins</h2>
@@ -335,7 +351,33 @@
       <div class="ci-grid" id="ci-grid"></div>
     </div>
 
-    <div class="section">
+    <div class="section" id="admin-calls-sec">
+      <div class="section-head">
+        <h2 class="serif">Coaching Calls — <span id="calls-month"></span></h2>
+        <span class="hint">Path 1/mo · Masters 2/mo · formal 1-on-1s, separate from the weekly standard</span>
+      </div>
+      <div id="admin-calls"></div>
+      <div class="feed-h eyebrow" style="margin:22px 0 10px">Recent takeaways &amp; action steps</div>
+      <div class="notes" id="calls-feed" style="display:grid;gap:10px"></div>
+    </div>
+
+    <div class="section" id="admin-planner-sec">
+      <div class="section-head">
+        <h2 class="serif">Campaign Planner — Team</h2>
+        <span class="hint">every mentee's goal → pace · edit any plan</span>
+      </div>
+      <div id="admin-planner"></div>
+    </div>
+
+    <div class="section" id="admin-bp-sec">
+      <div class="section-head">
+        <h2 class="serif">PUSH Blueprints — Team</h2>
+        <span class="hint">each mentee's PUSH scenarios · conservative → middle → goes-right · live from their page</span>
+      </div>
+      <div id="admin-bp"></div>
+    </div>
+
+    <div class="section" id="lb-sec">
       <div class="section-head">
         <h2 class="serif">Leaderboard</h2>
         <select id="lb-metric" onchange="renderLeaderboard()">
@@ -348,7 +390,7 @@
       <div class="lb" id="leaderboard"></div>
     </div>
 
-    <div class="section">
+    <div class="section" id="heat-sec">
       <div class="section-head">
         <h2 class="serif">Standards Heatmap</h2>
         <span class="hint">who's holding the line — read left→right for momentum</span>
@@ -362,38 +404,12 @@
       <div class="heat-scroll"><table class="heat" id="heat"></table></div>
     </div>
 
-    <div class="section">
+    <div class="section" id="mix-sec">
       <div class="section-head">
         <h2 class="serif">Sales by Channel</h2>
         <span class="hint">team totals — computed from the weekly form</span>
       </div>
       <div class="mix" id="mix"></div>
-    </div>
-
-    <div class="section">
-      <div class="section-head">
-        <h2 class="serif">Campaign Planner — Team</h2>
-        <span class="hint">every mentee's goal → pace · edit any plan</span>
-      </div>
-      <div id="admin-planner"></div>
-    </div>
-
-    <div class="section">
-      <div class="section-head">
-        <h2 class="serif">PUSH Blueprints — Team</h2>
-        <span class="hint">each mentee's PUSH scenarios · conservative → middle → goes-right · live from their page</span>
-      </div>
-      <div id="admin-bp"></div>
-    </div>
-
-    <div class="section">
-      <div class="section-head">
-        <h2 class="serif">Coaching Calls — <span id="calls-month"></span></h2>
-        <span class="hint">Path 1/mo · Masters 2/mo · formal 1-on-1s, separate from the weekly standard</span>
-      </div>
-      <div id="admin-calls"></div>
-      <div class="feed-h eyebrow" style="margin:22px 0 10px">Recent takeaways &amp; action steps</div>
-      <div class="notes" id="calls-feed" style="display:grid;gap:10px"></div>
     </div>
   </div>
 
@@ -411,6 +427,12 @@
     <div class="rep-context" id="rep-context"></div>
 
     <div class="kpis hidden" id="goals-strip" style="grid-template-columns:repeat(3,1fr);margin-top:16px"></div>
+
+    <!-- coaches: the 1-on-1 in one glance (admin mode only) -->
+    <div class="section hidden" id="prep-sec" style="margin-top:24px">
+      <div class="section-head"><h2 class="serif">Call Prep</h2><span class="hint">this month's call · last action steps · last check-in · pace</span></div>
+      <div class="assume" id="prep-cards" style="grid-template-columns:repeat(4,1fr)"></div>
+    </div>
 
     <!-- brand-new reps: one friendly card instead of seven empty sections -->
     <div class="section hidden" id="starter-sec" style="margin-top:24px">
@@ -1135,7 +1157,8 @@ function renderAdminBlueprints(){
       `<td style="color:var(--ink-soft);font-size:11px">${upd?upd.toLocaleDateString(undefined,{month:"short",day:"numeric"}):"—"}</td>`+
       `<td><button class="rowbtn" onclick="openRepBlueprint('${rep.id}')">open</button></td></tr>`;
   }).join("");
-  el.innerHTML=`<div class="heat-scroll"><table class="ptable">
+  const noBp=DATA.filter(r=>!t.rows.some(x=>x.rep.id===r.id));
+  el.innerHTML=(noBp.length?`<div class="hint" style="margin-bottom:10px">No blueprint yet: ${noBp.map(r=>`<a href="#" onclick="openRepBlueprint('${r.id}');return false" style="text-decoration:none">${r.name}</a>`).join(" · ")}</div>`:"")+`<div class="heat-scroll"><table class="ptable">
     <thead><tr><th style="text-align:left">Mentee</th><th>Goal</th><th>Conservative</th><th>Middle</th><th>Goes right</th><th>Actual</th><th>vs middle</th><th>Updated</th><th></th></tr></thead>
     <tbody>${rows}</tbody>
     <tfoot><tr style="font-weight:600;background:#FCFBF8"><td>Team</td><td>${money(t.goal)}</td><td>${money(t.c)}</td><td style="color:var(--good)">${money(t.m)}</td><td>${money(t.x)}</td><td>${money(t.actual)}</td><td></td><td></td><td></td></tr></tfoot>
@@ -1271,14 +1294,46 @@ function ciHistory(rep,ws){
   }
   return hist;
 }
+function ciData(){
+  const ws=ciWindowStart(), done=new Set();
+  WEEKLY_RAW.forEach(w=>{const t=ciParseDate(w.Timestamp);if(t&&t>=ws)done.add(String(w.RepID));});
+  return {ws,done,streaks:ciStreaks(done,ws)};
+}
+/* ── Coach's Radar: who needs you today, computed from every board below ── */
+function renderRadar(){
+  const el=$("radar"); if(!el)return;
+  const chips=[];
+  const live=CONFIG.USE_LIVE_DATA&&DATA.length&&SELECTED_CAMPAIGN===currentCampaign();
+  if(live){
+    const {done,streaks}=ciData();
+    const missing=DATA.filter(r=>!done.has(String(r.id)));
+    if(missing.length){
+      const worst=[...missing].sort((a,b)=>(streaks[b.id]||0)-(streaks[a.id]||0))[0];
+      chips.push({cls:"bad",id:"ci-section",html:`<b>${missing.length}</b> check-in${missing.length>1?"s":""} missing · worst: ${worst.name.split(" ")[0]} ×${streaks[worst.id]||1}w`});
+    }
+    const cs=DATA.map(r=>({r,c:callState(r)}));
+    const od=cs.filter(x=>x.c.overdue).length;
+    const nb=cs.filter(x=>x.c.status==="none"&&!x.c.overdue).length;
+    const sp=cs.filter(x=>x.c.status==="survey").length;
+    if(od)chips.push({cls:"bad",id:"admin-calls-sec",html:`<b>${od}</b> call${od>1?"s":""} OVERDUE`});
+    if(nb)chips.push({cls:"warn",id:"admin-calls-sec",html:`<b>${nb}</b> call${nb>1?"s":""} not booked`});
+    if(sp)chips.push({cls:"warn",id:"admin-calls-sec",html:`<b>${sp}</b> survey${sp>1?"s":""} pending`});
+    const t=plannerTeam();
+    const behind=t.rows.filter(x=>(x.plan.ahead??0)<-0.5);
+    if(behind.length)chips.push({cls:"warn",id:"admin-planner-sec",html:`<b>${behind.length}</b> behind pace: ${behind.slice(0,3).map(x=>x.rep.name.split(" ")[0]).join(", ")}${behind.length>3?"…":""}`});
+    const noPlan=DATA.filter(r=>!t.rows.some(x=>x.rep.id===r.id));
+    if(noPlan.length)chips.push({cls:"warn",id:"admin-planner-sec",html:`<b>${noPlan.length}</b> no campaign plan yet`});
+  }
+  el.innerHTML=chips.length
+    ?chips.map(c=>`<button class="rchip ${c.cls}" onclick="document.getElementById('${c.id}').scrollIntoView({behavior:'smooth'})"><span class="dot2"></span><span>${c.html}</span></button>`).join("")
+    :`<div class="rchip ok"><span class="dot2"></span>All clear — nothing needs you right now</div>`;
+}
 function renderCheckins(){
   const sec=$("ci-section");
   // operational view — only meaningful for the campaign happening right now
   if(!CONFIG.USE_LIVE_DATA||!DATA.length||SELECTED_CAMPAIGN!==currentCampaign()){sec.classList.add("hidden");return;}
   sec.classList.remove("hidden");
-  const ws=ciWindowStart(), done=new Set();
-  WEEKLY_RAW.forEach(w=>{const t=ciParseDate(w.Timestamp);if(t&&t>=ws)done.add(String(w.RepID));});
-  const streaks=ciStreaks(done,ws);
+  const {ws,done,streaks}=ciData();
   const rows=[...DATA].sort((a,b)=>{
     const d=(done.has(String(a.id))?1:0)-(done.has(String(b.id))?1:0);
     return d!==0?d:(streaks[b.id]-streaks[a.id])||a.name.localeCompare(b.name);
@@ -1506,11 +1561,12 @@ function renderAdminPlanner(){
       `<td><button class="rowbtn" onclick="openRepPlanner('${rep.id}')">plan</button></td></tr>`;
   }).join("");
   const tp=pace({ahead:t.ahead});
+  const noPlan=DATA.filter(r=>!t.rows.some(x=>x.rep.id===r.id));
   $("admin-planner").innerHTML=`<table class="ptable">
     <thead><tr><th>Mentee</th><th>Goal</th><th>Wks planned</th><th>Projected</th><th>Planned so far</th><th>Actual</th><th>Pace</th><th></th></tr></thead>
     <tbody>${rows}</tbody>
     <tfoot><tr style="font-weight:600;background:#FCFBF8"><td>Team</td><td>${money(t.goal)}</td><td></td><td>${money(t.projected)}</td><td>${money(t.expected)}</td><td>${money(t.actual)}</td><td><span class="${(t.ahead??0)>=0?'up':'down'}">${tp.word}</span></td><td></td></tr></tfoot>
-  </table>`;
+  </table>`+(noPlan.length?`<div class="hint" style="margin-top:10px">No plan yet: ${noPlan.map(r=>`<a href="#" onclick="openRepPlanner('${r.id}');return false" style="text-decoration:none">${r.name}</a>`).join(" · ")} — tap a name to start one</div>`:"");
 }
 /* admin: jump straight into a mentee's editable planner */
 function openRepPlanner(repId){
@@ -1558,10 +1614,14 @@ function renderAdminCalls(){
   }
   const rows=[...DATA].map(r=>({r,cs:callState(r)}))
     .sort((a,b)=>(a.cs.status==="done"?1:0)-(b.cs.status==="done"?1:0)||a.r.name.localeCompare(b.r.name));
-  const statusLab={none:"not booked",booked:"booked",survey:"survey pending",done:"done"};
   $("admin-calls").innerHTML=`<div class="calls-grid">`+rows.map(({r,cs})=>{
     const od=cs.overdue?` od`:"";
-    const lab=(cs.overdue?"OVERDUE · ":"")+statusLab[cs.status]+(cs.req>1?` ${Math.min(cs.completed,cs.surveyed)}/${cs.req}`:"");
+    const lab=(cs.overdue?"OVERDUE · ":"")+(()=>{
+      if(cs.status==="done")return cs.req>1?`all ${cs.req} done ✓`:"done ✓";
+      if(cs.status==="survey")return `${cs.completed} done · survey pending`;
+      if(cs.status==="booked")return "booked"+(cs.upcoming?` ${cs.upcoming.getMonth()+1}/${cs.upcoming.getDate()}`:"");
+      return "not booked";
+    })();
     return `<div class="call-row s-${cs.status}${od}"><span class="st"></span>${r.name}`+
       `<span class="cr-lab">${lab}</span>`+
       `<button class="linkbtn" title="copy ${r.name}'s personal dashboard link" onclick="navigator.clipboard.writeText(repLink('${r.id}')).then(()=>{this.textContent='✓';setTimeout(()=>this.textContent='🔗',1200)})">🔗</button></div>`;
@@ -1761,8 +1821,30 @@ function renderGoalsStrip(r){
   el.classList.remove("hidden");
   el.innerHTML=tiles.map(t=>`<div class="kpi"><div class="lab">${t.lab}</div><div class="val" style="font-size:20px">${t.val}</div><div class="meta">${t.meta}</div></div>`).join("");
 }
+/* coach call-prep: the 1-on-1 in one glance (admin deep-dive only) */
+function renderCallPrep(r){
+  const sec=$("prep-sec"); if(!sec)return;
+  sec.classList.toggle("hidden",MODE!=="admin");
+  if(MODE!=="admin")return;
+  const cs=callState(r);
+  const sv=SURVEY_RAW.filter(x=>String(x.RepID)===String(r.id))
+    .map(x=>({...x,t:ciParseDate(x.Timestamp)})).filter(x=>x.t).sort((a,b)=>b.t-a.t)[0];
+  const note=(r.notes||[])[0];
+  const p=plannerFor(r), pc=pace(p);
+  const callTxt=cs.status==="booked"&&cs.upcoming
+    ?`Booked ${cs.upcoming.toLocaleDateString(undefined,{weekday:"short",month:"short",day:"numeric"})} · ${cs.upcoming.toLocaleTimeString(undefined,{hour:"numeric",minute:"2-digit"})}`
+    :cs.status==="done"?"Done + surveyed ✓"
+    :cs.status==="survey"?`${cs.completed} done · survey pending`
+    :"Not booked — nudge them";
+  $("prep-cards").innerHTML=`
+    <div class="ag"><div class="ah">This month's call</div><div class="prep-note"><b>${callTxt}</b></div></div>
+    <div class="ag"><div class="ah">Last call — action steps</div><div class="prep-note">${sv?esc(sv.ActionSteps||"—"):"no survey yet"}</div></div>
+    <div class="ag"><div class="ah">Last check-in</div><div class="prep-note">${note?[note.win&&"<b>Win:</b> "+esc(note.win),note.obs&&"<b>Obstacle:</b> "+esc(note.obs),note.commit&&"<b>Commit:</b> "+esc(note.commit)].filter(Boolean).join("<br>")||"—":"no check-ins yet"}</div></div>
+    <div class="ag"><div class="ah">Pace</div><div class="prep-note"><b style="color:${(p.ahead??0)>=0?'var(--good)':'var(--bad)'}">${pc.word}</b>${p.planShort!=null&&p.planShort>0.5?`<br><span style="color:var(--ink-soft)">plan short ${money(p.planShort)}</span>`:""}</div></div>`;
+}
 function renderRep(){
   const r=currentRep(); if(!r)return;
+  renderCallPrep(r);
   renderRepContext(r);renderGoalsStrip(r);renderHero(r);renderSummary(r);renderChart();renderChannels(r);renderDiagnostics(r);renderStandards(r);renderNotes(r);
   renderCallNotes(r);renderRepPlanner(r);renderRepBlueprint(r);renderRepCallCard(r);
   // brand-new rep (no check-ins this campaign): collapse the data sections
@@ -1800,7 +1882,7 @@ function renderAll(){
     return;
   }
   renderCampaignSelect();
-  renderPeriod();renderKPIs();renderCheckins();renderLeaderboard();renderHeat();renderMix();
+  renderPeriod();renderKPIs();renderRadar();renderCheckins();renderLeaderboard();renderHeat();renderMix();
   renderAdminPlanner();renderAdminBlueprints();renderAdminCalls();
   fillRepSelect();renderRep();
 }
