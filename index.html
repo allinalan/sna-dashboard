@@ -967,7 +967,7 @@ function bpPaint(s,acts){
   const inp=(f,v,step,ph)=>`<label>${ph}<input class="bp-f" data-f="${f}" type="number" min="0" step="${step||1}" value="${v??""}" oninput="bpEdit()"></label>`;
   let h=`<div class="assume" style="grid-template-columns:1.7fr 1.3fr">
     <div class="ag"><div class="ah">The Appointment Lever <span class="chip-auto">SLOTS × COMPLETION × CLOSE × CPO</span></div>
-      <div class="arow" style="margin-bottom:10px">${inp("slots",s.slots,1,"Appt Slots Booked")}</div>
+      <div class="arow" style="margin-bottom:10px">${inp("slots",s.slots,1,"Appts Available")}</div>
       <table class="ptable"><thead><tr><th style="text-align:left">Sub-lever</th><th>Conservative</th><th>Middle (auto)</th><th>Goes right</th></tr></thead><tbody>
       ${[["comp","Completion %"],["close","Close %"],["cpo","Avg Order $"]].map(([k,lab])=>
         `<tr><td>${lab}</td>
