@@ -410,19 +410,34 @@
     </div>
     <div class="rep-context" id="rep-context"></div>
 
-    <div class="hero" id="rep-hero"></div>
+    <div class="kpis hidden" id="goals-strip" style="grid-template-columns:repeat(3,1fr);margin-top:16px"></div>
 
-    <div class="section">
-      <div class="section-head"><h2 class="serif">Performance Summary</h2></div>
+    <!-- brand-new reps: one friendly card instead of seven empty sections -->
+    <div class="section hidden" id="starter-sec" style="margin-top:24px">
+      <div class="call-card" style="border-style:dashed">
+        <div class="cc-main">
+          <div class="lab" style="font-family:'Geist Mono';font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft)">Your stats build here</div>
+          <div class="cc-title" style="margin-top:6px">First check-in unlocks this page</div>
+          <div class="cc-sub">After your first weekly check-in, this fills with your sales, weekly trend, channel breakdowns, and standards — all computed from what you report. Two minutes, every Monday.</div>
+        </div>
+        <a class="form-btn" href="https://docs.google.com/forms/d/e/1FAIpQLSdIAf_SaV1m2ASTN4YzEBeVxp7o-gkIBXqhCCbO5vmuNh7cTQ/viewform" target="_blank" rel="noopener">Do my check-in ↗</a>
+      </div>
+    </div>
+
+    <div class="hero rds" id="rep-hero"></div>
+
+    <div class="section rds">
+      <div class="section-head"><h2 class="serif">Performance Summary</h2><span class="hint">what's working &amp; what to watch — written automatically from your numbers</span></div>
       <div class="summary">
         <div class="sum-col"><h3>Strengths</h3><div id="sum-good"></div></div>
         <div class="sum-col"><h3>Watch</h3><div id="sum-warn"></div></div>
       </div>
     </div>
 
-    <div class="section">
+    <div class="section rds">
       <div class="section-head">
         <h2 class="serif">Weekly Trend</h2>
+        <span class="hint">your sales week by week vs the team average</span>
         <select id="chart-metric" onchange="renderChart()">
           <option value="sales">Sales</option>
           <option value="standards">Standards (1=all, .5=some, 0=miss)</option>
@@ -434,22 +449,22 @@
       </div>
     </div>
 
-    <div class="section">
-      <div class="section-head"><h2 class="serif">Sales by Channel</h2><span class="hint">orders · sales · avg order — weekly form</span></div>
+    <div class="section rds">
+      <div class="section-head"><h2 class="serif">Sales by Channel</h2><span class="hint">where your sales come from — orders · sales · avg order</span></div>
       <div id="channels"></div>
     </div>
 
-    <div class="section">
-      <div class="section-head"><h2 class="serif">Channel Diagnostics</h2><span class="hint">every rate computes automatically from raw counts</span></div>
+    <div class="section rds">
+      <div class="section-head"><h2 class="serif">Channel Diagnostics</h2><span class="hint">your funnel, rate by rate — computed from your check-ins, never typed</span></div>
       <div class="heat-scroll"><table class="ctable" id="diagnostics"></table></div>
     </div>
 
-    <div class="section">
-      <div class="section-head"><h2 class="serif">Standards</h2></div>
+    <div class="section rds">
+      <div class="section-head"><h2 class="serif">Standards</h2><span class="hint">the 3 weekly standards: 6 appts completed · 1 coaching interaction · 1 growth session</span></div>
       <div id="standards-block"></div>
     </div>
 
-    <div class="section">
+    <div class="section rds" id="call-notes-sec">
       <div class="section-head">
         <h2 class="serif">Coaching Call Notes</h2>
         <span class="hint">takeaways &amp; action steps from the post-call survey · newest first</span>
@@ -457,8 +472,8 @@
       <div class="notes" id="call-notes" style="display:grid;gap:10px"></div>
     </div>
 
-    <div class="section">
-      <div class="section-head"><h2 class="serif">Check-In Notes</h2></div>
+    <div class="section rds">
+      <div class="section-head"><h2 class="serif">Check-In Notes</h2><span class="hint">your weekly wins, obstacles &amp; commitments — newest first</span></div>
       <div class="notes" id="notes" style="display:grid;gap:10px"></div>
     </div>
 
@@ -473,7 +488,7 @@
     <div class="section" id="rep-bp-sec">
       <div class="section-head">
         <h2 class="serif" id="bp-title">PUSH Blueprint</h2>
-        <span class="hint" id="bp-saved">set your levers — saves automatically</span>
+        <span class="hint" id="bp-saved">your PUSH sprint math — set the levers, the daily numbers compute · saves automatically</span>
       </div>
       <div id="rep-bp"></div>
     </div>
@@ -1297,7 +1312,7 @@ function renderMix(target="mix"){
   $(target).innerHTML=sums.map(s=>
     `<div class="mix-row"><div class="mix-lab">${s.label}</div>`+
     `<div class="mix-track"><div class="mix-fill" style="width:${s.val?Math.max(s.val/max*100,2):0}%"></div></div>`+
-    (s.val==null?`<div class="mix-val await">awaiting form</div>`:`<div class="mix-val">${money(s.val)}</div>`)+
+    (s.val==null?`<div class="mix-val await">no data yet</div>`:`<div class="mix-val">${money(s.val)}</div>`)+
     `</div>`).join("");
 }
 
@@ -1528,7 +1543,9 @@ function renderRepCallCard(r){
   }
   $("rep-call-card").innerHTML=`<div class="call-card s-${cs.status}">
     <span class="cc-dot"></span>
-    <div class="cc-main"><div class="cc-title">${b.title}</div><div class="cc-sub">${b.sub}</div>${notes}</div>
+    <div class="cc-main">
+      <div style="font-family:'Geist Mono';font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:4px">Your coaching call · ${monthName()}</div>
+      <div class="cc-title">${b.title}</div><div class="cc-sub">${b.sub}</div>${notes}</div>
     ${b.btn?`<a class="form-btn" href="${b.btn.url}" target="_blank" rel="noopener">${b.btn.lab}</a>`:""}
   </div>`;
 }
@@ -1566,9 +1583,18 @@ function fillRepSelect(){
 }
 const currentRep=()=>MODE==="rep"?ME:DATA.find(r=>r.id===$("rep-select").value);
 
+/* Sheets turns "4%" into 0.04 — render pay back the way humans say it */
+function fmtPay(p){
+  const n=+p;
+  if(!isNaN(n)&&p!==""&&p!=null){
+    if(n>0&&n<1)return Math.round(n*100)+"%";
+    if(n>=1)return "$"+n;
+  }
+  return p||"—";
+}
 function renderRepContext(r){
   const chips=[
-    `<span class="chip tier"><b>${r.tier}</b> · ${r.pay}</span>`,
+    `<span class="chip tier"><b>${r.tier}</b> · ${fmtPay(r.pay)}</span>`,
     `<span class="chip">Region <b>${r.region}</b></span>`,
     `<span class="chip">Manager <b>${r.manager}</b></span>`,
     `<span class="chip">Goal <b>${r.goal}</b></span>`
@@ -1582,8 +1608,8 @@ function renderHero(r){
   const cards=[
     {big:true,lab:"Total sales · "+SELECTED_CAMPAIGN,val:money(totalSales(r)),meta:`${w} active weeks · avg ${money(avgWeek(r))}/wk`},
     {lab:"Standards met",val:p==null?"—":Math.round(p*100)+"%",meta:"weeks all-met"},
-    {lab:"Avg order",val:oAvg==null?"—":money(oAvg),meta:oAvg==null?"awaiting form":"sales ÷ orders",await:oAvg==null},
-    {lab:"Shift average",val:sAvg==null?"—":money(sAvg),meta:sAvg==null?"awaiting form":"event sales ÷ shifts",await:sAvg==null}
+    {lab:"Avg order",val:oAvg==null?"—":money(oAvg),meta:oAvg==null?"after your first check-in":"sales ÷ orders",await:oAvg==null},
+    {lab:"Shift average",val:sAvg==null?"—":money(sAvg),meta:sAvg==null?"after your first check-in":"event sales ÷ shifts",await:sAvg==null}
   ];
   $("rep-hero").innerHTML=cards.map(c=>c.big?
     `<div class="hero-big"><div class="lab">${c.lab}</div><div class="val">${c.val}</div><div class="meta">${c.meta}</div></div>`:
@@ -1610,6 +1636,10 @@ function renderSummary(r){
 function renderChart(){
   const r=currentRep(), metric=$("chart-metric").value;
   const series = metric==="sales"? r.sales.map(x=>x) : r.acct.map(x=>x);
+  if(!series.some(x=>x!=null)){
+    $("chart").innerHTML=`<div style="padding:36px 20px;text-align:center;font-size:12.5px;color:var(--ink-soft)">Your weekly trend draws here after your first check-in.</div>`;
+    return;
+  }
   const base = metric==="sales"? teamAvgWeekly(x=>x.sales) : teamAvgWeekly(x=>x.acct);
   const W=940,H=300,padL=46,padR=14,padT=14,padB=28,n=PERIOD.weeks;
   const allVals=[...series.filter(x=>x!=null),...base];
@@ -1718,10 +1748,30 @@ function renderCallNotes(r){
       `<div class="row"><b>Action steps before next call:</b> ${s.ActionSteps||"—"}</div></div>`;
   }).join("");
 }
+/* three goals can coexist — say what each one IS so nobody has to guess */
+function renderGoalsStrip(r){
+  const el=$("goals-strip"); if(!el)return;
+  const plan=plannerFor(r), bp=blueprintFor(r);
+  const season=(r.goal&&r.goal!=="—")?r.goal:null;
+  const tiles=[
+    {lab:"Season goal",val:season??"—",meta:"what you set with your coach"},
+    {lab:"Campaign plan",val:money(plan.cpoGoal),meta:"what your weekly plan adds up to"},
+    {lab:"PUSH goal",val:money(pman(bp.s.goal)),meta:"your PUSH-sprint target"}
+  ];
+  el.classList.remove("hidden");
+  el.innerHTML=tiles.map(t=>`<div class="kpi"><div class="lab">${t.lab}</div><div class="val" style="font-size:20px">${t.val}</div><div class="meta">${t.meta}</div></div>`).join("");
+}
 function renderRep(){
   const r=currentRep(); if(!r)return;
-  renderRepContext(r);renderHero(r);renderSummary(r);renderChart();renderChannels(r);renderDiagnostics(r);renderStandards(r);renderNotes(r);
+  renderRepContext(r);renderGoalsStrip(r);renderHero(r);renderSummary(r);renderChart();renderChannels(r);renderDiagnostics(r);renderStandards(r);renderNotes(r);
   renderCallNotes(r);renderRepPlanner(r);renderRepBlueprint(r);renderRepCallCard(r);
+  // brand-new rep (no check-ins this campaign): collapse the data sections
+  // into one starter card so the page leads with what they can DO
+  const collapse=MODE==="rep"&&activeWeeks(r)===0;
+  document.querySelectorAll("#view-rep .rds").forEach(el=>el.classList.toggle("hidden",collapse));
+  $("starter-sec").classList.toggle("hidden",!collapse);
+  if(collapse&&SURVEY_RAW.some(x=>String(x.RepID)===String(r.id)))
+    $("call-notes-sec").classList.remove("hidden"); // call notes exist — keep them
 }
 
 /* ═══════════════ MODE CHROME + INIT ═══════════════ */
