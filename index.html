@@ -240,6 +240,12 @@
   .ptable td .down{color:var(--bad);font-weight:600}
   .ptable .rowbtn{font-family:"Geist Mono";font-size:10.5px;border:1px solid var(--line);background:none;border-radius:7px;padding:3px 9px;cursor:pointer;color:var(--ink-soft)}
   .ptable .rowbtn:hover{border-color:var(--accent);color:var(--accent)}
+  .camp-pills{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 14px}
+  .camp-pill{font-family:"Geist Mono";font-size:10.5px;border:1px solid var(--line);background:var(--card);
+    border-radius:999px;padding:4px 12px;cursor:pointer;color:var(--ink-soft);transition:border-color .15s}
+  .camp-pill:hover{border-color:var(--accent);color:var(--accent)}
+  .camp-pill.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+  .camp-pill .tag{opacity:.55;margin-left:5px;font-size:8.5px;text-transform:uppercase;letter-spacing:.06em}
   .plan-empty{font-size:12.5px;color:var(--ink-soft);background:var(--card);border:1px dashed var(--line);border-radius:14px;padding:18px;text-align:center}
 
   /* ── admin calls board ── */
@@ -605,6 +611,48 @@ const nextCampaign = () => { const [s,y]=currentCampaign().split(" ");
   return s==="Fall"?`Spring ${+y+1}`:(s==="Spring"?`Summer ${y}`:`Fall ${y}`); };
 let SELECTED_CAMPAIGN = currentCampaign();
 
+/* ── The campaign being PLANNED is separate from the campaign being WATCHED.
+   During a campaign's final month (Apr · Aug · Dec) everyone is planning the
+   NEXT one, so the planner opens there; the day a campaign ends, the next one
+   is simply current, so the planner rolls forward forever on its own.
+   The snapshot above (SELECTED_CAMPAIGN) stays on the running campaign —
+   that's where this week's check-ins land. History never moves. ── */
+const CAMP_ORDER={Spring:0,Summer:1,Fall:2};
+const campKey=c=>{const a=String(c).split(" ");return (+a[1]||0)*3+(CAMP_ORDER[a[0]]??0);};
+const campaignEnd=c=>{const a=String(c).split(" ");
+  return new Date(+a[1], a[0]==="Spring"?4:a[0]==="Summer"?8:12, 0, 23,59,59);}; // last day of Apr/Aug/Dec
+const campaignEnded=c=>campaignEnd(c)<new Date();
+const planDefaultCampaign=()=>[3,7,11].includes(new Date().getMonth())?nextCampaign():currentCampaign();
+let PLAN_CAMPAIGN=planDefaultCampaign();
+
+/* one rep's weekly sales inside ANY campaign, straight from the raw rows —
+   the planner can look at history without moving the snapshot */
+function campaignSales(repId,campaign){
+  const cpoCols=["Demos_CPO","SVC_CPO","Event_CPO","Mktg_CPO","BizGift_CPO"];
+  const subs=WEEKLY_RAW.filter(w=>String(w.RepID)===String(repId)&&rowCampaign(w)===campaign);
+  return Array.from({length:PERIOD.weeks},(_,i)=>{
+    const x=subs.find(w=>+w.Week===i+1); if(!x)return null;
+    return cpoCols.reduce((t,c)=>t+(+x[c]||0),0);});
+}
+/* every campaign this rep has any trace of: check-ins, a saved plan, seed history */
+function repCampaigns(r){
+  const set=new Set([currentCampaign(),nextCampaign()]);
+  WEEKLY_RAW.forEach(w=>{if(String(w.RepID)===String(r.id))set.add(rowCampaign(w));});
+  PLANNER_RAW.forEach(pr=>{if(String(pr.RepID)===String(r.id)&&pr.Campaign)set.add(String(pr.Campaign).trim());});
+  if(SEED.some(x=>x.id===r.id&&x.sales&&x.sales.some(v=>v!=null)))set.add("Fall 2025");
+  return [...set].sort((a,b)=>campKey(a)-campKey(b));
+}
+function setPlanCampaign(c){
+  if(c===PLAN_CAMPAIGN)return;
+  PLAN_CAMPAIGN=c;
+  if(PLAN_TIMER){clearTimeout(PLAN_TIMER);PLAN_TIMER=null;}   // abandon a half-typed edit of the old campaign
+  renderAll();
+}
+const campPills=r=>`<div class="camp-pills">`+repCampaigns(r).map(c=>{
+    const tag=c===currentCampaign()?"now":(c===nextCampaign()?"next":(campaignEnded(c)?"done":""));
+    return `<button class="camp-pill ${c===PLAN_CAMPAIGN?"on":""}" onclick="setPlanCampaign('${c}')">${c}${tag?`<span class="tag">${tag}</span>`:""}</button>`;
+  }).join("")+`</div>`;
+
 /* ═══════════════ SEED DATA (real Fall 2025) ═══════════════
    sales[] / acct[] are weekly (wk1..wk17). apptsCompleted = real Fall total.
    standards are DERIVED from acct[] for the seed (1→all, partial→some, 0→miss).
@@ -887,10 +935,10 @@ function autoAssumptions(r){
 const pnum=x=>{if(x==null||x==="")return null;const v=+x;return isNaN(v)?null:v;};
 const pman=x=>{const v=pnum(x);return v&&v>0?v:null;}; // stored 0/blank = "use auto"
 function plannerFor(r){
-  const row=PLANNER_RAW.find(p=>String(p.RepID)===String(r.id)&&String(p.Campaign||"").trim()===SELECTED_CAMPAIGN)||null;
+  const row=PLANNER_RAW.find(p=>String(p.RepID)===String(r.id)&&String(p.Campaign||"").trim()===PLAN_CAMPAIGN)||null;
   const auto=autoAssumptions(r);
   const weeks=(row&&+row.Weeks)||PERIOD.weeks;
-  const start=(row&&ciParseDate(row.CampaignStart))||campaignStartDefault(SELECTED_CAMPAIGN);
+  const start=(row&&ciParseDate(row.CampaignStart))||campaignStartDefault(PLAN_CAMPAIGN);
   const manual={dc:pman(row&&row.DemoCompPct),dcl:pman(row&&row.DemoClosePct),dav:pman(row&&row.DemoAvgOrder),
                 sc:pman(row&&row.SvcCompPct),scl:pman(row&&row.SvcClosePct),sav:pman(row&&row.SvcAvgOrder),
                 sh:pman(row&&row.ShiftAvg)};
@@ -908,11 +956,16 @@ function plannerFor(r){
     return tot;
   };
   const now=new Date();
+  /* actuals for the campaign being planned — the live merge when it's the one
+     on screen, raw rows for any other, the seed for Fall 2025 */
+  const planSales = PLAN_CAMPAIGN===SELECTED_CAMPAIGN ? r.sales
+    : (PLAN_CAMPAIGN==="Fall 2025" && (SEED.find(x=>x.id===r.id)||{}).sales)
+      || campaignSales(r.id,PLAN_CAMPAIGN);
   const weeksArr=Array.from({length:weeks},(_,i)=>{
     const plan=weekly[i+1]||weekly[String(i+1)]||null;
     const ws=new Date(start.getTime()+i*7*86400000);
     const we=new Date(ws.getTime()+6*86400000+86399000);
-    return {wk:i+1,ws,we,plan:plan||{},exp:expWk(plan),actual:r.sales[i]??null,
+    return {wk:i+1,ws,we,plan:plan||{},exp:expWk(plan),actual:planSales[i]??null,
       past:we<now,current:ws<=now&&now<=we};
   });
   const cpoGoal=pman(row&&row.CPOGoal);
@@ -1380,7 +1433,8 @@ function renderRepPlanner(r){
   const root=$("rep-planner");
   // don't clobber the grid while someone is typing or a save is pending
   if(root.contains(document.activeElement)||PLAN_TIMER)return;
-  $("rp-title").textContent=(MODE==="rep"?"Your ":"")+"Campaign Planner · "+SELECTED_CAMPAIGN;
+  $("rp-title").textContent=(MODE==="rep"?"Your ":"")+"Campaign Planner · "+PLAN_CAMPAIGN
+    +(PLAN_CAMPAIGN===nextCampaign()?"":campaignEnded(PLAN_CAMPAIGN)?" · complete":"");
   const p=plannerFor(r);
   PLAN_REP=r.id;
   PLAN_AUTO=p.auto; PLAN_WEEKS=p.weeks;
@@ -1394,7 +1448,8 @@ function renderRepPlanner(r){
       :"";
     return `<label>${ph}<input class="pa-in" data-f="${f}" type="number" min="0" value="${man??""}" placeholder="${autoVal??"—"}" oninput="planEdit()">${hint}</label>`;
   };
-  let html=`<div class="assume">
+  let html=campPills(r);
+  html+=`<div class="assume">
     <div class="ag"><div class="ah">Campaign Goal</div><div class="arow">
       ${aIn("goal",p.cpoGoal,null,"CPO Goal $",true)}</div>
       <div class="hint" style="font-size:10px;margin-top:6px">week ${p.wkNow} of ${p.weeks} · starts ${p.start.toLocaleDateString(undefined,{month:"numeric",day:"numeric"})}</div></div>
@@ -1456,8 +1511,56 @@ function planTotalsHtml(v){
 }
 function planTotals(p){
   PLAN_START=p.start;PLAN_ACTUAL=p.actualToDate;
+  if(campaignEnded(PLAN_CAMPAIGN)){
+    $("plan-totals").innerHTML=campaignSummaryHtml(p);
+    return;
+  }
   $("plan-totals").innerHTML=planTotalsHtml({projected:p.projected,planned:p.plannedWeeks,
     weeks:p.weeks,goal:p.cpoGoal,expToDate:p.expToDate,actual:p.actualToDate});
+}
+
+/* ── the campaign is over: replace the live pace card with its final story —
+   what was sold, the weekly rhythm, and how it stacked against goal & plan.
+   Below it, campaign-over-campaign so growth is visible at a glance. ── */
+function campaignSummaryHtml(p){
+  const acts=p.weeksArr.map(w=>w.actual).filter(v=>v!=null);
+  const total=acts.reduce((a,b)=>a+b,0);
+  const wks=acts.length;
+  const avg=wks?Math.round(total/wks):null;
+  const best=wks?Math.max(...acts):null;
+  const bestWk=best!=null?p.weeksArr.find(w=>w.actual===best):null;
+  const goal=p.cpoGoal;
+  const hit=goal?Math.round(total/goal*100):null;
+  const vsPlan=p.projected!=null?total-p.projected:null;
+  const hero=goal!=null
+    ?`<div class="plan-hero ${hit>=100?"":"behind"}"><div class="lab">Campaign result</div>
+       <div class="val">${money(total)}<span style="font-size:14px;color:var(--ink-soft)"> · ${hit}% of goal</span></div>
+       <div class="meta">${hit>=100?"goal covered — carry the standard forward":`${money(goal-total)} short of the ${money(goal)} goal — the next plan starts from what these weeks proved`}</div></div>`
+    :`<div class="plan-hero"><div class="lab">Campaign result</div><div class="val">${money(total)}</div>
+       <div class="meta">no goal was set for this campaign</div></div>`;
+  const rep=DATA.find(x=>x.id===PLAN_REP)||{id:PLAN_REP,sales:[]};
+  const history=repCampaigns(rep).filter(c=>c!==nextCampaign()).map(c=>{
+    const sales=c===SELECTED_CAMPAIGN?rep.sales
+      :(c==="Fall 2025"&&(SEED.find(x=>x.id===rep.id)||{}).sales)||campaignSales(rep.id,c);
+    const a=(sales||[]).filter(v=>v!=null);
+    if(!a.length)return null;
+    const t=a.reduce((x,y)=>x+y,0);
+    return {c,t,w:a.length,avg:Math.round(t/a.length)};
+  }).filter(Boolean);
+  const histRows=history.map(h=>
+    `<tr class="${h.c===PLAN_CAMPAIGN?"wk-now":""}"><td style="text-align:left">${h.c}${h.c===PLAN_CAMPAIGN?"":""}</td>
+     <td>${money(h.t)}</td><td>${h.w}</td><td>${money(h.avg)}</td></tr>`).join("");
+  return `<div class="plan-grid">${hero}
+    <div class="kpi"><div class="lab">Weekly average</div><div class="val" style="font-size:22px">${money(avg)}</div>
+      <div class="meta">${wks} reporting week${wks===1?"":"s"}</div></div>
+    <div class="kpi"><div class="lab">Best week</div><div class="val" style="font-size:22px">${money(best)}</div>
+      <div class="meta">${bestWk?"week "+bestWk.wk:"—"}</div></div>
+    <div class="kpi"><div class="lab">Vs the plan</div><div class="val" style="font-size:22px">${vsPlan==null?"—":`<span class="${vsPlan>=0?"up":"down"}">${vsPlan>=0?"+":"−"}${money(Math.abs(vsPlan))}</span>`}</div>
+      <div class="meta">${p.projected!=null?`plan projected ${money(p.projected)}`:"no plan was built"}</div></div>
+  </div>`+(history.length>1?`<div style="margin-top:14px">
+    <div class="eyebrow" style="margin-bottom:8px">Campaign over campaign</div>
+    <table class="ptable"><thead><tr><th style="text-align:left">Campaign</th><th>Total</th><th>Wks</th><th>Avg / wk</th></tr></thead>
+    <tbody>${histRows}</tbody></table></div>`:"");
 }
 /* ── inline edits: recompute instantly, save after 1.2s of quiet ── */
 let PLAN_REP=null,PLAN_TIMER=null,PLAN_AUTO=null,PLAN_WEEKS=PERIOD.weeks,PLAN_START=null,PLAN_ACTUAL=0;
@@ -1520,7 +1623,7 @@ async function planSave(){
   if(!PLAN_REP||!CONFIG.WEBAPP_URL)return;
   const {weekly,f}=planReadDom();
   const p=plannerFor(DATA.find(x=>x.id===PLAN_REP)||ME);
-  const body={action:"savePlanner",repId:PLAN_REP,campaign:SELECTED_CAMPAIGN,
+  const body={action:"savePlanner",repId:PLAN_REP,campaign:PLAN_CAMPAIGN,
     CPOGoal:f.goal||0,Weeks:p.weeks,CampaignStart:p.start.toISOString().slice(0,10),
     DaysOff:0,EventShifts:0,ApptDays:0,AvgOrder:0,ClosingPct:0,EventsJSON:"[]",
     DemoCompPct:f.dc||0,DemoClosePct:f.dcl||0,DemoAvgOrder:f.dav||0,
@@ -1548,8 +1651,12 @@ function planRefreshComputed(){
 }
 function renderAdminPlanner(){
   const t=plannerTeam();
+  const pills=`<div class="camp-pills">`+[...new Set(DATA.flatMap(r=>repCampaigns(r)))].sort((a,b)=>campKey(a)-campKey(b)).map(c=>{
+      const tag=c===currentCampaign()?"now":(c===nextCampaign()?"next":(campaignEnded(c)?"done":""));
+      return `<button class="camp-pill ${c===PLAN_CAMPAIGN?"on":""}" onclick="setPlanCampaign('${c}')">${c}${tag?`<span class="tag">${tag}</span>`:""}</button>`;
+    }).join("")+`</div>`;
   if(!t.rows.length){
-    $("admin-planner").innerHTML=`<div class="plan-empty">No campaign plans yet for ${SELECTED_CAMPAIGN}. Open any mentee (Rep toggle) and plan their weeks — shifts and appointments per week, expected CPO computes automatically.</div>`;
+    $("admin-planner").innerHTML=pills+`<div class="plan-empty">No campaign plans yet for ${PLAN_CAMPAIGN}. Open any mentee (Rep toggle) and plan their weeks — shifts and appointments per week, expected CPO computes automatically.</div>`;
     return;
   }
   const rows=t.rows.sort((a,b)=>(b.plan.ahead??-9e9)-(a.plan.ahead??-9e9)).map(({rep,plan})=>{
@@ -1562,7 +1669,7 @@ function renderAdminPlanner(){
   }).join("");
   const tp=pace({ahead:t.ahead});
   const noPlan=DATA.filter(r=>!t.rows.some(x=>x.rep.id===r.id));
-  $("admin-planner").innerHTML=`<table class="ptable">
+  $("admin-planner").innerHTML=pills+`<table class="ptable">
     <thead><tr><th>Mentee</th><th>Goal</th><th>Wks planned</th><th>Projected</th><th>Planned so far</th><th>Actual</th><th>Pace</th><th></th></tr></thead>
     <tbody>${rows}</tbody>
     <tfoot><tr style="font-weight:600;background:#FCFBF8"><td>Team</td><td>${money(t.goal)}</td><td></td><td>${money(t.projected)}</td><td>${money(t.expected)}</td><td>${money(t.actual)}</td><td><span class="${(t.ahead??0)>=0?'up':'down'}">${tp.word}</span></td><td></td></tr></tfoot>
