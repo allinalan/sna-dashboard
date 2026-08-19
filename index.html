@@ -287,10 +287,6 @@
   .a-real{display:block;font-family:"Geist Mono";font-size:9px;letter-spacing:.02em;color:var(--good);margin-top:3px;cursor:pointer;text-transform:none;white-space:nowrap}
   .a-real:hover{text-decoration:underline}
   .pw-in{width:100%;max-width:70px;font-family:"Geist Mono";font-size:12px;padding:5px 6px;border:1px solid var(--line);border-radius:6px;background:var(--paper);color:var(--ink);text-align:right}
-  #rep-bp .pw-in{max-width:96px;min-width:64px}
-  #rep-bp input[type=number]::-webkit-outer-spin-button,#rep-bp input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
-  #rep-bp input[type=number]{-moz-appearance:textfield;appearance:textfield}
-  #rep-bp .bp-mid{color:var(--good);font-weight:600}
   .pw-in:focus{border-color:var(--accent);outline:none}
   .ptable td.pw-exp,.ptable td.pw-act{font-weight:600}
   .ptable tr.wk-now td{background:var(--accent-soft)}
@@ -375,13 +371,6 @@
       <div id="admin-planner"></div>
     </div>
 
-    <div class="section" id="admin-bp-sec">
-      <div class="section-head">
-        <h2 class="serif">PUSH Blueprints — Team</h2>
-        <span class="hint">each mentee's PUSH scenarios · conservative → middle → goes-right · live from their page</span>
-      </div>
-      <div id="admin-bp"></div>
-    </div>
 
     <div class="section" id="lb-sec">
       <div class="section-head">
@@ -432,7 +421,7 @@
     </div>
     <div class="rep-context" id="rep-context"></div>
 
-    <div class="kpis hidden" id="goals-strip" style="grid-template-columns:repeat(3,1fr);margin-top:16px"></div>
+    <div class="kpis hidden" id="goals-strip" style="grid-template-columns:repeat(2,1fr);margin-top:16px"></div>
 
     <!-- coaches: the 1-on-1 in one glance (admin mode only) -->
     <div class="section hidden" id="prep-sec" style="margin-top:24px">
@@ -513,13 +502,6 @@
       <div id="rep-planner"></div>
     </div>
 
-    <div class="section" id="rep-bp-sec">
-      <div class="section-head">
-        <h2 class="serif" id="bp-title">PUSH Blueprint</h2>
-        <span class="hint" id="bp-saved">your PUSH sprint math — set the levers, the daily numbers compute · saves automatically</span>
-      </div>
-      <div id="rep-bp"></div>
-    </div>
 
     <!-- team aggregates + leaderboard — the ONLY peer visibility in rep mode -->
     <div id="rep-team-block" class="hidden">
@@ -575,7 +557,6 @@ const CONFIG = {
   CALLS_TAB: "Calls",           // RepID · Month · Status · CallDateTime · Coach
   SURVEY_TAB: "CallSurvey",     // Timestamp · RepID · Month · Takeaways · ActionSteps
   PLANNER_TAB: "Planner",       // per rep per campaign planner inputs
-  BLUEPRINT_TAB: "Blueprint",   // per rep per campaign PUSH blueprint (levers + actuals)
   CALENDLY_URL: "https://calendly.com/sharp-ninja-academy",
   SURVEY_FORM_URL: "https://docs.google.com/forms/d/e/1FAIpQLSedU7b3dOX6JQs8fcRJbqB5q3dmbEc9fSoUm-rmpK9484R4cQ/viewform",
   WEBAPP_URL: "https://script.google.com/macros/s/AKfycbyNFDkgEAUT5IDNw4wvCHLQZoe70XxVwgAZmG8bNTmlkY8t0d-wL2eKa53kgke2AOCHPQ/exec",
@@ -735,7 +716,7 @@ const SEED = [
 ];
 
 /* ═══════════════ DATA LOAD — one fetch feeds every view ═══════════════ */
-let DATA=[], ROSTER_RAW=[], CALLS_RAW=[], SURVEY_RAW=[], PLANNER_RAW=[], BLUEPRINT_RAW=[];
+let DATA=[], ROSTER_RAW=[], CALLS_RAW=[], SURVEY_RAW=[], PLANNER_RAW=[];
 async function loadData(){
   if(!CONFIG.USE_LIVE_DATA){DATA=SEED;setSource(false);resolveIdentity();return;}
   try{
@@ -749,7 +730,6 @@ async function loadData(){
     CALLS_RAW=await tab(CONFIG.CALLS_TAB,true);
     SURVEY_RAW=await tab(CONFIG.SURVEY_TAB,true);
     PLANNER_RAW=await tab(CONFIG.PLANNER_TAB,true);
-    BLUEPRINT_RAW=await tab(CONFIG.BLUEPRINT_TAB,true);
     applyCampaign();
     setSource(true);
   }
@@ -998,237 +978,6 @@ function plannerTeam(){
     expected:t(x=>x.plan.expToDate), actual:t(x=>x.plan.actualToDate), ahead:t(x=>x.plan.ahead)};
 }
 
-/* ═══════════════ PUSH BLUEPRINT — lever scenarios per rep per campaign ═══════════════
-   The Appointment Lever (slots × completion% × close% × CPO) has three sub-levers,
-   each a conservative/goes-right pair whose midpoint is the Realistic Middle.
-   Additional levers are a free list (add/remove/rename). Everything derives live;
-   only the inputs + tracker actuals are stored — one Blueprint row per (rep, campaign). */
-const esc=s=>String(s??"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
-const fmtP=n=>(n%1===0)?String(n):String(Math.round(n*10)/10);
-const bpMid=(a,b)=>(a+b)/2;
-const BP_DEFAULTS={goal:30000,days:15,slots:100,predays:4,cph:25,bph:2,
-  comp_c:70,comp_x:80,close_c:65,close_x:75,cpo_c:500,cpo_x:700,
-  levers:[{name:"Event / Booth Shifts",c:0,x:0}]};
-function blueprintRowOf(r){
-  return BLUEPRINT_RAW.find(p=>String(p.RepID)===String(r.id)&&String(p.Campaign||"").trim()===SELECTED_CAMPAIGN)||null;
-}
-function blueprintFor(r){
-  const row=blueprintRowOf(r);
-  let plan=null,acts={};
-  if(row){
-    try{plan=JSON.parse(row.PlannerJSON||"null");}catch(e){}
-    try{acts=(JSON.parse(row.BlueprintJSON||"{}")||{}).acts||{};}catch(e){}
-  }
-  const s=Object.assign({},BP_DEFAULTS,plan||{});
-  if(!Array.isArray(s.levers))s.levers=BP_DEFAULTS.levers.map(l=>Object.assign({},l));
-  return {row,s,acts,scen:bpScen(s)};
-}
-function bpScen(s){
-  const m={comp:bpMid(+s.comp_c||0,+s.comp_x||0),close:bpMid(+s.close_c||0,+s.close_x||0),cpo:bpMid(+s.cpo_c||0,+s.cpo_x||0)};
-  const rev=(comp,close,cpo)=>(+s.slots||0)*comp/100*close/100*cpo;
-  const appt={c:rev(+s.comp_c||0,+s.close_c||0,+s.cpo_c||0),m:rev(m.comp,m.close,m.cpo),x:rev(+s.comp_x||0,+s.close_x||0,+s.cpo_x||0)};
-  const lev={c:0,m:0,x:0};
-  (s.levers||[]).forEach(l=>{lev.c+=+l.c||0;lev.m+=bpMid(+l.c||0,+l.x||0);lev.x+=+l.x||0;});
-  return {m,appt,lev,tot:{c:appt.c+lev.c,m:appt.m+lev.m,x:appt.x+lev.x}};
-}
-function bpActualTotal(acts){
-  let t=null;
-  const add=v=>{const n=pnum(v);if(n!=null)t=(t||0)+n;};
-  add(acts.appt);
-  Object.values(acts.byLever||{}).forEach(add);
-  return t;
-}
-function blueprintTeam(){
-  const rows=DATA.map(r=>({rep:r,bp:blueprintFor(r)})).filter(x=>x.bp.row);
-  const t=fn=>rows.length?rows.map(fn).filter(x=>x!=null).reduce((a,b)=>a+b,0):null;
-  return {rows,goal:t(x=>+x.bp.row.Goal||null),c:t(x=>x.bp.scen.tot.c),m:t(x=>x.bp.scen.tot.m),
-    x:t(x=>x.bp.scen.tot.x),actual:t(x=>bpActualTotal(x.bp.acts))};
-}
-
-/* ── rep blueprint UI ── */
-let BP_REP=null,BP_TIMER=null;
-function renderRepBlueprint(r){
-  const root=$("rep-bp"); if(!root)return;
-  // don't clobber inputs while someone is typing or a save is pending
-  if(root.contains(document.activeElement)||BP_TIMER)return;
-  BP_REP=r.id;
-  const {s,acts}=blueprintFor(r);
-  bpPaint(s,acts);
-}
-function bpPaint(s,acts){
-  $("bp-title").textContent=(MODE==="rep"?"Your ":"")+"PUSH Blueprint · "+SELECTED_CAMPAIGN;
-  const inp=(f,v,step,ph)=>`<label>${ph}<input class="bp-f" data-f="${f}" type="number" min="0" step="${step||1}" value="${v??""}" oninput="bpEdit()"></label>`;
-  let h=`<div class="assume" style="grid-template-columns:1.7fr 1.3fr">
-    <div class="ag"><div class="ah">The Appointment Lever <span class="chip-auto">SLOTS × COMPLETION × CLOSE × CPO</span></div>
-      <div class="arow" style="margin-bottom:10px">${inp("slots",s.slots,1,"Appts Available")}</div>
-      <table class="ptable"><thead><tr><th style="text-align:left">Sub-lever</th><th>Conservative</th><th>Middle (auto)</th><th>Goes right</th></tr></thead><tbody>
-      ${[["comp","Completion %"],["close","Close %"],["cpo","Avg Order $"]].map(([k,lab])=>
-        `<tr><td>${lab}</td>
-         <td><input class="pw-in bp-f" data-f="${k}_c" type="number" min="0" value="${s[k+"_c"]??""}" oninput="bpEdit()"></td>
-         <td class="bp-mid" id="bp-m-${k}">—</td>
-         <td><input class="pw-in bp-f" data-f="${k}_x" type="number" min="0" value="${s[k+"_x"]??""}" oninput="bpEdit()"></td></tr>`).join("")}
-      </tbody></table></div>
-    <div class="ag"><div class="ah">Goal &amp; Work Rates</div>
-      <div class="arow">${inp("goal",s.goal,500,"PUSH Goal $")}${inp("days",s.days,1,"Days Working")}</div>
-      <div class="arow" style="margin-top:10px">${inp("predays",s.predays,1,"Pre-PUSH Call Days")}${inp("cph",s.cph,1,"Calls/Hr")}${inp("bph",s.bph,0.5,"Booked/Hr")}</div>
-      <div class="hint" style="font-size:10px;margin-top:8px">middle levers drive the goal math below</div></div>
-  </div>`;
-  h+=`<div class="heat-scroll" style="margin-bottom:10px"><table class="ptable"><thead><tr>
-    <th style="text-align:left">Additional lever (rename freely)</th><th>Conservative</th><th>Middle (auto)</th><th>Goes right</th><th></th></tr></thead><tbody>`;
-  (s.levers||[]).forEach((lv,i)=>{
-    h+=`<tr><td style="text-align:left"><input class="pw-in bp-ln" data-i="${i}" type="text" value="${esc(lv.name)}" style="max-width:none;width:100%;text-align:left" oninput="bpEdit()"></td>
-      <td><input class="pw-in bp-lc" data-i="${i}" type="number" min="0" step="500" value="${lv.c??""}" oninput="bpEdit()"></td>
-      <td class="bp-mid" id="bp-lvm-${i}">—</td>
-      <td><input class="pw-in bp-lx" data-i="${i}" type="number" min="0" step="500" value="${lv.x??""}" oninput="bpEdit()"></td>
-      <td><button class="rowbtn" onclick="bpRemoveLever(${i})">× remove</button></td></tr>`;
-  });
-  h+=`</tbody></table></div>
-  <button class="rowbtn" style="margin-bottom:16px" onclick="bpAddLever()">+ add lever</button>`;
-  h+=`<div id="bp-scen" style="margin-bottom:16px"></div>`;
-  h+=`<div class="eyebrow" style="margin:4px 0 10px">Live Tracker — targets are the middle case</div>
-  <div class="heat-scroll" style="margin-bottom:16px"><table class="ptable"><thead><tr><th style="text-align:left">Metric</th><th>Target (middle)</th><th>Actual</th></tr></thead><tbody>
-    <tr><td>Slots run</td><td id="bp-tg-run">—</td><td><input class="pw-in bp-a" data-a="slotsRun" type="number" min="0" value="${acts.slotsRun??""}" oninput="bpEdit()"></td></tr>
-    <tr><td>Sales closed</td><td id="bp-tg-closed">—</td><td><input class="pw-in bp-a" data-a="closed" type="number" min="0" value="${acts.closed??""}" oninput="bpEdit()"></td></tr>
-    <tr><td>Avg order (CPO)</td><td id="bp-tg-cpo">—</td><td><input class="pw-in bp-a" data-a="cpo" type="number" min="0" value="${acts.cpo??""}" oninput="bpEdit()"></td></tr>
-    <tr><td>Appointment revenue</td><td id="bp-tg-appt">—</td><td><input class="pw-in bp-a" data-a="appt" type="number" min="0" step="100" value="${acts.appt??""}" oninput="bpEdit()"></td></tr>
-    ${(s.levers||[]).map((lv,i)=>`<tr><td>${esc(lv.name)} revenue</td><td id="bp-tg-lv-${i}">—</td>
-      <td><input class="pw-in bp-al" data-i="${i}" type="number" min="0" step="100" value="${(acts.byLever||{})[lv.name]??""}" oninput="bpEdit()"></td></tr>`).join("")}
-    <tr style="font-weight:600"><td>TOTAL SHIPPED</td><td id="bp-tg-tot">—</td><td id="bp-act-tot">—</td></tr>
-  </tbody></table></div>`;
-  h+=`<div class="eyebrow" style="margin:4px 0 10px">The Math — to hit your goal at middle levers</div><div id="bp-math"></div>`;
-  $("rep-bp").innerHTML=h;
-  bpRecalcDom();
-}
-function bpReadDom(){
-  const root=$("rep-bp");
-  const s={};
-  root.querySelectorAll(".bp-f").forEach(el=>{const v=el.value.trim();s[el.dataset.f]=v===""?0:+v;});
-  s.levers=[];
-  root.querySelectorAll(".bp-ln").forEach(el=>{
-    const i=+el.dataset.i;
-    const c=root.querySelector(`.bp-lc[data-i="${i}"]`), x=root.querySelector(`.bp-lx[data-i="${i}"]`);
-    s.levers[i]={name:el.value.trim()||"Untitled lever",
-      c:(c&&c.value.trim()!=="")?+c.value:0, x:(x&&x.value.trim()!=="")?+x.value:0};
-  });
-  const acts={byLever:{}};
-  root.querySelectorAll(".bp-a").forEach(el=>{const v=el.value.trim();if(v!=="")acts[el.dataset.a]=+v;});
-  root.querySelectorAll(".bp-al").forEach(el=>{const v=el.value.trim();if(v!=="")acts.byLever[s.levers[+el.dataset.i].name]=+v;});
-  return {s,acts};
-}
-function bpRecalcDom(){
-  const root=$("rep-bp"); if(!root||!root.innerHTML)return;
-  const {s,acts}=bpReadDom();
-  const sc=bpScen(s);
-  const setIf=(id,txt)=>{const el=$(id);if(el)el.textContent=txt;};
-  setIf("bp-m-comp",fmtP(sc.m.comp)+"%");setIf("bp-m-close",fmtP(sc.m.close)+"%");setIf("bp-m-cpo",money(sc.m.cpo));
-  s.levers.forEach((lv,i)=>setIf("bp-lvm-"+i,money(bpMid(+lv.c||0,+lv.x||0))));
-  const rows=[["Appointments ("+(s.slots||0)+" slots)",sc.appt]]
-    .concat(s.levers.map(lv=>[lv.name,{c:+lv.c||0,m:bpMid(+lv.c||0,+lv.x||0),x:+lv.x||0}]));
-  $("bp-scen").innerHTML=`<div class="grid3" style="margin-bottom:12px">
-    <div class="bucket"><div class="lab">Conservative floor</div><div class="val">${money(sc.tot.c)}</div><div class="meta">${fmtP(+s.comp_c||0)}% / ${fmtP(+s.close_c||0)}% / ${money(+s.cpo_c||0)}</div></div>
-    <div class="bucket" style="border-color:var(--good)"><div class="lab">Realistic middle</div><div class="val" style="color:var(--good)">${money(sc.tot.m)}</div><div class="meta">${fmtP(sc.m.comp)}% / ${fmtP(sc.m.close)}% / ${money(sc.m.cpo)} · the standard to protect</div></div>
-    <div class="bucket" style="border-color:var(--accent)"><div class="lab">Everything goes right</div><div class="val" style="color:var(--accent)">${money(sc.tot.x)}</div><div class="meta">${fmtP(+s.comp_x||0)}% / ${fmtP(+s.close_x||0)}% / ${money(+s.cpo_x||0)}</div></div></div>
-  <div class="heat-scroll"><table class="ptable"><thead><tr><th style="text-align:left">Lever</th><th>Conservative</th><th>Middle</th><th>Goes right</th></tr></thead><tbody>
-    ${rows.map(([n,v])=>`<tr><td>${esc(n)}</td><td>${money(v.c)}</td><td style="font-weight:600;color:var(--good)">${money(v.m)}</td><td>${money(v.x)}</td></tr>`).join("")}
-    <tr style="font-weight:600"><td>TOTAL</td><td>${money(sc.tot.c)}</td><td style="color:var(--good)">${money(sc.tot.m)}</td><td>${money(sc.tot.x)}</td></tr>
-  </tbody></table></div>`;
-  const runM=(+s.slots||0)*sc.m.comp/100, closedM=runM*sc.m.close/100;
-  setIf("bp-tg-run",String(Math.round(runM)));
-  setIf("bp-tg-closed",String(Math.round(closedM)));
-  setIf("bp-tg-cpo",money(sc.m.cpo));
-  setIf("bp-tg-appt",money(sc.appt.m));
-  s.levers.forEach((lv,i)=>setIf("bp-tg-lv-"+i,money(bpMid(+lv.c||0,+lv.x||0))));
-  setIf("bp-tg-tot",money(sc.tot.m));
-  const at=bpActualTotal(acts);
-  setIf("bp-act-tot",at==null?"—":money(at));
-  const apptGoal=Math.max(0,(+s.goal||0)-sc.lev.m);
-  let mh;
-  if(sc.m.cpo>0&&sc.m.close>0&&sc.m.comp>0&&s.days>0&&s.cph>0&&s.bph>0&&s.predays>0&&apptGoal>0){
-    const orders=apptGoal/sc.m.cpo, completed=orders/(sc.m.close/100), booked=completed/(sc.m.comp/100);
-    const calls=booked*s.cph/s.bph, pre=calls/2;
-    const capOk=(+s.slots||0)>=Math.ceil(booked);
-    mh=`<div class="grid5">
-      <div class="bucket"><div class="lab">Appt goal</div><div class="val" style="font-size:19px">${money(apptGoal)}</div><div class="meta">${money(sc.lev.m)} covered by other levers</div></div>
-      <div class="bucket"><div class="lab">Orders needed</div><div class="val" style="font-size:19px">${Math.ceil(orders)}</div><div class="meta">${(orders/s.days).toFixed(1)} per day</div></div>
-      <div class="bucket"><div class="lab">Appts booked needed</div><div class="val" style="font-size:19px;color:${capOk?'var(--good)':'var(--bad)'}">${Math.ceil(booked)}</div><div class="meta">${capOk?`fits your ${s.slots} slots ✓`:`over your ${s.slots} slots — short ${Math.ceil(booked)-(+s.slots||0)}`}</div></div>
-      <div class="bucket"><div class="lab">Calls needed</div><div class="val" style="font-size:19px">${Math.ceil(calls).toLocaleString()}</div><div class="meta">${(calls/s.cph).toFixed(1)} hrs on the phone</div></div>
-      <div class="bucket"><div class="lab">Pre-PUSH calls/day</div><div class="val" style="font-size:19px">${Math.ceil(pre/s.predays)}</div><div class="meta">book half before day 1 · ${(pre/s.predays/s.cph).toFixed(1)} hrs/day</div></div>
-    </div>`;
-  }else mh=`<div class="plan-empty">Set a goal and your levers — orders needed, appointments needed, and the call plan compute here automatically.</div>`;
-  $("bp-math").innerHTML=mh;
-}
-function bpEdit(){
-  $("bp-saved").textContent="typing…";
-  bpRecalcDom();
-  if(BP_TIMER)clearTimeout(BP_TIMER);
-  BP_TIMER=setTimeout(bpSave,1200);
-}
-function bpAddLever(){
-  const {s,acts}=bpReadDom();
-  s.levers.push({name:"New Lever",c:0,x:0});
-  bpPaint(s,acts);bpEdit();
-}
-function bpRemoveLever(i){
-  const {s,acts}=bpReadDom();
-  const name=(s.levers[i]||{}).name;
-  s.levers.splice(i,1);
-  if(acts.byLever)delete acts.byLever[name];
-  bpPaint(s,acts);bpEdit();
-}
-async function bpSave(){
-  BP_TIMER=null;
-  if(!BP_REP||!CONFIG.WEBAPP_URL)return;
-  const {s,acts}=bpReadDom();
-  const sc=bpScen(s);
-  const body={action:"saveBlueprint",repId:BP_REP,campaign:SELECTED_CAMPAIGN,
-    Goal:+s.goal||0,ProjC:Math.round(sc.tot.c),ProjM:Math.round(sc.tot.m),ProjX:Math.round(sc.tot.x),
-    TotalActual:bpActualTotal(acts)||0,
-    PlannerJSON:JSON.stringify(s),BlueprintJSON:JSON.stringify({acts})};
-  $("bp-saved").textContent="saving…";
-  try{
-    const j=await fetch(CONFIG.WEBAPP_URL,{method:"POST",body:JSON.stringify(body)}).then(r=>r.json());
-    if(!j.ok)throw new Error(j.error||"save failed");
-    $("bp-saved").textContent="saved ✓";
-    await loadData();
-    if(!$("rep-bp").contains(document.activeElement))renderAll();
-  }catch(e){$("bp-saved").textContent="⚠ not saved — "+e.message;}
-}
-
-/* ── admin: every mentee's blueprint at a glance ── */
-function renderAdminBlueprints(){
-  const el=$("admin-bp"); if(!el)return;
-  const t=blueprintTeam();
-  if(!t.rows.length){
-    el.innerHTML=`<div class="plan-empty">No PUSH blueprints yet for ${SELECTED_CAMPAIGN}. Every mentee has one on their personal page — levers in, scenarios out. Open any mentee (Rep toggle) to start theirs with them.</div>`;
-    return;
-  }
-  const rows=t.rows.sort((a,b)=>b.bp.scen.tot.m-a.bp.scen.tot.m).map(({rep,bp})=>{
-    const act=bpActualTotal(bp.acts);
-    const vs=act!=null?act-bp.scen.tot.m:null;
-    const upd=ciParseDate(bp.row.UpdatedAt);
-    return `<tr><td>${rep.name}</td><td>${money(+bp.row.Goal||null)}</td>`+
-      `<td>${money(bp.scen.tot.c)}</td><td style="font-weight:600;color:var(--good)">${money(bp.scen.tot.m)}</td><td>${money(bp.scen.tot.x)}</td>`+
-      `<td>${act==null?"—":money(act)}</td>`+
-      `<td>${vs==null?"—":`<span class="${vs>=0?'up':'down'}">${vs>=0?"+":"−"}${money(Math.abs(vs))}</span>`}</td>`+
-      `<td style="color:var(--ink-soft);font-size:11px">${upd?upd.toLocaleDateString(undefined,{month:"short",day:"numeric"}):"—"}</td>`+
-      `<td><button class="rowbtn" onclick="openRepBlueprint('${rep.id}')">open</button></td></tr>`;
-  }).join("");
-  const noBp=DATA.filter(r=>!t.rows.some(x=>x.rep.id===r.id));
-  el.innerHTML=(noBp.length?`<div class="hint" style="margin-bottom:10px">No blueprint yet: ${noBp.map(r=>`<a href="#" onclick="openRepBlueprint('${r.id}');return false" style="text-decoration:none">${r.name}</a>`).join(" · ")}</div>`:"")+`<div class="heat-scroll"><table class="ptable">
-    <thead><tr><th style="text-align:left">Mentee</th><th>Goal</th><th>Conservative</th><th>Middle</th><th>Goes right</th><th>Actual</th><th>vs middle</th><th>Updated</th><th></th></tr></thead>
-    <tbody>${rows}</tbody>
-    <tfoot><tr style="font-weight:600;background:#FCFBF8"><td>Team</td><td>${money(t.goal)}</td><td>${money(t.c)}</td><td style="color:var(--good)">${money(t.m)}</td><td>${money(t.x)}</td><td>${money(t.actual)}</td><td></td><td></td><td></td></tr></tfoot>
-  </table></div>`;
-}
-/* admin: jump straight into a mentee's blueprint */
-function openRepBlueprint(repId){
-  if(MODE==="rep")return;
-  setView("rep");
-  $("rep-select").value=repId;
-  renderRep();
-  const sec=$("rep-bp-sec");
-  if(sec)sec.scrollIntoView({behavior:"smooth",block:"start"});
-}
 
 /* rep link for the admin board — how each mentee's personal URL is formed */
 const repLink=id=>location.origin+location.pathname+"?rep="+encodeURIComponent(id);
@@ -1921,12 +1670,11 @@ function renderCallNotes(r){
 /* three goals can coexist — say what each one IS so nobody has to guess */
 function renderGoalsStrip(r){
   const el=$("goals-strip"); if(!el)return;
-  const plan=plannerFor(r), bp=blueprintFor(r);
+  const plan=plannerFor(r);
   const season=(r.goal&&r.goal!=="—")?r.goal:null;
   const tiles=[
     {lab:"Season goal",val:season??"—",meta:"what you set with your coach"},
-    {lab:"Campaign plan",val:money(plan.cpoGoal),meta:"what your weekly plan adds up to"},
-    {lab:"PUSH goal",val:money(pman(bp.s.goal)),meta:"your PUSH-sprint target"}
+    {lab:"Campaign plan",val:money(plan.cpoGoal),meta:"what your weekly plan adds up to"}
   ];
   el.classList.remove("hidden");
   el.innerHTML=tiles.map(t=>`<div class="kpi"><div class="lab">${t.lab}</div><div class="val" style="font-size:20px">${t.val}</div><div class="meta">${t.meta}</div></div>`).join("");
@@ -1956,7 +1704,7 @@ function renderRep(){
   const r=currentRep(); if(!r)return;
   renderCallPrep(r);
   renderRepContext(r);renderGoalsStrip(r);renderHero(r);renderSummary(r);renderChart();renderChannels(r);renderDiagnostics(r);renderStandards(r);renderNotes(r);
-  renderCallNotes(r);renderRepPlanner(r);renderRepBlueprint(r);renderRepCallCard(r);
+  renderCallNotes(r);renderRepPlanner(r);renderRepCallCard(r);
   // brand-new rep (no check-ins this campaign): collapse the data sections
   // into one starter card so the page leads with what they can DO
   const collapse=MODE==="rep"&&activeWeeks(r)===0;
@@ -1993,7 +1741,7 @@ function renderAll(){
   }
   renderCampaignSelect();
   renderPeriod();renderKPIs();renderRadar();renderCheckins();renderLeaderboard();renderHeat();renderMix();
-  renderAdminPlanner();renderAdminBlueprints();renderAdminCalls();
+  renderAdminPlanner();renderAdminCalls();
   fillRepSelect();renderRep();
 }
 async function init(){
