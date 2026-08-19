@@ -646,6 +646,9 @@ function setPlanCampaign(c){
   if(c===PLAN_CAMPAIGN)return;
   PLAN_CAMPAIGN=c;
   if(PLAN_TIMER){clearTimeout(PLAN_TIMER);PLAN_TIMER=null;}   // abandon a half-typed edit of the old campaign
+  // the clicked pill sits INSIDE the planner card, so it is the focused element —
+  // blur it or renderRepPlanner's don't-clobber-while-typing guard skips the re-render
+  if(document.activeElement&&document.activeElement.blur)document.activeElement.blur();
   renderAll();
 }
 const campPills=r=>`<div class="camp-pills">`+repCampaigns(r).map(c=>{
