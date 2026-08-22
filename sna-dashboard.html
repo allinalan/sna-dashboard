@@ -5,89 +5,125 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Sharp Ninja Academy — Mentee Dashboard</title>
 <meta name="description" content="Sharp Ninja Academy mentee performance — weekly check-ins, standards, and sales by channel. Live coach dashboard.">
-<meta name="theme-color" content="#F7F5F0">
+<meta name="theme-color" content="#191410">
 <meta property="og:title" content="Sharp Ninja Academy — Mentee Dashboard">
 <meta property="og:description" content="Weekly check-ins, standards, and sales by channel — live coach view.">
 <meta property="og:type" content="website">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='29' fill='%23F7F5F0' stroke='%2316140F' stroke-width='4'/%3E%3Ctext x='32' y='43' font-size='30' text-anchor='middle' font-family='Hiragino Mincho ProN,Yu Mincho,serif' fill='%2316140F'%3E忍%3C/text%3E%3C/svg%3E">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23AE3B15'/%3E%3Ctext x='32' y='44' font-size='34' text-anchor='middle' font-family='Hiragino Mincho ProN,Yu Mincho,serif' fill='%23F3EFE6'%3E忍%3C/text%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..700&family=Hanken+Grotesk:wght@400;500;600;700&family=Spline+Sans+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
+  /* ═════════════════════════════════════════════════════════════════════
+     SNA MENTEE DASHBOARD — "Program Book" design system, shared with the
+     Master Hub. Dark lacquer masthead over warm paper; vermilion seal;
+     brass details. Fraunces (display) · Hanken Grotesk (text) ·
+     Spline Sans Mono (numbers, labels).
+     ═════════════════════════════════════════════════════════════════════ */
   :root{
-    --paper:#F7F5F0; --ink:#16140F; --ink-soft:#5A554B;
-    --line:#DED9CE; --line-soft:#EBE7DD;
-    --accent:#B4451F; --accent-soft:#F0E2D8;
-    --good:#3E6B4B; --good-bg:#DFEAE0;
-    --warn:#C99700; --warn-bg:#F7ECCF;
-    --bad:#B4451F;  --bad-bg:#F3DBD2;
-    --card:#FFFFFF;
+    --paper:#F3EFE6; --paper-deep:#EAE4D6;
+    --card:#FBF8F1; --card-raised:#FFFDF6;
+    --ink:#1C1712; --ink-soft:#5E5645; --ink-faint:#958C79;
+    --line:#DCD5C3; --line-soft:#E8E2D2; --line-strong:#C9C0AA;
+    --accent:#AE3B15; --accent-deep:#8F2F0F; --accent-soft:#F1DFD2; --accent-ink:#7C2C0E;
+    --brass:#8E7942;
+    --good:#3D6B4F; --good-bg:#DFE9DC;
+    --warn:#96760A; --warn-bg:#F2E7C6;
+    --bad:#A33512;  --bad-bg:#F0D9CC;
+    --shell:#191410; --shell-hi:#221C15;
+    --shell-text:#F4EEDF; --shell-mut:#9A907C; --shell-dim:#7C7360;
+    --serif:"Fraunces",Georgia,serif;
+    --sans:"Hanken Grotesk",-apple-system,"Helvetica Neue",sans-serif;
+    --monof:"Spline Sans Mono",ui-monospace,SFMono-Regular,monospace;
   }
   *{box-sizing:border-box;margin:0;padding:0}
   html{-webkit-text-size-adjust:100%}
-  body{background:var(--paper);color:var(--ink);font-family:"Geist",-apple-system,"Helvetica Neue",sans-serif;line-height:1.5;-webkit-font-smoothing:antialiased;padding:0 0 80px}
-  .mono{font-family:"Geist Mono",ui-monospace,monospace}
-  ::selection{background:var(--accent-soft)}
+  body{background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:14px;line-height:1.5;
+    -webkit-font-smoothing:antialiased;-webkit-tap-highlight-color:transparent;padding:0 0 90px}
+  .mono{font-family:var(--monof)}
+  ::selection{background:#EAD9C4}
   a{color:var(--accent)}
   :focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:4px}
-  .wrap{max-width:1100px;margin:0 auto;padding:0 24px}
-  .serif{font-family:"Fraunces",Georgia,serif}
-  .eyebrow{font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--ink-soft);font-weight:500}
+  .wrap{max-width:1140px;margin:0 auto;padding:0 26px}
+  .serif{font-family:var(--serif)}
+  .eyebrow{font-family:var(--monof);font-size:10px;letter-spacing:.24em;text-transform:uppercase;
+    color:var(--ink-soft);font-weight:500;display:flex;align-items:center;gap:9px}
+  .eyebrow::before{content:"";width:20px;height:2px;background:var(--accent);flex:none}
 
-  header{border-bottom:1px solid var(--line);background:var(--paper);position:sticky;top:0;z-index:30}
-  .head-inner{display:flex;align-items:center;justify-content:space-between;padding:16px 24px;max-width:1100px;margin:0 auto;flex-wrap:wrap;gap:12px}
-  .brand{display:flex;align-items:center;gap:14px}
-  .mark{width:38px;height:38px;border:1.5px solid var(--ink);border-radius:50%;display:grid;place-items:center;font-family:"Fraunces";font-weight:600;font-size:18px;flex:none}
-  .brand h1{font-family:"Fraunces";font-size:19px;font-weight:600;letter-spacing:-.01em;line-height:1.1}
-  .brand .sub{font-size:11px;color:var(--ink-soft);letter-spacing:.04em}
-  .head-right{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
-  .status{font-size:11px;color:var(--ink-soft);display:flex;align-items:center;gap:6px}
-  .dot{width:7px;height:7px;border-radius:50%;background:var(--good)}
-  .dot.seed{background:var(--warn)}
-  .toggle{display:flex;border:1px solid var(--line);border-radius:999px;overflow:hidden;background:var(--card)}
-  .toggle button{font-family:"Geist Mono";font-size:12px;padding:8px 16px;border:none;background:none;cursor:pointer;color:var(--ink-soft);letter-spacing:.03em}
-  .toggle button.on{background:var(--ink);color:var(--paper)}
+  /* film grain over everything */
+  body::after{content:"";position:fixed;inset:0;z-index:200;pointer-events:none;opacity:.05;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='220' height='220' filter='url(%23n)'/%3E%3C/svg%3E")}
 
-  .period{padding:20px 0 6px}
-  .period .big{font-family:"Fraunces";font-size:clamp(28px,5vw,42px);font-weight:600;letter-spacing:-.02em;line-height:1.05}
-  .period .frame{font-size:12px;color:var(--ink-soft);margin-top:6px;letter-spacing:.02em}
+  /* ═══ masthead — the dark cover ═══ */
+  header{background:linear-gradient(180deg,var(--shell-hi),var(--shell));color:var(--shell-text);
+    position:sticky;top:0;z-index:30;border-bottom:1px solid rgba(142,121,66,.4);
+    box-shadow:0 12px 26px -18px rgba(18,13,7,.55)}
+  .head-inner{display:flex;align-items:center;justify-content:space-between;padding:13px 26px;max-width:1140px;margin:0 auto;flex-wrap:wrap;gap:12px}
+  .brand{display:flex;align-items:center;gap:13px}
+  .mark{width:40px;height:40px;background:var(--accent);color:#F6EFE2;border-radius:10px;flex:none;
+    display:grid;place-items:center;font-family:"Hiragino Mincho ProN","Yu Mincho",serif;font-size:20px;line-height:1;font-weight:400;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.14),0 2px 8px rgba(0,0,0,.4)}
+  .brand h1{font-family:var(--serif);font-size:19px;font-weight:540;letter-spacing:.005em;line-height:1.1;color:var(--shell-text)}
+  .brand .sub{font-family:var(--monof);font-size:8.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--shell-mut);margin-top:4px}
+  .head-right{display:flex;align-items:center;gap:11px;flex-wrap:wrap;margin-left:auto}
+  .status{font-family:var(--monof);font-size:10.5px;color:var(--shell-mut);display:flex;align-items:center;gap:7px}
+  .dot{width:7px;height:7px;border-radius:50%;background:#6FA080;flex:none;box-shadow:0 0 6px rgba(111,160,128,.5)}
+  .dot.seed{background:#D9A62E;box-shadow:0 0 6px rgba(217,166,46,.5)}
+  .toggle{display:flex;gap:2px;border:1px solid rgba(244,238,223,.24);border-radius:9px;background:rgba(244,238,223,.06);padding:3px}
+  .toggle button{font-family:var(--monof);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;
+    padding:6px 14px;border:none;background:none;border-radius:6px;cursor:pointer;color:var(--shell-mut);
+    transition:background .15s,color .15s}
+  .toggle button:hover{color:var(--shell-text)}
+  .toggle button.on{background:var(--paper);color:var(--ink);font-weight:500}
+  .form-btn{font-family:var(--monof);font-size:10.5px;font-weight:500;letter-spacing:.09em;text-transform:uppercase;
+    text-decoration:none;color:#FFF9F1;background:var(--accent);border:1px solid var(--accent);border-radius:8px;
+    padding:8px 15px;transition:background .15s,border-color .15s}
+  .form-btn:hover{background:var(--accent-deep);border-color:var(--accent-deep);opacity:1}
+
+  /* ═══ page title ═══ */
+  .period{padding:36px 0 6px}
+  .period .big{font-family:var(--serif);font-size:clamp(30px,4.6vw,42px);font-weight:540;letter-spacing:-.018em;line-height:1.02;margin-top:10px}
+  .period .frame{font-family:var(--monof);font-size:11px;color:var(--ink-soft);margin-top:9px;letter-spacing:.03em}
   .period .frame b{color:var(--accent);font-weight:600}
 
-  .kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-top:22px}
-  .kpi{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px}
-  .kpi .lab{font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-soft)}
-  .kpi .val{font-family:"Fraunces";font-size:29px;font-weight:600;letter-spacing:-.02em;margin-top:8px;line-height:1}
-  .kpi .meta{font-size:11px;color:var(--ink-soft);margin-top:6px}
+  /* ═══ stat groups — annual-report rules, not boxes ═══ */
+  .kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:14px 24px;margin-top:26px}
+  .kpi{border-top:2px solid var(--ink);padding:11px 0 2px;background:none}
+  .kpi .lab{font-family:var(--monof);font-size:9.5px;letter-spacing:.15em;text-transform:uppercase;color:var(--ink-soft)}
+  .kpi .val{font-family:var(--serif);font-size:29px;font-weight:520;letter-spacing:-.02em;margin-top:8px;line-height:1}
+  .kpi .meta{font-size:11px;color:var(--ink-faint);margin-top:6px}
+  .kpi.alert{border-top-color:var(--accent)}
   .kpi.alert .val{color:var(--accent)}
 
-  .section{margin-top:40px}
-  .section-head{display:flex;align-items:baseline;justify-content:space-between;border-bottom:1px solid var(--line);padding-bottom:10px;margin-bottom:18px;gap:12px;flex-wrap:wrap}
-  .section-head h2{font-family:"Fraunces";font-size:20px;font-weight:600;letter-spacing:-.01em}
-  .section-head .hint{font-size:11px;color:var(--ink-soft)}
-  select{font-family:"Geist Mono";font-size:12px;padding:7px 30px 7px 12px;border:1px solid var(--line);border-radius:8px;background:var(--card) url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'><path d='M1 1l4 4 4-4' stroke='%235A554B' stroke-width='1.4' fill='none'/></svg>") no-repeat right 11px center;color:var(--ink);cursor:pointer;-webkit-appearance:none;appearance:none}
+  .section{margin-top:46px}
+  .section-head{display:flex;align-items:baseline;justify-content:space-between;border-bottom:2px solid var(--ink);padding-bottom:10px;margin-bottom:18px;gap:12px;flex-wrap:wrap}
+  .section-head h2{font-family:var(--serif);font-size:21px;font-weight:560;letter-spacing:-.012em}
+  .section-head .hint{font-family:var(--monof);font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-faint)}
+  select{font-family:var(--monof);font-size:11.5px;padding:7px 30px 7px 12px;border:1px solid var(--line-strong);border-radius:8px;background:var(--card) url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'><path d='M1 1l4 4 4-4' stroke='%235E5645' stroke-width='1.4' fill='none'/></svg>") no-repeat right 11px center;color:var(--ink);cursor:pointer;-webkit-appearance:none;appearance:none;transition:border-color .15s}
 
-  .lb{background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+  /* ═══ leaderboard ═══ */
+  .lb{background:var(--card);border:1px solid var(--line);border-radius:12px;overflow:hidden;box-shadow:0 1px 2px rgba(28,23,18,.04)}
   .lb-row{display:grid;grid-template-columns:34px 1fr 110px 92px;align-items:center;gap:10px;padding:12px 18px;border-bottom:1px solid var(--line-soft)}
   .lb-row:last-child{border-bottom:none}
-  .lb-row.h{font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-soft);padding:11px 18px}
-  .lb-rank{font-family:"Fraunces";font-weight:600;font-size:15px;color:var(--ink-soft)}
+  .lb-row.h{font-family:var(--monof);font-size:9.5px;letter-spacing:.15em;text-transform:uppercase;color:var(--ink-soft);padding:12px 18px 9px;border-bottom:1.5px solid rgba(28,23,18,.65)}
+  .lb-rank{font-family:var(--serif);font-weight:560;font-size:15px;color:var(--ink-faint)}
   .lb-rank.top{color:var(--accent)}
   .lb-name{font-size:13px;font-weight:500}
-  .lb-name .tag{font-size:10px;color:var(--ink-soft);margin-left:7px;border:1px solid var(--line);border-radius:5px;padding:1px 5px}
-  .lb-bar-wrap{height:7px;background:var(--line-soft);border-radius:99px;overflow:hidden}
+  .lb-name .tag{font-family:var(--monof);font-size:9px;letter-spacing:.05em;color:var(--ink-soft);margin-left:7px;border:1px solid var(--line);border-radius:5px;padding:1px 5px}
+  .lb-bar-wrap{height:6px;background:var(--line-soft);border-radius:99px;overflow:hidden}
   .lb-bar{height:100%;background:var(--accent);border-radius:99px}
-  .lb-val{font-size:13px;font-weight:600;text-align:right;font-variant-numeric:tabular-nums}
+  .lb-val{font-family:var(--monof);font-size:12px;font-weight:600;text-align:right;font-variant-numeric:tabular-nums}
 
   /* check-ins */
-  .ci-lead{font-size:12px;color:var(--ink-soft);margin-bottom:14px}
+  .ci-lead{font-size:12.5px;color:var(--ink-soft);margin-bottom:14px}
   .ci-lead b{color:var(--ink)}
   .ci-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:8px}
   .ci-item{display:flex;align-items:center;gap:9px;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 13px;font-size:12.5px;font-weight:500}
   .ci-item .st{width:8px;height:8px;border-radius:50%;flex:none}
   .ci-item.in .st{background:var(--good)}
   .ci-item.out .st{background:var(--bad)}
-  .ci-item.out{background:var(--bad-bg);border-color:#E4C4B6}
-  .ci-item .lab2{margin-left:auto;font-size:10px;letter-spacing:.06em;text-transform:uppercase;font-weight:600;flex:none}
+  .ci-item.out{background:var(--bad-bg);border-color:#DFBEAC}
+  .ci-item .lab2{margin-left:auto;font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;font-weight:600;flex:none}
   .ci-item.in .lab2{color:var(--good)}
   .ci-item.out .lab2{color:var(--bad)}
   .ci-main{display:flex;flex-direction:column;gap:4px;min-width:0}
@@ -96,21 +132,21 @@
   .ci-hist i.y{background:var(--good)}
   .ci-hist i.n{background:var(--bad);opacity:.4}
   .ci-hist i.na{background:var(--line)}
-  .ci-hist span{font-family:"Geist Mono",ui-monospace,monospace;font-size:9.5px;color:var(--ink-soft);margin-left:4px}
+  .ci-hist span{font-family:var(--monof);font-size:9.5px;color:var(--ink-soft);margin-left:4px;white-space:nowrap}
 
   /* heatmap */
-  .heat-legend{display:flex;gap:16px;font-size:11px;color:var(--ink-soft);margin-bottom:14px;flex-wrap:wrap}
+  .heat-legend{display:flex;gap:16px;font-family:var(--monof);font-size:10px;letter-spacing:.04em;color:var(--ink-soft);margin-bottom:14px;flex-wrap:wrap}
   .heat-legend span{display:flex;align-items:center;gap:6px}
   .sw{width:12px;height:12px;border-radius:3px}
   .sw.all{background:var(--good)}.sw.some{background:var(--warn)}.sw.miss{background:var(--bad)}.sw.none{background:var(--line-soft);border:1px solid var(--line)}
-  .heat-scroll{overflow-x:auto;border:1px solid var(--line);border-radius:14px;background:var(--card)}
+  .heat-scroll{overflow-x:auto;border:1px solid var(--line);border-radius:12px;background:var(--card);box-shadow:0 1px 2px rgba(28,23,18,.04)}
   .heat{border-collapse:separate;border-spacing:0;width:100%;min-width:760px}
-  .heat th{font-size:9.5px;color:var(--ink-soft);font-weight:500;padding:8px 0;text-align:center}
+  .heat th{font-family:var(--monof);font-size:9px;letter-spacing:.06em;color:var(--ink-soft);font-weight:500;padding:10px 0 7px;text-align:center;border-bottom:1.5px solid rgba(28,23,18,.65)}
   .heat th.name,.heat td.name{text-align:left;padding-left:16px;white-space:nowrap;font-size:12px}
   .heat td.name{font-weight:500}
-  .heat td.pct{font-size:11px;text-align:right;padding-right:16px;font-variant-numeric:tabular-nums;color:var(--ink-soft)}
+  .heat td.pct{font-family:var(--monof);font-size:10.5px;text-align:right;padding-right:16px;font-variant-numeric:tabular-nums;color:var(--ink-soft)}
   .heat th.pct{text-align:right;padding-right:16px}
-  .heat tbody tr:nth-child(even){background:#FCFBF8}
+  .heat tbody tr:nth-child(even){background:var(--card-raised)}
   .cell{width:20px;height:20px;padding:2px}
   .cell .box{width:100%;height:16px;border-radius:3px;margin:0 auto}
   .box.all{background:var(--good)}.box.some{background:var(--warn)}.box.miss{background:var(--bad)}.box.none{background:var(--line-soft)}
@@ -118,129 +154,133 @@
   /* channel mix */
   .mix{display:grid;gap:10px}
   .mix-row{display:grid;grid-template-columns:160px 1fr 120px;align-items:center;gap:14px}
-  .mix-lab{font-size:12px;color:var(--ink-soft)}
-  .mix-track{height:10px;background:var(--line-soft);border-radius:99px;overflow:hidden}
+  .mix-lab{font-size:12.5px;color:var(--ink-soft)}
+  .mix-track{height:9px;background:var(--line-soft);border-radius:99px;overflow:hidden}
   .mix-fill{height:100%;border-radius:99px;background:var(--accent)}
-  .mix-val{font-size:11px;text-align:right;font-weight:500}
+  .mix-val{font-family:var(--monof);font-size:10.5px;text-align:right;font-weight:500;font-variant-numeric:tabular-nums}
   .mix-val.await{color:var(--warn)}
 
-  .rep-pick{display:flex;align-items:center;gap:12px;margin:22px 0 4px;flex-wrap:wrap}
-  .rep-pick select{font-size:14px;padding:10px 36px 10px 14px;min-width:240px}
+  .rep-pick{display:flex;align-items:center;gap:12px;margin:30px 0 4px;flex-wrap:wrap}
+  .rep-pick select{font-size:13px;padding:10px 36px 10px 14px;min-width:240px}
   .rep-context{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
-  .chip{font-size:11px;border:1px solid var(--line);border-radius:999px;padding:5px 12px;color:var(--ink-soft);background:var(--card)}
+  .chip{font-family:var(--monof);font-size:10px;letter-spacing:.04em;border:1px solid var(--line);border-radius:999px;padding:5px 12px;color:var(--ink-soft);background:var(--card)}
   .chip b{color:var(--ink);font-weight:600}
-  .chip.tier{border-color:var(--accent);color:var(--accent)}
-  .chip.new{border-color:var(--warn);color:#8a6800;background:#FBF4E4}
+  .chip.tier{border-color:var(--accent);color:var(--accent);background:var(--accent-soft)}
+  .chip.new{border-color:#D9C17E;color:#7A5E06;background:var(--warn-bg)}
 
-  .hero{display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:12px;margin-top:18px}
-  .hero-big{background:var(--ink);color:var(--paper);border-radius:16px;padding:20px}
-  .hero-big .lab{font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;opacity:.7}
-  .hero-big .val{font-family:"Fraunces";font-size:38px;font-weight:600;letter-spacing:-.02em;margin-top:10px;line-height:1}
-  .hero-big .meta{font-size:11.5px;opacity:.75;margin-top:8px}
-  .mini{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px}
-  .mini .lab{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft)}
-  .mini .val{font-family:"Fraunces";font-size:25px;font-weight:600;margin-top:8px;line-height:1}
-  .mini .val.muted{color:var(--line)}
-  .mini .meta{font-size:11px;color:var(--ink-soft);margin-top:5px}
+  /* rep hero — one dark anchor + ruled satellites */
+  .hero{display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:14px 24px;margin-top:20px;align-items:stretch}
+  .hero-big{background:linear-gradient(180deg,var(--shell-hi),var(--shell));color:var(--shell-text);border-radius:14px;padding:20px;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.07),0 14px 34px -18px rgba(18,13,7,.5)}
+  .hero-big .lab{font-family:var(--monof);font-size:9.5px;letter-spacing:.15em;text-transform:uppercase;color:var(--shell-mut)}
+  .hero-big .val{font-family:var(--serif);font-size:38px;font-weight:520;letter-spacing:-.02em;margin-top:10px;line-height:1}
+  .hero-big .meta{font-family:var(--monof);font-size:10px;color:var(--shell-mut);margin-top:9px}
+  .mini{border-top:2px solid var(--ink);padding:11px 0 2px;background:none}
+  .mini .lab{font-family:var(--monof);font-size:9.5px;letter-spacing:.15em;text-transform:uppercase;color:var(--ink-soft)}
+  .mini .val{font-family:var(--serif);font-size:26px;font-weight:520;letter-spacing:-.02em;margin-top:8px;line-height:1}
+  .mini .val.muted{color:var(--line-strong)}
+  .mini .meta{font-size:11px;color:var(--ink-faint);margin-top:5px}
   .mini .meta.await{color:var(--warn)}
 
   .summary{display:grid;grid-template-columns:1fr 1fr;gap:24px}
-  .sum-col h3{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:12px}
-  .sum-item{display:flex;gap:10px;align-items:flex-start;font-size:13px;margin-bottom:10px;line-height:1.45}
+  .sum-col h3{font-family:var(--monof);font-size:10px;letter-spacing:.17em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:12px}
+  .sum-item{display:flex;gap:10px;align-items:flex-start;font-size:13px;margin-bottom:10px;line-height:1.5}
   .sum-item .pip{flex:none;width:6px;height:6px;border-radius:50%;margin-top:7px}
   .pip.good{background:var(--good)}.pip.warn{background:var(--bad)}
-  .sum-empty{font-size:12px;color:var(--ink-soft);font-style:italic}
+  .sum-empty{font-size:12px;color:var(--ink-faint);font-style:italic}
 
-  .chart-card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px}
-  .chart-legend{display:flex;gap:18px;font-size:11px;color:var(--ink-soft);margin-bottom:8px;flex-wrap:wrap}
+  .chart-card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:20px;box-shadow:0 1px 2px rgba(28,23,18,.04)}
+  .chart-legend{display:flex;gap:18px;font-family:var(--monof);font-size:10px;letter-spacing:.04em;color:var(--ink-soft);margin-bottom:8px;flex-wrap:wrap}
   .chart-legend span{display:flex;align-items:center;gap:6px}
   .lg-line{width:16px;height:2px;background:var(--accent)}
   .lg-base{width:16px;height:0;border-top:2px dashed var(--ink-soft)}
   svg{display:block;width:100%;height:auto;overflow:visible}
 
-  .grid5{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}
-  .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
-  .bucket{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px}
-  .bucket .lab{font-size:11px;color:var(--ink-soft)}
-  .bucket .val{font-family:"Fraunces";font-size:23px;font-weight:600;margin-top:8px;line-height:1}
-  .bucket .val.muted{color:var(--line)}
-  .bucket .meta{font-size:10.5px;color:var(--ink-soft);margin-top:6px}
+  .grid5{display:grid;grid-template-columns:repeat(5,1fr);gap:14px 24px}
+  .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px 24px}
+  .bucket{border-top:2px solid var(--ink);padding:11px 0 2px;background:none}
+  .bucket .lab{font-family:var(--monof);font-size:9.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--ink-soft)}
+  .bucket .val{font-family:var(--serif);font-size:23px;font-weight:520;letter-spacing:-.015em;margin-top:8px;line-height:1}
+  .bucket .val.muted{color:var(--line-strong)}
+  .bucket .meta{font-size:10.5px;color:var(--ink-faint);margin-top:6px}
   .bucket .meta.await{color:var(--warn)}
 
-  .ctable{width:100%;border-collapse:collapse;background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden}
-  .ctable th{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft);font-weight:500;text-align:right;padding:11px 16px;border-bottom:1px solid var(--line)}
+  .ctable{width:100%;border-collapse:collapse;background:var(--card);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+  .ctable th{font-family:var(--monof);font-size:9.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--ink-soft);font-weight:500;text-align:right;padding:12px 16px 9px;border-bottom:1.5px solid rgba(28,23,18,.65)}
   .ctable th:first-child{text-align:left}
   .ctable td{font-size:13px;text-align:right;padding:11px 16px;border-bottom:1px solid var(--line-soft);font-variant-numeric:tabular-nums}
   .ctable td.cn{text-align:left;color:var(--ink-soft)}
-  .ctable td.cn .evt{font-size:9.5px;color:var(--accent);border:1px solid var(--accent-soft);border-radius:5px;padding:1px 5px;margin-left:6px}
-  .ctable tfoot td{font-weight:600;border-top:1px solid var(--line);border-bottom:none;background:#FCFBF8}
+  .ctable td.cn .evt{font-family:var(--monof);font-size:9px;color:var(--accent);border:1px solid var(--accent-soft);background:var(--accent-soft);border-radius:5px;padding:1px 5px;margin-left:6px}
+  .ctable tfoot td{font-weight:600;border-top:1.5px solid rgba(28,23,18,.65);border-bottom:none;background:var(--card-raised)}
   .ctable tfoot td.cn{color:var(--ink)}
   .aw{color:var(--warn);font-size:11px}
   .strip{display:flex;gap:4px;flex-wrap:wrap;margin-top:4px}
   .strip .box{width:22px;height:22px;border-radius:4px;display:grid;place-items:center;font-size:9px;color:rgba(255,255,255,.85)}
 
-  .notes .note{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px}
-  .note .wk{font-size:10.5px;color:var(--accent);letter-spacing:.08em;text-transform:uppercase}
-  .note .row{font-size:12.5px;margin-top:6px;color:var(--ink-soft)}
+  .notes .note{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px;box-shadow:0 1px 2px rgba(28,23,18,.04)}
+  .note .wk{font-family:var(--monof);font-size:9.5px;color:var(--accent);letter-spacing:.13em;text-transform:uppercase}
+  .note .row{font-size:12.5px;margin-top:6px;color:var(--ink-soft);line-height:1.55}
   .note .row b{color:var(--ink);font-weight:600}
 
   .hidden{display:none}
-  .foot{margin-top:48px;border-top:1px solid var(--line);padding-top:18px;font-size:11px;color:var(--ink-soft);line-height:1.7}
-  .foot b{color:var(--ink)}
+  .foot{margin-top:60px;border-top:1px solid var(--line);padding-top:20px;font-family:var(--monof);font-size:10px;letter-spacing:.03em;color:var(--ink-faint);line-height:1.8}
+  .foot b{color:var(--ink-soft)}
 
-  /* ── polish pass: type roles, elevation, interaction ── */
-  .eyebrow,.status,.kpi .lab,.mini .lab,.hero-big .lab,.bucket .lab,
-  .lb-row.h,.lb-name .tag,.chip,.heat th,.heat td.pct,.ctable th,
-  .sum-col h3,.note .wk,.ci-item .lab2,.period .frame{font-family:"Geist Mono",ui-monospace,monospace}
+  /* type roles & interaction (shared) */
   .lb-val,.ctable td,.kpi .val,.mini .val,.bucket .val,.hero-big .val{font-variant-numeric:tabular-nums}
-  .kpi,.lb,.heat-scroll,.chart-card,.mini,.bucket,.notes .note,.ctable{box-shadow:0 1px 2px rgba(22,20,15,.03),0 10px 28px -18px rgba(22,20,15,.16)}
-  .hero-big{box-shadow:0 14px 34px -18px rgba(22,20,15,.45)}
   .lb-row:not(.h){transition:background .12s ease}
-  .lb-row:not(.h):hover{background:#FCFBF8}
+  .lb-row:not(.h):hover{background:var(--paper-deep)}
   .ci-item{transition:transform .12s ease,box-shadow .12s ease}
-  .ci-item:hover{transform:translateY(-1px);box-shadow:0 6px 16px -10px rgba(22,20,15,.25)}
-  select:hover,.toggle button:hover{border-color:var(--ink-soft)}
+  .ci-item:hover{transform:translateY(-1px);box-shadow:0 6px 16px -10px rgba(28,23,18,.25)}
+  select:hover{border-color:var(--ink-faint)}
   select:focus{border-color:var(--accent);outline:none}
-  .form-btn{font-family:"Geist Mono",ui-monospace,monospace;font-size:11.5px;letter-spacing:.03em;text-decoration:none;color:var(--paper);background:var(--ink);border:1px solid var(--ink);border-radius:999px;padding:8px 16px;transition:opacity .12s ease}
-  .form-btn:hover{opacity:.85}
   .foot-grid{display:flex;justify-content:space-between;gap:24px;flex-wrap:wrap;align-items:baseline}
   .foot a{text-decoration:none;border-bottom:1px solid var(--accent-soft)}
 
   /* ── coaching call card (rep) ── */
-  .call-card{border-radius:16px;padding:20px;border:1px solid var(--line);background:var(--card);display:flex;gap:16px;align-items:center;flex-wrap:wrap;box-shadow:0 1px 2px rgba(22,20,15,.03),0 10px 28px -18px rgba(22,20,15,.16)}
+  .call-card{border-radius:14px;padding:20px;border:1px solid var(--line);background:var(--card);display:flex;gap:16px;align-items:center;flex-wrap:wrap;box-shadow:0 1px 2px rgba(28,23,18,.04)}
   .call-card .cc-dot{width:12px;height:12px;border-radius:50%;flex:none}
-  .call-card.s-none{border-color:#E4C4B6;background:var(--bad-bg)}
+  .call-card.s-none{border-color:#DFBEAC;background:var(--bad-bg)}
   .call-card.s-none .cc-dot{background:var(--bad)}
   .call-card.s-booked .cc-dot{background:var(--ink-soft)}
-  .call-card.s-survey{border-color:#E8D9A8;background:var(--warn-bg)}
+  .call-card.s-survey{border-color:#DFD0A0;background:var(--warn-bg)}
   .call-card.s-survey .cc-dot{background:var(--warn)}
-  .call-card.s-done{border-color:#BFD4C4;background:var(--good-bg)}
+  .call-card.s-done{border-color:#B9CFBB;background:var(--good-bg)}
   .call-card.s-done .cc-dot{background:var(--good)}
   .call-card .cc-main{flex:1;min-width:220px}
-  .call-card .cc-title{font-family:"Fraunces";font-size:18px;font-weight:600}
+  .call-card .cc-title{font-family:var(--serif);font-size:18px;font-weight:560;letter-spacing:-.008em}
   .call-card .cc-sub{font-size:12px;color:var(--ink-soft);margin-top:4px}
   .cc-notes{margin-top:10px;display:grid;gap:8px}
-  .cc-note{font-size:12.5px;background:rgba(255,255,255,.65);border:1px solid var(--line-soft);border-radius:10px;padding:10px 12px;line-height:1.5}
-  .cc-note b{font-family:"Geist Mono";font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-soft);display:block;margin-bottom:2px}
+  .cc-note{font-size:12.5px;background:rgba(255,253,246,.7);border:1px solid var(--line-soft);border-radius:10px;padding:10px 12px;line-height:1.5}
+  .cc-note b{font-family:var(--monof);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft);display:block;margin-bottom:2px}
 
   /* ── planner ── */
-  .plan-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:14px}
-  .plan-hero{grid-column:span 2;background:var(--ink);color:var(--paper);border-radius:14px;padding:16px}
-  .plan-hero .lab{font-family:"Geist Mono";font-size:10px;letter-spacing:.1em;text-transform:uppercase;opacity:.7}
-  .plan-hero .val{font-family:"Fraunces";font-size:27px;font-weight:600;margin-top:7px}
-  .plan-hero .meta{font-size:11px;opacity:.75;margin-top:5px}
+  .plan-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px 24px;margin-bottom:16px;align-items:stretch}
+  .plan-hero{grid-column:span 2;background:linear-gradient(180deg,var(--shell-hi),var(--shell));color:var(--shell-text);border-radius:14px;padding:16px;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.07),0 14px 34px -18px rgba(18,13,7,.5)}
+  .plan-hero .lab{font-family:var(--monof);font-size:9.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--shell-mut)}
+  .plan-hero .val{font-family:var(--serif);font-size:27px;font-weight:520;margin-top:8px;letter-spacing:-.015em}
+  .plan-hero .meta{font-family:var(--monof);font-size:10px;color:var(--shell-mut);margin-top:6px}
   .plan-hero.ahead{background:var(--good)}
+  .plan-hero.ahead .lab,.plan-hero.ahead .meta{color:rgba(244,238,223,.75)}
   .plan-hero.behind{background:var(--accent)}
-  .ptable{width:100%;border-collapse:collapse;background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden;box-shadow:0 1px 2px rgba(22,20,15,.03),0 10px 28px -18px rgba(22,20,15,.16)}
-  .ptable th{font-family:"Geist Mono";font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-soft);font-weight:500;text-align:right;padding:10px 14px;border-bottom:1px solid var(--line)}
+  .plan-hero.behind .lab,.plan-hero.behind .meta{color:rgba(255,249,241,.78)}
+  .ptable{width:100%;border-collapse:collapse;background:var(--card);border:1px solid var(--line);border-radius:12px;overflow:hidden;box-shadow:0 1px 2px rgba(28,23,18,.04)}
+  .ptable th{font-family:var(--monof);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft);font-weight:500;text-align:right;padding:11px 14px 8px;border-bottom:1.5px solid rgba(28,23,18,.65)}
   .ptable th:first-child,.ptable td:first-child{text-align:left}
   .ptable td{font-size:12.5px;text-align:right;padding:10px 14px;border-bottom:1px solid var(--line-soft);font-variant-numeric:tabular-nums}
   .ptable tbody tr:last-child td{border-bottom:none}
   .ptable td .up{color:var(--good);font-weight:600}
   .ptable td .down{color:var(--bad);font-weight:600}
-  .ptable .rowbtn{font-family:"Geist Mono";font-size:10.5px;border:1px solid var(--line);background:none;border-radius:7px;padding:3px 9px;cursor:pointer;color:var(--ink-soft)}
+  .ptable .rowbtn{font-family:var(--monof);font-size:10px;letter-spacing:.05em;text-transform:uppercase;border:1px solid var(--line-strong);background:none;border-radius:7px;padding:3px 9px;cursor:pointer;color:var(--ink-soft);transition:border-color .15s,color .15s}
   .ptable .rowbtn:hover{border-color:var(--accent);color:var(--accent)}
-  .plan-empty{font-size:12.5px;color:var(--ink-soft);background:var(--card);border:1px dashed var(--line);border-radius:14px;padding:18px;text-align:center}
+  .camp-pills{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 14px}
+  .camp-pill{font-family:var(--monof);font-size:10px;letter-spacing:.04em;border:1px solid var(--line-strong);background:var(--card);
+    border-radius:999px;padding:4px 12px;cursor:pointer;color:var(--ink-soft);transition:border-color .15s,color .15s}
+  .camp-pill:hover{border-color:var(--accent);color:var(--accent)}
+  .camp-pill.on{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+  .camp-pill .tag{opacity:.6;margin-left:5px;font-size:8px;text-transform:uppercase;letter-spacing:.08em}
+  .plan-empty{font-size:12.5px;color:var(--ink-faint);background:var(--card);border:1px dashed var(--line-strong);border-radius:12px;padding:20px;text-align:center}
 
   /* ── admin calls board ── */
   .calls-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:8px}
@@ -250,32 +290,46 @@
   .call-row.s-booked .st{background:var(--ink-soft)}
   .call-row.s-survey .st{background:var(--warn)}
   .call-row.s-done .st{background:var(--good)}
-  .call-row.od{background:var(--bad-bg);border-color:#E4C4B6}
-  .call-row .cr-lab{margin-left:auto;font-family:"Geist Mono";font-size:9.5px;letter-spacing:.05em;text-transform:uppercase;font-weight:600;color:var(--ink-soft);text-align:right}
+  .call-row.od{background:var(--bad-bg);border-color:#DFBEAC}
+  .call-row .cr-lab{margin-left:auto;font-family:var(--monof);font-size:9px;letter-spacing:.06em;text-transform:uppercase;font-weight:600;color:var(--ink-soft);text-align:right}
   .call-row .linkbtn{font-size:11px;border:none;background:none;cursor:pointer;color:var(--ink-soft);padding:2px}
   .call-row .linkbtn:hover{color:var(--accent)}
 
+  /* ── coach's radar ── */
+  .radar{display:flex;gap:8px;flex-wrap:wrap}
+  .rchip{display:flex;align-items:center;gap:8px;font-family:var(--monof);font-size:11px;letter-spacing:.02em;color:var(--ink);border:1px solid var(--line-strong);background:var(--card);border-radius:999px;padding:8px 14px;cursor:pointer;transition:transform .12s ease,border-color .15s}
+  .rchip:hover{transform:translateY(-1px);border-color:var(--ink-faint)}
+  .rchip .dot2{width:8px;height:8px;border-radius:50%;flex:none}
+  .rchip.bad{border-color:#DFBEAC;background:var(--bad-bg)}
+  .rchip.bad .dot2{background:var(--bad)}
+  .rchip.warn{border-color:#DFD0A0;background:var(--warn-bg)}
+  .rchip.warn .dot2{background:var(--warn)}
+  .rchip.ok{border-color:#B9CFBB;background:var(--good-bg);cursor:default}
+  .rchip.ok .dot2{background:var(--good)}
+  .prep-note{font-size:12px;line-height:1.55;color:var(--ink);margin-top:2px}
+
   /* ── planner v2: assumptions + weekly grid ── */
   .assume{display:grid;grid-template-columns:1.1fr 1.6fr 1.6fr 1fr;gap:10px;margin-bottom:14px}
-  .ag{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px;box-shadow:0 1px 2px rgba(22,20,15,.03),0 10px 28px -18px rgba(22,20,15,.16)}
-  .ag .ah{font-family:"Geist Mono";font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:9px;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
-  .chip-auto{font-family:"Geist Mono";font-size:8.5px;letter-spacing:.04em;border:1px solid var(--good);color:var(--good);background:var(--good-bg);border-radius:5px;padding:1px 5px}
+  .ag{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:13px;box-shadow:0 1px 2px rgba(28,23,18,.04)}
+  .ag .ah{font-family:var(--monof);font-size:9.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:9px;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+  .chip-auto{font-family:var(--monof);font-size:8px;letter-spacing:.04em;border:1px solid var(--good);color:var(--good);background:var(--good-bg);border-radius:5px;padding:1px 5px}
   .ag .arow{display:flex;gap:8px}
-  .ag label{font-family:"Geist Mono";font-size:9px;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-soft);display:block;flex:1;min-width:0}
-  .ag input{width:100%;font-family:"Geist Mono";font-size:12.5px;padding:6px 8px;margin-top:3px;border:1px solid var(--line);border-radius:7px;background:var(--paper);color:var(--ink)}
-  .ag input:focus{border-color:var(--accent);outline:none}
+  .ag label{font-family:var(--monof);font-size:8.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-soft);display:block;flex:1;min-width:0}
+  .ag input{width:100%;font-family:var(--monof);font-size:12.5px;padding:6px 8px;margin-top:3px;border:1px solid var(--line);border-radius:7px;background:var(--paper);color:var(--ink);transition:border-color .15s}
+  .ag input:focus{border-color:var(--accent);outline:none;box-shadow:0 0 0 3px rgba(174,59,21,.1)}
   .ag input::placeholder{color:var(--good);opacity:.9}
-  .a-real{display:block;font-family:"Geist Mono";font-size:9px;letter-spacing:.02em;color:var(--good);margin-top:3px;cursor:pointer;text-transform:none;white-space:nowrap}
+  .a-real{display:block;font-family:var(--monof);font-size:9px;letter-spacing:.02em;color:var(--good);margin-top:3px;cursor:pointer;text-transform:none;white-space:nowrap}
   .a-real:hover{text-decoration:underline}
-  .pw-in{width:100%;max-width:70px;font-family:"Geist Mono";font-size:12px;padding:5px 6px;border:1px solid var(--line);border-radius:6px;background:var(--paper);color:var(--ink);text-align:right}
-  #rep-bp .pw-in{max-width:96px;min-width:64px}
-  #rep-bp input[type=number]::-webkit-outer-spin-button,#rep-bp input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
-  #rep-bp input[type=number]{-moz-appearance:textfield;appearance:textfield}
-  #rep-bp .bp-mid{color:var(--good);font-weight:600}
+  .pw-in{width:100%;max-width:70px;font-family:var(--monof);font-size:12px;padding:5px 6px;border:1px solid var(--line);border-radius:6px;background:var(--paper);color:var(--ink);text-align:right}
   .pw-in:focus{border-color:var(--accent);outline:none}
   .ptable td.pw-exp,.ptable td.pw-act{font-weight:600}
   .ptable tr.wk-now td{background:var(--accent-soft)}
   @media(max-width:880px){.assume{grid-template-columns:1fr 1fr}}
+
+  /* page entrance — once per view switch */
+  @keyframes pageIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+  .pane-in{animation:pageIn .38s cubic-bezier(.16,.68,.32,1)}
+  @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
 
   @media(max-width:880px){
     .plan-grid{grid-template-columns:1fr 1fr}
@@ -286,6 +340,24 @@
     .grid5{grid-template-columns:1fr 1fr}
     .lb-row{grid-template-columns:28px 1fr 74px}.lb-bar-wrap{display:none}
     .mix-row{grid-template-columns:110px 1fr 90px}
+    .kpi .val{font-size:26px}
+    .period{padding-top:28px}
+  }
+  @media(max-width:600px){
+    .wrap{padding:0 18px}
+    /* inline 4-up grids (team pulse, prep cards) can't fit a phone — override them */
+    #team-kpis-rep,#prep-cards{grid-template-columns:repeat(2,1fr)!important}
+    .kpi{min-width:0}
+    .head-inner{padding:11px 18px 10px;gap:8px 9px}
+    .brand{gap:10px}
+    .mark{width:34px;height:34px;font-size:17px;border-radius:8px}
+    .brand h1{font-size:15.5px;white-space:nowrap}
+    .brand .sub{display:none}
+    .status{display:none}
+    .head-right{gap:7px}
+    .toggle button{padding:6px 10px;font-size:10px}
+    .form-btn{padding:7px 10px;font-size:9.5px;white-space:nowrap}
+    .hero-big .val{font-size:32px}
   }
 </style>
 </head>
@@ -326,6 +398,9 @@
 
     <div class="kpis" id="kpis"></div>
 
+    <!-- who needs you today — computed from everything below, tap to jump -->
+    <div class="radar" id="radar" style="margin-top:16px"></div>
+
     <div class="section hidden" id="ci-section">
       <div class="section-head">
         <h2 class="serif">This Week's Check-Ins</h2>
@@ -335,7 +410,26 @@
       <div class="ci-grid" id="ci-grid"></div>
     </div>
 
-    <div class="section">
+    <div class="section" id="admin-calls-sec">
+      <div class="section-head">
+        <h2 class="serif">Coaching Calls — <span id="calls-month"></span></h2>
+        <span class="hint">Path 1/mo · Masters 2/mo · formal 1-on-1s, separate from the weekly standard</span>
+      </div>
+      <div id="admin-calls"></div>
+      <div class="feed-h eyebrow" style="margin:22px 0 10px">Recent takeaways &amp; action steps</div>
+      <div class="notes" id="calls-feed" style="display:grid;gap:10px"></div>
+    </div>
+
+    <div class="section" id="admin-planner-sec">
+      <div class="section-head">
+        <h2 class="serif">Campaign Planner — Team</h2>
+        <span class="hint">every mentee's goal → pace · edit any plan</span>
+      </div>
+      <div id="admin-planner"></div>
+    </div>
+
+
+    <div class="section" id="lb-sec">
       <div class="section-head">
         <h2 class="serif">Leaderboard</h2>
         <select id="lb-metric" onchange="renderLeaderboard()">
@@ -348,7 +442,7 @@
       <div class="lb" id="leaderboard"></div>
     </div>
 
-    <div class="section">
+    <div class="section" id="heat-sec">
       <div class="section-head">
         <h2 class="serif">Standards Heatmap</h2>
         <span class="hint">who's holding the line — read left→right for momentum</span>
@@ -362,38 +456,12 @@
       <div class="heat-scroll"><table class="heat" id="heat"></table></div>
     </div>
 
-    <div class="section">
+    <div class="section" id="mix-sec">
       <div class="section-head">
         <h2 class="serif">Sales by Channel</h2>
         <span class="hint">team totals — computed from the weekly form</span>
       </div>
       <div class="mix" id="mix"></div>
-    </div>
-
-    <div class="section">
-      <div class="section-head">
-        <h2 class="serif">Campaign Planner — Team</h2>
-        <span class="hint">every mentee's goal → pace · edit any plan</span>
-      </div>
-      <div id="admin-planner"></div>
-    </div>
-
-    <div class="section">
-      <div class="section-head">
-        <h2 class="serif">PUSH Blueprints — Team</h2>
-        <span class="hint">each mentee's PUSH scenarios · conservative → middle → goes-right · live from their page</span>
-      </div>
-      <div id="admin-bp"></div>
-    </div>
-
-    <div class="section">
-      <div class="section-head">
-        <h2 class="serif">Coaching Calls — <span id="calls-month"></span></h2>
-        <span class="hint">Path 1/mo · Masters 2/mo · formal 1-on-1s, separate from the weekly standard</span>
-      </div>
-      <div id="admin-calls"></div>
-      <div class="feed-h eyebrow" style="margin:22px 0 10px">Recent takeaways &amp; action steps</div>
-      <div class="notes" id="calls-feed" style="display:grid;gap:10px"></div>
     </div>
   </div>
 
@@ -410,19 +478,40 @@
     </div>
     <div class="rep-context" id="rep-context"></div>
 
-    <div class="hero" id="rep-hero"></div>
+    <div class="kpis hidden" id="goals-strip" style="grid-template-columns:repeat(2,1fr);margin-top:16px"></div>
 
-    <div class="section">
-      <div class="section-head"><h2 class="serif">Performance Summary</h2></div>
+    <!-- coaches: the 1-on-1 in one glance (admin mode only) -->
+    <div class="section hidden" id="prep-sec" style="margin-top:24px">
+      <div class="section-head"><h2 class="serif">Call Prep</h2><span class="hint">this month's call · last action steps · last check-in · pace</span></div>
+      <div class="assume" id="prep-cards" style="grid-template-columns:repeat(4,1fr)"></div>
+    </div>
+
+    <!-- brand-new reps: one friendly card instead of seven empty sections -->
+    <div class="section hidden" id="starter-sec" style="margin-top:24px">
+      <div class="call-card" style="border-style:dashed">
+        <div class="cc-main">
+          <div class="lab" style="font-family:'Spline Sans Mono';font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft)">Your stats build here</div>
+          <div class="cc-title" style="margin-top:6px">First check-in unlocks this page</div>
+          <div class="cc-sub">After your first weekly check-in, this fills with your sales, weekly trend, channel breakdowns, and standards — all computed from what you report. Two minutes, every Monday.</div>
+        </div>
+        <a class="form-btn" href="https://docs.google.com/forms/d/e/1FAIpQLSdIAf_SaV1m2ASTN4YzEBeVxp7o-gkIBXqhCCbO5vmuNh7cTQ/viewform" target="_blank" rel="noopener">Do my check-in ↗</a>
+      </div>
+    </div>
+
+    <div class="hero rds" id="rep-hero"></div>
+
+    <div class="section rds">
+      <div class="section-head"><h2 class="serif">Performance Summary</h2><span class="hint">what's working &amp; what to watch — written automatically from your numbers</span></div>
       <div class="summary">
         <div class="sum-col"><h3>Strengths</h3><div id="sum-good"></div></div>
         <div class="sum-col"><h3>Watch</h3><div id="sum-warn"></div></div>
       </div>
     </div>
 
-    <div class="section">
+    <div class="section rds">
       <div class="section-head">
         <h2 class="serif">Weekly Trend</h2>
+        <span class="hint">your sales week by week vs the team average</span>
         <select id="chart-metric" onchange="renderChart()">
           <option value="sales">Sales</option>
           <option value="standards">Standards (1=all, .5=some, 0=miss)</option>
@@ -434,22 +523,22 @@
       </div>
     </div>
 
-    <div class="section">
-      <div class="section-head"><h2 class="serif">Sales by Channel</h2><span class="hint">orders · sales · avg order — weekly form</span></div>
+    <div class="section rds">
+      <div class="section-head"><h2 class="serif">Sales by Channel</h2><span class="hint">where your sales come from — orders · sales · avg order</span></div>
       <div id="channels"></div>
     </div>
 
-    <div class="section">
-      <div class="section-head"><h2 class="serif">Channel Diagnostics</h2><span class="hint">every rate computes automatically from raw counts</span></div>
+    <div class="section rds">
+      <div class="section-head"><h2 class="serif">Channel Diagnostics</h2><span class="hint">your funnel, rate by rate — computed from your check-ins, never typed</span></div>
       <div class="heat-scroll"><table class="ctable" id="diagnostics"></table></div>
     </div>
 
-    <div class="section">
-      <div class="section-head"><h2 class="serif">Standards</h2></div>
+    <div class="section rds">
+      <div class="section-head"><h2 class="serif">Standards</h2><span class="hint">the 3 weekly standards: 6 appts completed · 1 coaching interaction · 1 growth session</span></div>
       <div id="standards-block"></div>
     </div>
 
-    <div class="section">
+    <div class="section rds" id="call-notes-sec">
       <div class="section-head">
         <h2 class="serif">Coaching Call Notes</h2>
         <span class="hint">takeaways &amp; action steps from the post-call survey · newest first</span>
@@ -457,8 +546,8 @@
       <div class="notes" id="call-notes" style="display:grid;gap:10px"></div>
     </div>
 
-    <div class="section">
-      <div class="section-head"><h2 class="serif">Check-In Notes</h2></div>
+    <div class="section rds">
+      <div class="section-head"><h2 class="serif">Check-In Notes</h2><span class="hint">your weekly wins, obstacles &amp; commitments — newest first</span></div>
       <div class="notes" id="notes" style="display:grid;gap:10px"></div>
     </div>
 
@@ -470,13 +559,6 @@
       <div id="rep-planner"></div>
     </div>
 
-    <div class="section" id="rep-bp-sec">
-      <div class="section-head">
-        <h2 class="serif" id="bp-title">PUSH Blueprint</h2>
-        <span class="hint" id="bp-saved">set your levers — saves automatically</span>
-      </div>
-      <div id="rep-bp"></div>
-    </div>
 
     <!-- team aggregates + leaderboard — the ONLY peer visibility in rep mode -->
     <div id="rep-team-block" class="hidden">
@@ -532,7 +614,6 @@ const CONFIG = {
   CALLS_TAB: "Calls",           // RepID · Month · Status · CallDateTime · Coach
   SURVEY_TAB: "CallSurvey",     // Timestamp · RepID · Month · Takeaways · ActionSteps
   PLANNER_TAB: "Planner",       // per rep per campaign planner inputs
-  BLUEPRINT_TAB: "Blueprint",   // per rep per campaign PUSH blueprint (levers + actuals)
   CALENDLY_URL: "https://calendly.com/sharp-ninja-academy",
   SURVEY_FORM_URL: "https://docs.google.com/forms/d/e/1FAIpQLSedU7b3dOX6JQs8fcRJbqB5q3dmbEc9fSoUm-rmpK9484R4cQ/viewform",
   WEBAPP_URL: "https://script.google.com/macros/s/AKfycbyNFDkgEAUT5IDNw4wvCHLQZoe70XxVwgAZmG8bNTmlkY8t0d-wL2eKa53kgke2AOCHPQ/exec",
@@ -567,6 +648,51 @@ const currentCampaign = () => { const d=new Date(); return seasonOf(d)+" "+d.get
 const nextCampaign = () => { const [s,y]=currentCampaign().split(" ");
   return s==="Fall"?`Spring ${+y+1}`:(s==="Spring"?`Summer ${y}`:`Fall ${y}`); };
 let SELECTED_CAMPAIGN = currentCampaign();
+
+/* ── The campaign being PLANNED is separate from the campaign being WATCHED.
+   During a campaign's final month (Apr · Aug · Dec) everyone is planning the
+   NEXT one, so the planner opens there; the day a campaign ends, the next one
+   is simply current, so the planner rolls forward forever on its own.
+   The snapshot above (SELECTED_CAMPAIGN) stays on the running campaign —
+   that's where this week's check-ins land. History never moves. ── */
+const CAMP_ORDER={Spring:0,Summer:1,Fall:2};
+const campKey=c=>{const a=String(c).split(" ");return (+a[1]||0)*3+(CAMP_ORDER[a[0]]??0);};
+const campaignEnd=c=>{const a=String(c).split(" ");
+  return new Date(+a[1], a[0]==="Spring"?4:a[0]==="Summer"?8:12, 0, 23,59,59);}; // last day of Apr/Aug/Dec
+const campaignEnded=c=>campaignEnd(c)<new Date();
+const planDefaultCampaign=()=>[3,7,11].includes(new Date().getMonth())?nextCampaign():currentCampaign();
+let PLAN_CAMPAIGN=planDefaultCampaign();
+
+/* one rep's weekly sales inside ANY campaign, straight from the raw rows —
+   the planner can look at history without moving the snapshot */
+function campaignSales(repId,campaign){
+  const cpoCols=["Demos_CPO","SVC_CPO","Event_CPO","Mktg_CPO","BizGift_CPO"];
+  const subs=WEEKLY_RAW.filter(w=>String(w.RepID)===String(repId)&&rowCampaign(w)===campaign);
+  return Array.from({length:PERIOD.weeks},(_,i)=>{
+    const x=subs.find(w=>+w.Week===i+1); if(!x)return null;
+    return cpoCols.reduce((t,c)=>t+(+x[c]||0),0);});
+}
+/* every campaign this rep has any trace of: check-ins, a saved plan, seed history */
+function repCampaigns(r){
+  const set=new Set([currentCampaign(),nextCampaign()]);
+  WEEKLY_RAW.forEach(w=>{if(String(w.RepID)===String(r.id))set.add(rowCampaign(w));});
+  PLANNER_RAW.forEach(pr=>{if(String(pr.RepID)===String(r.id)&&pr.Campaign)set.add(String(pr.Campaign).trim());});
+  if(SEED.some(x=>x.id===r.id&&x.sales&&x.sales.some(v=>v!=null)))set.add("Fall 2025");
+  return [...set].sort((a,b)=>campKey(a)-campKey(b));
+}
+function setPlanCampaign(c){
+  if(c===PLAN_CAMPAIGN)return;
+  PLAN_CAMPAIGN=c;
+  if(PLAN_TIMER){clearTimeout(PLAN_TIMER);PLAN_TIMER=null;}   // abandon a half-typed edit of the old campaign
+  // the clicked pill sits INSIDE the planner card, so it is the focused element —
+  // blur it or renderRepPlanner's don't-clobber-while-typing guard skips the re-render
+  if(document.activeElement&&document.activeElement.blur)document.activeElement.blur();
+  renderAll();
+}
+const campPills=r=>`<div class="camp-pills">`+repCampaigns(r).map(c=>{
+    const tag=c===currentCampaign()?"now":(c===nextCampaign()?"next":(campaignEnded(c)?"done":""));
+    return `<button class="camp-pill ${c===PLAN_CAMPAIGN?"on":""}" onclick="setPlanCampaign('${c}')">${c}${tag?`<span class="tag">${tag}</span>`:""}</button>`;
+  }).join("")+`</div>`;
 
 /* ═══════════════ SEED DATA (real Fall 2025) ═══════════════
    sales[] / acct[] are weekly (wk1..wk17). apptsCompleted = real Fall total.
@@ -647,7 +773,7 @@ const SEED = [
 ];
 
 /* ═══════════════ DATA LOAD — one fetch feeds every view ═══════════════ */
-let DATA=[], ROSTER_RAW=[], CALLS_RAW=[], SURVEY_RAW=[], PLANNER_RAW=[], BLUEPRINT_RAW=[];
+let DATA=[], ROSTER_RAW=[], CALLS_RAW=[], SURVEY_RAW=[], PLANNER_RAW=[];
 async function loadData(){
   if(!CONFIG.USE_LIVE_DATA){DATA=SEED;setSource(false);resolveIdentity();return;}
   try{
@@ -661,7 +787,6 @@ async function loadData(){
     CALLS_RAW=await tab(CONFIG.CALLS_TAB,true);
     SURVEY_RAW=await tab(CONFIG.SURVEY_TAB,true);
     PLANNER_RAW=await tab(CONFIG.PLANNER_TAB,true);
-    BLUEPRINT_RAW=await tab(CONFIG.BLUEPRINT_TAB,true);
     applyCampaign();
     setSource(true);
   }
@@ -792,10 +917,16 @@ function teamStats(){
 const monthKey=d=>d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0");
 const monthName=()=>new Date().toLocaleDateString(undefined,{month:"long"});
 const callsRequired=r=>/masters/i.test(String(r.tier||""))?2:1;
+/* Sheets sometimes stores "2026-07" as a real date — accept either form */
+function monthNorm(v){
+  const d=ciParseDate(v);
+  if(d&&String(v).match(/^Date\(|GMT|\//))return monthKey(d);
+  return String(v||"").trim();
+}
 function callState(r){
   const mk=monthKey(new Date());
-  const mine=CALLS_RAW.filter(c=>String(c.RepID)===String(r.id)&&String(c.Month||"").trim()===mk);
-  const surveys=SURVEY_RAW.filter(s=>String(s.RepID)===String(r.id)&&String(s.Month||"").trim()===mk);
+  const mine=CALLS_RAW.filter(c=>String(c.RepID)===String(r.id)&&monthNorm(c.Month)===mk);
+  const surveys=SURVEY_RAW.filter(s=>String(s.RepID)===String(r.id)&&monthNorm(s.Month)===mk);
   const req=callsRequired(r);
   const norm=c=>String(c.Status||"").trim().toLowerCase();
   const completed=mine.filter(c=>norm(c)==="completed"||norm(c)==="survey_done").length;
@@ -844,10 +975,10 @@ function autoAssumptions(r){
 const pnum=x=>{if(x==null||x==="")return null;const v=+x;return isNaN(v)?null:v;};
 const pman=x=>{const v=pnum(x);return v&&v>0?v:null;}; // stored 0/blank = "use auto"
 function plannerFor(r){
-  const row=PLANNER_RAW.find(p=>String(p.RepID)===String(r.id)&&String(p.Campaign||"").trim()===SELECTED_CAMPAIGN)||null;
+  const row=PLANNER_RAW.find(p=>String(p.RepID)===String(r.id)&&String(p.Campaign||"").trim()===PLAN_CAMPAIGN)||null;
   const auto=autoAssumptions(r);
   const weeks=(row&&+row.Weeks)||PERIOD.weeks;
-  const start=(row&&ciParseDate(row.CampaignStart))||campaignStartDefault(SELECTED_CAMPAIGN);
+  const start=(row&&ciParseDate(row.CampaignStart))||campaignStartDefault(PLAN_CAMPAIGN);
   const manual={dc:pman(row&&row.DemoCompPct),dcl:pman(row&&row.DemoClosePct),dav:pman(row&&row.DemoAvgOrder),
                 sc:pman(row&&row.SvcCompPct),scl:pman(row&&row.SvcClosePct),sav:pman(row&&row.SvcAvgOrder),
                 sh:pman(row&&row.ShiftAvg)};
@@ -865,11 +996,16 @@ function plannerFor(r){
     return tot;
   };
   const now=new Date();
+  /* actuals for the campaign being planned — the live merge when it's the one
+     on screen, raw rows for any other, the seed for Fall 2025 */
+  const planSales = PLAN_CAMPAIGN===SELECTED_CAMPAIGN ? r.sales
+    : (PLAN_CAMPAIGN==="Fall 2025" && (SEED.find(x=>x.id===r.id)||{}).sales)
+      || campaignSales(r.id,PLAN_CAMPAIGN);
   const weeksArr=Array.from({length:weeks},(_,i)=>{
     const plan=weekly[i+1]||weekly[String(i+1)]||null;
     const ws=new Date(start.getTime()+i*7*86400000);
     const we=new Date(ws.getTime()+6*86400000+86399000);
-    return {wk:i+1,ws,we,plan:plan||{},exp:expWk(plan),actual:r.sales[i]??null,
+    return {wk:i+1,ws,we,plan:plan||{},exp:expWk(plan),actual:planSales[i]??null,
       past:we<now,current:ws<=now&&now<=we};
   });
   const cpoGoal=pman(row&&row.CPOGoal);
@@ -899,236 +1035,6 @@ function plannerTeam(){
     expected:t(x=>x.plan.expToDate), actual:t(x=>x.plan.actualToDate), ahead:t(x=>x.plan.ahead)};
 }
 
-/* ═══════════════ PUSH BLUEPRINT — lever scenarios per rep per campaign ═══════════════
-   The Appointment Lever (slots × completion% × close% × CPO) has three sub-levers,
-   each a conservative/goes-right pair whose midpoint is the Realistic Middle.
-   Additional levers are a free list (add/remove/rename). Everything derives live;
-   only the inputs + tracker actuals are stored — one Blueprint row per (rep, campaign). */
-const esc=s=>String(s??"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
-const fmtP=n=>(n%1===0)?String(n):String(Math.round(n*10)/10);
-const bpMid=(a,b)=>(a+b)/2;
-const BP_DEFAULTS={goal:30000,days:15,slots:100,predays:4,cph:25,bph:2,
-  comp_c:70,comp_x:80,close_c:65,close_x:75,cpo_c:500,cpo_x:700,
-  levers:[{name:"Event / Booth Shifts",c:0,x:0}]};
-function blueprintRowOf(r){
-  return BLUEPRINT_RAW.find(p=>String(p.RepID)===String(r.id)&&String(p.Campaign||"").trim()===SELECTED_CAMPAIGN)||null;
-}
-function blueprintFor(r){
-  const row=blueprintRowOf(r);
-  let plan=null,acts={};
-  if(row){
-    try{plan=JSON.parse(row.PlannerJSON||"null");}catch(e){}
-    try{acts=(JSON.parse(row.BlueprintJSON||"{}")||{}).acts||{};}catch(e){}
-  }
-  const s=Object.assign({},BP_DEFAULTS,plan||{});
-  if(!Array.isArray(s.levers))s.levers=BP_DEFAULTS.levers.map(l=>Object.assign({},l));
-  return {row,s,acts,scen:bpScen(s)};
-}
-function bpScen(s){
-  const m={comp:bpMid(+s.comp_c||0,+s.comp_x||0),close:bpMid(+s.close_c||0,+s.close_x||0),cpo:bpMid(+s.cpo_c||0,+s.cpo_x||0)};
-  const rev=(comp,close,cpo)=>(+s.slots||0)*comp/100*close/100*cpo;
-  const appt={c:rev(+s.comp_c||0,+s.close_c||0,+s.cpo_c||0),m:rev(m.comp,m.close,m.cpo),x:rev(+s.comp_x||0,+s.close_x||0,+s.cpo_x||0)};
-  const lev={c:0,m:0,x:0};
-  (s.levers||[]).forEach(l=>{lev.c+=+l.c||0;lev.m+=bpMid(+l.c||0,+l.x||0);lev.x+=+l.x||0;});
-  return {m,appt,lev,tot:{c:appt.c+lev.c,m:appt.m+lev.m,x:appt.x+lev.x}};
-}
-function bpActualTotal(acts){
-  let t=null;
-  const add=v=>{const n=pnum(v);if(n!=null)t=(t||0)+n;};
-  add(acts.appt);
-  Object.values(acts.byLever||{}).forEach(add);
-  return t;
-}
-function blueprintTeam(){
-  const rows=DATA.map(r=>({rep:r,bp:blueprintFor(r)})).filter(x=>x.bp.row);
-  const t=fn=>rows.length?rows.map(fn).filter(x=>x!=null).reduce((a,b)=>a+b,0):null;
-  return {rows,goal:t(x=>+x.bp.row.Goal||null),c:t(x=>x.bp.scen.tot.c),m:t(x=>x.bp.scen.tot.m),
-    x:t(x=>x.bp.scen.tot.x),actual:t(x=>bpActualTotal(x.bp.acts))};
-}
-
-/* ── rep blueprint UI ── */
-let BP_REP=null,BP_TIMER=null;
-function renderRepBlueprint(r){
-  const root=$("rep-bp"); if(!root)return;
-  // don't clobber inputs while someone is typing or a save is pending
-  if(root.contains(document.activeElement)||BP_TIMER)return;
-  BP_REP=r.id;
-  const {s,acts}=blueprintFor(r);
-  bpPaint(s,acts);
-}
-function bpPaint(s,acts){
-  $("bp-title").textContent=(MODE==="rep"?"Your ":"")+"PUSH Blueprint · "+SELECTED_CAMPAIGN;
-  const inp=(f,v,step,ph)=>`<label>${ph}<input class="bp-f" data-f="${f}" type="number" min="0" step="${step||1}" value="${v??""}" oninput="bpEdit()"></label>`;
-  let h=`<div class="assume" style="grid-template-columns:1.7fr 1.3fr">
-    <div class="ag"><div class="ah">The Appointment Lever <span class="chip-auto">SLOTS × COMPLETION × CLOSE × CPO</span></div>
-      <div class="arow" style="margin-bottom:10px">${inp("slots",s.slots,1,"Appt Slots Booked")}</div>
-      <table class="ptable"><thead><tr><th style="text-align:left">Sub-lever</th><th>Conservative</th><th>Middle (auto)</th><th>Goes right</th></tr></thead><tbody>
-      ${[["comp","Completion %"],["close","Close %"],["cpo","Avg Order $"]].map(([k,lab])=>
-        `<tr><td>${lab}</td>
-         <td><input class="pw-in bp-f" data-f="${k}_c" type="number" min="0" value="${s[k+"_c"]??""}" oninput="bpEdit()"></td>
-         <td class="bp-mid" id="bp-m-${k}">—</td>
-         <td><input class="pw-in bp-f" data-f="${k}_x" type="number" min="0" value="${s[k+"_x"]??""}" oninput="bpEdit()"></td></tr>`).join("")}
-      </tbody></table></div>
-    <div class="ag"><div class="ah">Goal &amp; Work Rates</div>
-      <div class="arow">${inp("goal",s.goal,500,"PUSH Goal $")}${inp("days",s.days,1,"Days Working")}</div>
-      <div class="arow" style="margin-top:10px">${inp("predays",s.predays,1,"Pre-PUSH Call Days")}${inp("cph",s.cph,1,"Calls/Hr")}${inp("bph",s.bph,0.5,"Booked/Hr")}</div>
-      <div class="hint" style="font-size:10px;margin-top:8px">middle levers drive the goal math below</div></div>
-  </div>`;
-  h+=`<div class="heat-scroll" style="margin-bottom:10px"><table class="ptable"><thead><tr>
-    <th style="text-align:left">Additional lever (rename freely)</th><th>Conservative</th><th>Middle (auto)</th><th>Goes right</th><th></th></tr></thead><tbody>`;
-  (s.levers||[]).forEach((lv,i)=>{
-    h+=`<tr><td style="text-align:left"><input class="pw-in bp-ln" data-i="${i}" type="text" value="${esc(lv.name)}" style="max-width:none;width:100%;text-align:left" oninput="bpEdit()"></td>
-      <td><input class="pw-in bp-lc" data-i="${i}" type="number" min="0" step="500" value="${lv.c??""}" oninput="bpEdit()"></td>
-      <td class="bp-mid" id="bp-lvm-${i}">—</td>
-      <td><input class="pw-in bp-lx" data-i="${i}" type="number" min="0" step="500" value="${lv.x??""}" oninput="bpEdit()"></td>
-      <td><button class="rowbtn" onclick="bpRemoveLever(${i})">× remove</button></td></tr>`;
-  });
-  h+=`</tbody></table></div>
-  <button class="rowbtn" style="margin-bottom:16px" onclick="bpAddLever()">+ add lever</button>`;
-  h+=`<div id="bp-scen" style="margin-bottom:16px"></div>`;
-  h+=`<div class="eyebrow" style="margin:4px 0 10px">Live Tracker — targets are the middle case</div>
-  <div class="heat-scroll" style="margin-bottom:16px"><table class="ptable"><thead><tr><th style="text-align:left">Metric</th><th>Target (middle)</th><th>Actual</th></tr></thead><tbody>
-    <tr><td>Slots run</td><td id="bp-tg-run">—</td><td><input class="pw-in bp-a" data-a="slotsRun" type="number" min="0" value="${acts.slotsRun??""}" oninput="bpEdit()"></td></tr>
-    <tr><td>Sales closed</td><td id="bp-tg-closed">—</td><td><input class="pw-in bp-a" data-a="closed" type="number" min="0" value="${acts.closed??""}" oninput="bpEdit()"></td></tr>
-    <tr><td>Avg order (CPO)</td><td id="bp-tg-cpo">—</td><td><input class="pw-in bp-a" data-a="cpo" type="number" min="0" value="${acts.cpo??""}" oninput="bpEdit()"></td></tr>
-    <tr><td>Appointment revenue</td><td id="bp-tg-appt">—</td><td><input class="pw-in bp-a" data-a="appt" type="number" min="0" step="100" value="${acts.appt??""}" oninput="bpEdit()"></td></tr>
-    ${(s.levers||[]).map((lv,i)=>`<tr><td>${esc(lv.name)} revenue</td><td id="bp-tg-lv-${i}">—</td>
-      <td><input class="pw-in bp-al" data-i="${i}" type="number" min="0" step="100" value="${(acts.byLever||{})[lv.name]??""}" oninput="bpEdit()"></td></tr>`).join("")}
-    <tr style="font-weight:600"><td>TOTAL SHIPPED</td><td id="bp-tg-tot">—</td><td id="bp-act-tot">—</td></tr>
-  </tbody></table></div>`;
-  h+=`<div class="eyebrow" style="margin:4px 0 10px">The Math — to hit your goal at middle levers</div><div id="bp-math"></div>`;
-  $("rep-bp").innerHTML=h;
-  bpRecalcDom();
-}
-function bpReadDom(){
-  const root=$("rep-bp");
-  const s={};
-  root.querySelectorAll(".bp-f").forEach(el=>{const v=el.value.trim();s[el.dataset.f]=v===""?0:+v;});
-  s.levers=[];
-  root.querySelectorAll(".bp-ln").forEach(el=>{
-    const i=+el.dataset.i;
-    const c=root.querySelector(`.bp-lc[data-i="${i}"]`), x=root.querySelector(`.bp-lx[data-i="${i}"]`);
-    s.levers[i]={name:el.value.trim()||"Untitled lever",
-      c:(c&&c.value.trim()!=="")?+c.value:0, x:(x&&x.value.trim()!=="")?+x.value:0};
-  });
-  const acts={byLever:{}};
-  root.querySelectorAll(".bp-a").forEach(el=>{const v=el.value.trim();if(v!=="")acts[el.dataset.a]=+v;});
-  root.querySelectorAll(".bp-al").forEach(el=>{const v=el.value.trim();if(v!=="")acts.byLever[s.levers[+el.dataset.i].name]=+v;});
-  return {s,acts};
-}
-function bpRecalcDom(){
-  const root=$("rep-bp"); if(!root||!root.innerHTML)return;
-  const {s,acts}=bpReadDom();
-  const sc=bpScen(s);
-  const setIf=(id,txt)=>{const el=$(id);if(el)el.textContent=txt;};
-  setIf("bp-m-comp",fmtP(sc.m.comp)+"%");setIf("bp-m-close",fmtP(sc.m.close)+"%");setIf("bp-m-cpo",money(sc.m.cpo));
-  s.levers.forEach((lv,i)=>setIf("bp-lvm-"+i,money(bpMid(+lv.c||0,+lv.x||0))));
-  const rows=[["Appointments ("+(s.slots||0)+" slots)",sc.appt]]
-    .concat(s.levers.map(lv=>[lv.name,{c:+lv.c||0,m:bpMid(+lv.c||0,+lv.x||0),x:+lv.x||0}]));
-  $("bp-scen").innerHTML=`<div class="grid3" style="margin-bottom:12px">
-    <div class="bucket"><div class="lab">Conservative floor</div><div class="val">${money(sc.tot.c)}</div><div class="meta">${fmtP(+s.comp_c||0)}% / ${fmtP(+s.close_c||0)}% / ${money(+s.cpo_c||0)}</div></div>
-    <div class="bucket" style="border-color:var(--good)"><div class="lab">Realistic middle</div><div class="val" style="color:var(--good)">${money(sc.tot.m)}</div><div class="meta">${fmtP(sc.m.comp)}% / ${fmtP(sc.m.close)}% / ${money(sc.m.cpo)} · the standard to protect</div></div>
-    <div class="bucket" style="border-color:var(--accent)"><div class="lab">Everything goes right</div><div class="val" style="color:var(--accent)">${money(sc.tot.x)}</div><div class="meta">${fmtP(+s.comp_x||0)}% / ${fmtP(+s.close_x||0)}% / ${money(+s.cpo_x||0)}</div></div></div>
-  <div class="heat-scroll"><table class="ptable"><thead><tr><th style="text-align:left">Lever</th><th>Conservative</th><th>Middle</th><th>Goes right</th></tr></thead><tbody>
-    ${rows.map(([n,v])=>`<tr><td>${esc(n)}</td><td>${money(v.c)}</td><td style="font-weight:600;color:var(--good)">${money(v.m)}</td><td>${money(v.x)}</td></tr>`).join("")}
-    <tr style="font-weight:600"><td>TOTAL</td><td>${money(sc.tot.c)}</td><td style="color:var(--good)">${money(sc.tot.m)}</td><td>${money(sc.tot.x)}</td></tr>
-  </tbody></table></div>`;
-  const runM=(+s.slots||0)*sc.m.comp/100, closedM=runM*sc.m.close/100;
-  setIf("bp-tg-run",String(Math.round(runM)));
-  setIf("bp-tg-closed",String(Math.round(closedM)));
-  setIf("bp-tg-cpo",money(sc.m.cpo));
-  setIf("bp-tg-appt",money(sc.appt.m));
-  s.levers.forEach((lv,i)=>setIf("bp-tg-lv-"+i,money(bpMid(+lv.c||0,+lv.x||0))));
-  setIf("bp-tg-tot",money(sc.tot.m));
-  const at=bpActualTotal(acts);
-  setIf("bp-act-tot",at==null?"—":money(at));
-  const apptGoal=Math.max(0,(+s.goal||0)-sc.lev.m);
-  let mh;
-  if(sc.m.cpo>0&&sc.m.close>0&&sc.m.comp>0&&s.days>0&&s.cph>0&&s.bph>0&&s.predays>0&&apptGoal>0){
-    const orders=apptGoal/sc.m.cpo, completed=orders/(sc.m.close/100), booked=completed/(sc.m.comp/100);
-    const calls=booked*s.cph/s.bph, pre=calls/2;
-    const capOk=(+s.slots||0)>=Math.ceil(booked);
-    mh=`<div class="grid5">
-      <div class="bucket"><div class="lab">Appt goal</div><div class="val" style="font-size:19px">${money(apptGoal)}</div><div class="meta">${money(sc.lev.m)} covered by other levers</div></div>
-      <div class="bucket"><div class="lab">Orders needed</div><div class="val" style="font-size:19px">${Math.ceil(orders)}</div><div class="meta">${(orders/s.days).toFixed(1)} per day</div></div>
-      <div class="bucket"><div class="lab">Appts booked needed</div><div class="val" style="font-size:19px;color:${capOk?'var(--good)':'var(--bad)'}">${Math.ceil(booked)}</div><div class="meta">${capOk?`fits your ${s.slots} slots ✓`:`over your ${s.slots} slots — short ${Math.ceil(booked)-(+s.slots||0)}`}</div></div>
-      <div class="bucket"><div class="lab">Calls needed</div><div class="val" style="font-size:19px">${Math.ceil(calls).toLocaleString()}</div><div class="meta">${(calls/s.cph).toFixed(1)} hrs on the phone</div></div>
-      <div class="bucket"><div class="lab">Pre-PUSH calls/day</div><div class="val" style="font-size:19px">${Math.ceil(pre/s.predays)}</div><div class="meta">book half before day 1 · ${(pre/s.predays/s.cph).toFixed(1)} hrs/day</div></div>
-    </div>`;
-  }else mh=`<div class="plan-empty">Set a goal and your levers — orders needed, appointments needed, and the call plan compute here automatically.</div>`;
-  $("bp-math").innerHTML=mh;
-}
-function bpEdit(){
-  $("bp-saved").textContent="typing…";
-  bpRecalcDom();
-  if(BP_TIMER)clearTimeout(BP_TIMER);
-  BP_TIMER=setTimeout(bpSave,1200);
-}
-function bpAddLever(){
-  const {s,acts}=bpReadDom();
-  s.levers.push({name:"New Lever",c:0,x:0});
-  bpPaint(s,acts);bpEdit();
-}
-function bpRemoveLever(i){
-  const {s,acts}=bpReadDom();
-  const name=(s.levers[i]||{}).name;
-  s.levers.splice(i,1);
-  if(acts.byLever)delete acts.byLever[name];
-  bpPaint(s,acts);bpEdit();
-}
-async function bpSave(){
-  BP_TIMER=null;
-  if(!BP_REP||!CONFIG.WEBAPP_URL)return;
-  const {s,acts}=bpReadDom();
-  const sc=bpScen(s);
-  const body={action:"saveBlueprint",repId:BP_REP,campaign:SELECTED_CAMPAIGN,
-    Goal:+s.goal||0,ProjC:Math.round(sc.tot.c),ProjM:Math.round(sc.tot.m),ProjX:Math.round(sc.tot.x),
-    TotalActual:bpActualTotal(acts)||0,
-    PlannerJSON:JSON.stringify(s),BlueprintJSON:JSON.stringify({acts})};
-  $("bp-saved").textContent="saving…";
-  try{
-    const j=await fetch(CONFIG.WEBAPP_URL,{method:"POST",body:JSON.stringify(body)}).then(r=>r.json());
-    if(!j.ok)throw new Error(j.error||"save failed");
-    $("bp-saved").textContent="saved ✓";
-    await loadData();
-    if(!$("rep-bp").contains(document.activeElement))renderAll();
-  }catch(e){$("bp-saved").textContent="⚠ not saved — "+e.message;}
-}
-
-/* ── admin: every mentee's blueprint at a glance ── */
-function renderAdminBlueprints(){
-  const el=$("admin-bp"); if(!el)return;
-  const t=blueprintTeam();
-  if(!t.rows.length){
-    el.innerHTML=`<div class="plan-empty">No PUSH blueprints yet for ${SELECTED_CAMPAIGN}. Every mentee has one on their personal page — levers in, scenarios out. Open any mentee (Rep toggle) to start theirs with them.</div>`;
-    return;
-  }
-  const rows=t.rows.sort((a,b)=>b.bp.scen.tot.m-a.bp.scen.tot.m).map(({rep,bp})=>{
-    const act=bpActualTotal(bp.acts);
-    const vs=act!=null?act-bp.scen.tot.m:null;
-    const upd=ciParseDate(bp.row.UpdatedAt);
-    return `<tr><td>${rep.name}</td><td>${money(+bp.row.Goal||null)}</td>`+
-      `<td>${money(bp.scen.tot.c)}</td><td style="font-weight:600;color:var(--good)">${money(bp.scen.tot.m)}</td><td>${money(bp.scen.tot.x)}</td>`+
-      `<td>${act==null?"—":money(act)}</td>`+
-      `<td>${vs==null?"—":`<span class="${vs>=0?'up':'down'}">${vs>=0?"+":"−"}${money(Math.abs(vs))}</span>`}</td>`+
-      `<td style="color:var(--ink-soft);font-size:11px">${upd?upd.toLocaleDateString(undefined,{month:"short",day:"numeric"}):"—"}</td>`+
-      `<td><button class="rowbtn" onclick="openRepBlueprint('${rep.id}')">open</button></td></tr>`;
-  }).join("");
-  el.innerHTML=`<div class="heat-scroll"><table class="ptable">
-    <thead><tr><th style="text-align:left">Mentee</th><th>Goal</th><th>Conservative</th><th>Middle</th><th>Goes right</th><th>Actual</th><th>vs middle</th><th>Updated</th><th></th></tr></thead>
-    <tbody>${rows}</tbody>
-    <tfoot><tr style="font-weight:600;background:#FCFBF8"><td>Team</td><td>${money(t.goal)}</td><td>${money(t.c)}</td><td style="color:var(--good)">${money(t.m)}</td><td>${money(t.x)}</td><td>${money(t.actual)}</td><td></td><td></td><td></td></tr></tfoot>
-  </table></div>`;
-}
-/* admin: jump straight into a mentee's blueprint */
-function openRepBlueprint(repId){
-  if(MODE==="rep")return;
-  setView("rep");
-  $("rep-select").value=repId;
-  renderRep();
-  const sec=$("rep-bp-sec");
-  if(sec)sec.scrollIntoView({behavior:"smooth",block:"start"});
-}
 
 /* rep link for the admin board — how each mentee's personal URL is formed */
 const repLink=id=>location.origin+location.pathname+"?rep="+encodeURIComponent(id);
@@ -1138,6 +1044,13 @@ function setView(v){
   $("view-rep").classList.toggle("hidden",v!=="rep");
   $("btn-team").classList.toggle("on",v==="team");
   $("btn-rep").classList.toggle("on",v==="rep");
+  paneIn($("view-"+v));
+}
+/* replay the entrance on the pane being shown — view switches only, never on data refreshes */
+function paneIn(el){
+  if(!el)return;
+  el.classList.remove("pane-in"); void el.offsetWidth;
+  el.classList.add("pane-in");
 }
 
 /* ═══════════════ TEAM ═══════════════ */
@@ -1250,14 +1163,46 @@ function ciHistory(rep,ws){
   }
   return hist;
 }
+function ciData(){
+  const ws=ciWindowStart(), done=new Set();
+  WEEKLY_RAW.forEach(w=>{const t=ciParseDate(w.Timestamp);if(t&&t>=ws)done.add(String(w.RepID));});
+  return {ws,done,streaks:ciStreaks(done,ws)};
+}
+/* ── Coach's Radar: who needs you today, computed from every board below ── */
+function renderRadar(){
+  const el=$("radar"); if(!el)return;
+  const chips=[];
+  const live=CONFIG.USE_LIVE_DATA&&DATA.length&&SELECTED_CAMPAIGN===currentCampaign();
+  if(live){
+    const {done,streaks}=ciData();
+    const missing=DATA.filter(r=>!done.has(String(r.id)));
+    if(missing.length){
+      const worst=[...missing].sort((a,b)=>(streaks[b.id]||0)-(streaks[a.id]||0))[0];
+      chips.push({cls:"bad",id:"ci-section",html:`<b>${missing.length}</b> check-in${missing.length>1?"s":""} missing · worst: ${worst.name.split(" ")[0]} ×${streaks[worst.id]||1}w`});
+    }
+    const cs=DATA.map(r=>({r,c:callState(r)}));
+    const od=cs.filter(x=>x.c.overdue).length;
+    const nb=cs.filter(x=>x.c.status==="none"&&!x.c.overdue).length;
+    const sp=cs.filter(x=>x.c.status==="survey").length;
+    if(od)chips.push({cls:"bad",id:"admin-calls-sec",html:`<b>${od}</b> call${od>1?"s":""} OVERDUE`});
+    if(nb)chips.push({cls:"warn",id:"admin-calls-sec",html:`<b>${nb}</b> call${nb>1?"s":""} not booked`});
+    if(sp)chips.push({cls:"warn",id:"admin-calls-sec",html:`<b>${sp}</b> survey${sp>1?"s":""} pending`});
+    const t=plannerTeam();
+    const behind=t.rows.filter(x=>(x.plan.ahead??0)<-0.5);
+    if(behind.length)chips.push({cls:"warn",id:"admin-planner-sec",html:`<b>${behind.length}</b> behind pace: ${behind.slice(0,3).map(x=>x.rep.name.split(" ")[0]).join(", ")}${behind.length>3?"…":""}`});
+    const noPlan=DATA.filter(r=>!t.rows.some(x=>x.rep.id===r.id));
+    if(noPlan.length)chips.push({cls:"warn",id:"admin-planner-sec",html:`<b>${noPlan.length}</b> no campaign plan yet`});
+  }
+  el.innerHTML=chips.length
+    ?chips.map(c=>`<button class="rchip ${c.cls}" onclick="document.getElementById('${c.id}').scrollIntoView({behavior:'smooth'})"><span class="dot2"></span><span>${c.html}</span></button>`).join("")
+    :`<div class="rchip ok"><span class="dot2"></span>All clear — nothing needs you right now</div>`;
+}
 function renderCheckins(){
   const sec=$("ci-section");
   // operational view — only meaningful for the campaign happening right now
   if(!CONFIG.USE_LIVE_DATA||!DATA.length||SELECTED_CAMPAIGN!==currentCampaign()){sec.classList.add("hidden");return;}
   sec.classList.remove("hidden");
-  const ws=ciWindowStart(), done=new Set();
-  WEEKLY_RAW.forEach(w=>{const t=ciParseDate(w.Timestamp);if(t&&t>=ws)done.add(String(w.RepID));});
-  const streaks=ciStreaks(done,ws);
+  const {ws,done,streaks}=ciData();
   const rows=[...DATA].sort((a,b)=>{
     const d=(done.has(String(a.id))?1:0)-(done.has(String(b.id))?1:0);
     return d!==0?d:(streaks[b.id]-streaks[a.id])||a.name.localeCompare(b.name);
@@ -1291,7 +1236,7 @@ function renderMix(target="mix"){
   $(target).innerHTML=sums.map(s=>
     `<div class="mix-row"><div class="mix-lab">${s.label}</div>`+
     `<div class="mix-track"><div class="mix-fill" style="width:${s.val?Math.max(s.val/max*100,2):0}%"></div></div>`+
-    (s.val==null?`<div class="mix-val await">awaiting form</div>`:`<div class="mix-val">${money(s.val)}</div>`)+
+    (s.val==null?`<div class="mix-val await">no data yet</div>`:`<div class="mix-val">${money(s.val)}</div>`)+
     `</div>`).join("");
 }
 
@@ -1304,7 +1249,8 @@ function renderRepPlanner(r){
   const root=$("rep-planner");
   // don't clobber the grid while someone is typing or a save is pending
   if(root.contains(document.activeElement)||PLAN_TIMER)return;
-  $("rp-title").textContent=(MODE==="rep"?"Your ":"")+"Campaign Planner · "+SELECTED_CAMPAIGN;
+  $("rp-title").textContent=(MODE==="rep"?"Your ":"")+"Campaign Planner · "+PLAN_CAMPAIGN
+    +(PLAN_CAMPAIGN===nextCampaign()?"":campaignEnded(PLAN_CAMPAIGN)?" · complete":"");
   const p=plannerFor(r);
   PLAN_REP=r.id;
   PLAN_AUTO=p.auto; PLAN_WEEKS=p.weeks;
@@ -1318,7 +1264,8 @@ function renderRepPlanner(r){
       :"";
     return `<label>${ph}<input class="pa-in" data-f="${f}" type="number" min="0" value="${man??""}" placeholder="${autoVal??"—"}" oninput="planEdit()">${hint}</label>`;
   };
-  let html=`<div class="assume">
+  let html=campPills(r);
+  html+=`<div class="assume">
     <div class="ag"><div class="ah">Campaign Goal</div><div class="arow">
       ${aIn("goal",p.cpoGoal,null,"CPO Goal $",true)}</div>
       <div class="hint" style="font-size:10px;margin-top:6px">week ${p.wkNow} of ${p.weeks} · starts ${p.start.toLocaleDateString(undefined,{month:"numeric",day:"numeric"})}</div></div>
@@ -1380,8 +1327,56 @@ function planTotalsHtml(v){
 }
 function planTotals(p){
   PLAN_START=p.start;PLAN_ACTUAL=p.actualToDate;
+  if(campaignEnded(PLAN_CAMPAIGN)){
+    $("plan-totals").innerHTML=campaignSummaryHtml(p);
+    return;
+  }
   $("plan-totals").innerHTML=planTotalsHtml({projected:p.projected,planned:p.plannedWeeks,
     weeks:p.weeks,goal:p.cpoGoal,expToDate:p.expToDate,actual:p.actualToDate});
+}
+
+/* ── the campaign is over: replace the live pace card with its final story —
+   what was sold, the weekly rhythm, and how it stacked against goal & plan.
+   Below it, campaign-over-campaign so growth is visible at a glance. ── */
+function campaignSummaryHtml(p){
+  const acts=p.weeksArr.map(w=>w.actual).filter(v=>v!=null);
+  const total=acts.reduce((a,b)=>a+b,0);
+  const wks=acts.length;
+  const avg=wks?Math.round(total/wks):null;
+  const best=wks?Math.max(...acts):null;
+  const bestWk=best!=null?p.weeksArr.find(w=>w.actual===best):null;
+  const goal=p.cpoGoal;
+  const hit=goal?Math.round(total/goal*100):null;
+  const vsPlan=p.projected!=null?total-p.projected:null;
+  const hero=goal!=null
+    ?`<div class="plan-hero ${hit>=100?"":"behind"}"><div class="lab">Campaign result</div>
+       <div class="val">${money(total)}<span style="font-size:14px;color:var(--ink-soft)"> · ${hit}% of goal</span></div>
+       <div class="meta">${hit>=100?"goal covered — carry the standard forward":`${money(goal-total)} short of the ${money(goal)} goal — the next plan starts from what these weeks proved`}</div></div>`
+    :`<div class="plan-hero"><div class="lab">Campaign result</div><div class="val">${money(total)}</div>
+       <div class="meta">no goal was set for this campaign</div></div>`;
+  const rep=DATA.find(x=>x.id===PLAN_REP)||{id:PLAN_REP,sales:[]};
+  const history=repCampaigns(rep).filter(c=>c!==nextCampaign()).map(c=>{
+    const sales=c===SELECTED_CAMPAIGN?rep.sales
+      :(c==="Fall 2025"&&(SEED.find(x=>x.id===rep.id)||{}).sales)||campaignSales(rep.id,c);
+    const a=(sales||[]).filter(v=>v!=null);
+    if(!a.length)return null;
+    const t=a.reduce((x,y)=>x+y,0);
+    return {c,t,w:a.length,avg:Math.round(t/a.length)};
+  }).filter(Boolean);
+  const histRows=history.map(h=>
+    `<tr class="${h.c===PLAN_CAMPAIGN?"wk-now":""}"><td style="text-align:left">${h.c}${h.c===PLAN_CAMPAIGN?"":""}</td>
+     <td>${money(h.t)}</td><td>${h.w}</td><td>${money(h.avg)}</td></tr>`).join("");
+  return `<div class="plan-grid">${hero}
+    <div class="kpi"><div class="lab">Weekly average</div><div class="val" style="font-size:22px">${money(avg)}</div>
+      <div class="meta">${wks} reporting week${wks===1?"":"s"}</div></div>
+    <div class="kpi"><div class="lab">Best week</div><div class="val" style="font-size:22px">${money(best)}</div>
+      <div class="meta">${bestWk?"week "+bestWk.wk:"—"}</div></div>
+    <div class="kpi"><div class="lab">Vs the plan</div><div class="val" style="font-size:22px">${vsPlan==null?"—":`<span class="${vsPlan>=0?"up":"down"}">${vsPlan>=0?"+":"−"}${money(Math.abs(vsPlan))}</span>`}</div>
+      <div class="meta">${p.projected!=null?`plan projected ${money(p.projected)}`:"no plan was built"}</div></div>
+  </div>`+(history.length>1?`<div style="margin-top:14px">
+    <div class="eyebrow" style="margin-bottom:8px">Campaign over campaign</div>
+    <table class="ptable"><thead><tr><th style="text-align:left">Campaign</th><th>Total</th><th>Wks</th><th>Avg / wk</th></tr></thead>
+    <tbody>${histRows}</tbody></table></div>`:"");
 }
 /* ── inline edits: recompute instantly, save after 1.2s of quiet ── */
 let PLAN_REP=null,PLAN_TIMER=null,PLAN_AUTO=null,PLAN_WEEKS=PERIOD.weeks,PLAN_START=null,PLAN_ACTUAL=0;
@@ -1444,7 +1439,7 @@ async function planSave(){
   if(!PLAN_REP||!CONFIG.WEBAPP_URL)return;
   const {weekly,f}=planReadDom();
   const p=plannerFor(DATA.find(x=>x.id===PLAN_REP)||ME);
-  const body={action:"savePlanner",repId:PLAN_REP,campaign:SELECTED_CAMPAIGN,
+  const body={action:"savePlanner",repId:PLAN_REP,campaign:PLAN_CAMPAIGN,
     CPOGoal:f.goal||0,Weeks:p.weeks,CampaignStart:p.start.toISOString().slice(0,10),
     DaysOff:0,EventShifts:0,ApptDays:0,AvgOrder:0,ClosingPct:0,EventsJSON:"[]",
     DemoCompPct:f.dc||0,DemoClosePct:f.dcl||0,DemoAvgOrder:f.dav||0,
@@ -1472,8 +1467,12 @@ function planRefreshComputed(){
 }
 function renderAdminPlanner(){
   const t=plannerTeam();
+  const pills=`<div class="camp-pills">`+[...new Set(DATA.flatMap(r=>repCampaigns(r)))].sort((a,b)=>campKey(a)-campKey(b)).map(c=>{
+      const tag=c===currentCampaign()?"now":(c===nextCampaign()?"next":(campaignEnded(c)?"done":""));
+      return `<button class="camp-pill ${c===PLAN_CAMPAIGN?"on":""}" onclick="setPlanCampaign('${c}')">${c}${tag?`<span class="tag">${tag}</span>`:""}</button>`;
+    }).join("")+`</div>`;
   if(!t.rows.length){
-    $("admin-planner").innerHTML=`<div class="plan-empty">No campaign plans yet for ${SELECTED_CAMPAIGN}. Open any mentee (Rep toggle) and plan their weeks — shifts and appointments per week, expected CPO computes automatically.</div>`;
+    $("admin-planner").innerHTML=pills+`<div class="plan-empty">No campaign plans yet for ${PLAN_CAMPAIGN}. Open any mentee (Rep toggle) and plan their weeks — shifts and appointments per week, expected CPO computes automatically.</div>`;
     return;
   }
   const rows=t.rows.sort((a,b)=>(b.plan.ahead??-9e9)-(a.plan.ahead??-9e9)).map(({rep,plan})=>{
@@ -1485,11 +1484,12 @@ function renderAdminPlanner(){
       `<td><button class="rowbtn" onclick="openRepPlanner('${rep.id}')">plan</button></td></tr>`;
   }).join("");
   const tp=pace({ahead:t.ahead});
-  $("admin-planner").innerHTML=`<table class="ptable">
+  const noPlan=DATA.filter(r=>!t.rows.some(x=>x.rep.id===r.id));
+  $("admin-planner").innerHTML=pills+`<table class="ptable">
     <thead><tr><th>Mentee</th><th>Goal</th><th>Wks planned</th><th>Projected</th><th>Planned so far</th><th>Actual</th><th>Pace</th><th></th></tr></thead>
     <tbody>${rows}</tbody>
-    <tfoot><tr style="font-weight:600;background:#FCFBF8"><td>Team</td><td>${money(t.goal)}</td><td></td><td>${money(t.projected)}</td><td>${money(t.expected)}</td><td>${money(t.actual)}</td><td><span class="${(t.ahead??0)>=0?'up':'down'}">${tp.word}</span></td><td></td></tr></tfoot>
-  </table>`;
+    <tfoot><tr style="font-weight:600;background:var(--card-raised)"><td>Team</td><td>${money(t.goal)}</td><td></td><td>${money(t.projected)}</td><td>${money(t.expected)}</td><td>${money(t.actual)}</td><td><span class="${(t.ahead??0)>=0?'up':'down'}">${tp.word}</span></td><td></td></tr></tfoot>
+  </table>`+(noPlan.length?`<div class="hint" style="margin-top:10px">No plan yet: ${noPlan.map(r=>`<a href="#" onclick="openRepPlanner('${r.id}');return false" style="text-decoration:none">${r.name}</a>`).join(" · ")} — tap a name to start one</div>`:"");
 }
 /* admin: jump straight into a mentee's editable planner */
 function openRepPlanner(repId){
@@ -1522,7 +1522,9 @@ function renderRepCallCard(r){
   }
   $("rep-call-card").innerHTML=`<div class="call-card s-${cs.status}">
     <span class="cc-dot"></span>
-    <div class="cc-main"><div class="cc-title">${b.title}</div><div class="cc-sub">${b.sub}</div>${notes}</div>
+    <div class="cc-main">
+      <div style="font-family:'Spline Sans Mono';font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:4px">Your coaching call · ${monthName()}</div>
+      <div class="cc-title">${b.title}</div><div class="cc-sub">${b.sub}</div>${notes}</div>
     ${b.btn?`<a class="form-btn" href="${b.btn.url}" target="_blank" rel="noopener">${b.btn.lab}</a>`:""}
   </div>`;
 }
@@ -1535,10 +1537,14 @@ function renderAdminCalls(){
   }
   const rows=[...DATA].map(r=>({r,cs:callState(r)}))
     .sort((a,b)=>(a.cs.status==="done"?1:0)-(b.cs.status==="done"?1:0)||a.r.name.localeCompare(b.r.name));
-  const statusLab={none:"not booked",booked:"booked",survey:"survey pending",done:"done"};
   $("admin-calls").innerHTML=`<div class="calls-grid">`+rows.map(({r,cs})=>{
     const od=cs.overdue?` od`:"";
-    const lab=(cs.overdue?"OVERDUE · ":"")+statusLab[cs.status]+(cs.req>1?` ${Math.min(cs.completed,cs.surveyed)}/${cs.req}`:"");
+    const lab=(cs.overdue?"OVERDUE · ":"")+(()=>{
+      if(cs.status==="done")return cs.req>1?`all ${cs.req} done ✓`:"done ✓";
+      if(cs.status==="survey")return `${cs.completed} done · survey pending`;
+      if(cs.status==="booked")return "booked"+(cs.upcoming?` ${cs.upcoming.getMonth()+1}/${cs.upcoming.getDate()}`:"");
+      return "not booked";
+    })();
     return `<div class="call-row s-${cs.status}${od}"><span class="st"></span>${r.name}`+
       `<span class="cr-lab">${lab}</span>`+
       `<button class="linkbtn" title="copy ${r.name}'s personal dashboard link" onclick="navigator.clipboard.writeText(repLink('${r.id}')).then(()=>{this.textContent='✓';setTimeout(()=>this.textContent='🔗',1200)})">🔗</button></div>`;
@@ -1560,9 +1566,18 @@ function fillRepSelect(){
 }
 const currentRep=()=>MODE==="rep"?ME:DATA.find(r=>r.id===$("rep-select").value);
 
+/* Sheets turns "4%" into 0.04 — render pay back the way humans say it */
+function fmtPay(p){
+  const n=+p;
+  if(!isNaN(n)&&p!==""&&p!=null){
+    if(n>0&&n<1)return Math.round(n*100)+"%";
+    if(n>=1)return "$"+n;
+  }
+  return p||"—";
+}
 function renderRepContext(r){
   const chips=[
-    `<span class="chip tier"><b>${r.tier}</b> · ${r.pay}</span>`,
+    `<span class="chip tier"><b>${r.tier}</b> · ${fmtPay(r.pay)}</span>`,
     `<span class="chip">Region <b>${r.region}</b></span>`,
     `<span class="chip">Manager <b>${r.manager}</b></span>`,
     `<span class="chip">Goal <b>${r.goal}</b></span>`
@@ -1576,8 +1591,8 @@ function renderHero(r){
   const cards=[
     {big:true,lab:"Total sales · "+SELECTED_CAMPAIGN,val:money(totalSales(r)),meta:`${w} active weeks · avg ${money(avgWeek(r))}/wk`},
     {lab:"Standards met",val:p==null?"—":Math.round(p*100)+"%",meta:"weeks all-met"},
-    {lab:"Avg order",val:oAvg==null?"—":money(oAvg),meta:oAvg==null?"awaiting form":"sales ÷ orders",await:oAvg==null},
-    {lab:"Shift average",val:sAvg==null?"—":money(sAvg),meta:sAvg==null?"awaiting form":"event sales ÷ shifts",await:sAvg==null}
+    {lab:"Avg order",val:oAvg==null?"—":money(oAvg),meta:oAvg==null?"after your first check-in":"sales ÷ orders",await:oAvg==null},
+    {lab:"Shift average",val:sAvg==null?"—":money(sAvg),meta:sAvg==null?"after your first check-in":"event sales ÷ shifts",await:sAvg==null}
   ];
   $("rep-hero").innerHTML=cards.map(c=>c.big?
     `<div class="hero-big"><div class="lab">${c.lab}</div><div class="val">${c.val}</div><div class="meta">${c.meta}</div></div>`:
@@ -1604,6 +1619,10 @@ function renderSummary(r){
 function renderChart(){
   const r=currentRep(), metric=$("chart-metric").value;
   const series = metric==="sales"? r.sales.map(x=>x) : r.acct.map(x=>x);
+  if(!series.some(x=>x!=null)){
+    $("chart").innerHTML=`<div style="padding:36px 20px;text-align:center;font-size:12.5px;color:var(--ink-soft)">Your weekly trend draws here after your first check-in.</div>`;
+    return;
+  }
   const base = metric==="sales"? teamAvgWeekly(x=>x.sales) : teamAvgWeekly(x=>x.acct);
   const W=940,H=300,padL=46,padR=14,padT=14,padB=28,n=PERIOD.weeks;
   const allVals=[...series.filter(x=>x!=null),...base];
@@ -1612,8 +1631,8 @@ function renderChart(){
   const y=v=>padT+(H-padT-padB)*(1-(v-minV)/(maxV-minV||1));
   const fmtY=v=>metric==="sales"?"$"+(v>=1000?(v/1000).toFixed(0)+"k":Math.round(v)):v.toFixed(1);
   let grid="";for(let i=0;i<=4;i++){const v=minV+(maxV-minV)*i/4,yy=y(v);
-    grid+=`<line x1="${padL}" y1="${yy}" x2="${W-padR}" y2="${yy}" stroke="var(--line-soft)"/><text x="${padL-8}" y="${yy+4}" text-anchor="end" font-size="10" fill="var(--ink-soft)" font-family="Geist Mono">${fmtY(v)}</text>`;}
-  let xlab="";for(let i=0;i<n;i+=2)xlab+=`<text x="${x(i)}" y="${H-8}" text-anchor="middle" font-size="9.5" fill="var(--ink-soft)" font-family="Geist Mono">w${i+1}</text>`;
+    grid+=`<line x1="${padL}" y1="${yy}" x2="${W-padR}" y2="${yy}" stroke="var(--line-soft)"/><text x="${padL-8}" y="${yy+4}" text-anchor="end" font-size="10" fill="var(--ink-soft)" font-family="Spline Sans Mono">${fmtY(v)}</text>`;}
+  let xlab="";for(let i=0;i<n;i+=2)xlab+=`<text x="${x(i)}" y="${H-8}" text-anchor="middle" font-size="9.5" fill="var(--ink-soft)" font-family="Spline Sans Mono">w${i+1}</text>`;
   const baseLine=base.map((v,i)=>`${i?'L':'M'}${x(i)},${y(v)}`).join(" ");
   let repPath="",started=false,dots="";
   series.forEach((v,i)=>{if(v==null){started=false;return;}repPath+=(started?"L":"M")+x(i)+","+y(v)+" ";started=true;dots+=`<circle cx="${x(i)}" cy="${y(v)}" r="3" fill="var(--accent)"/>`;});
@@ -1712,10 +1731,51 @@ function renderCallNotes(r){
       `<div class="row"><b>Action steps before next call:</b> ${s.ActionSteps||"—"}</div></div>`;
   }).join("");
 }
+/* three goals can coexist — say what each one IS so nobody has to guess */
+function renderGoalsStrip(r){
+  const el=$("goals-strip"); if(!el)return;
+  const plan=plannerFor(r);
+  const season=(r.goal&&r.goal!=="—")?r.goal:null;
+  const tiles=[
+    {lab:"Season goal",val:season??"—",meta:"what you set with your coach"},
+    {lab:"Campaign plan",val:money(plan.cpoGoal),meta:"what your weekly plan adds up to"}
+  ];
+  el.classList.remove("hidden");
+  el.innerHTML=tiles.map(t=>`<div class="kpi"><div class="lab">${t.lab}</div><div class="val" style="font-size:20px">${t.val}</div><div class="meta">${t.meta}</div></div>`).join("");
+}
+/* coach call-prep: the 1-on-1 in one glance (admin deep-dive only) */
+function renderCallPrep(r){
+  const sec=$("prep-sec"); if(!sec)return;
+  sec.classList.toggle("hidden",MODE!=="admin");
+  if(MODE!=="admin")return;
+  const cs=callState(r);
+  const sv=SURVEY_RAW.filter(x=>String(x.RepID)===String(r.id))
+    .map(x=>({...x,t:ciParseDate(x.Timestamp)})).filter(x=>x.t).sort((a,b)=>b.t-a.t)[0];
+  const note=(r.notes||[])[0];
+  const p=plannerFor(r), pc=pace(p);
+  const callTxt=cs.status==="booked"&&cs.upcoming
+    ?`Booked ${cs.upcoming.toLocaleDateString(undefined,{weekday:"short",month:"short",day:"numeric"})} · ${cs.upcoming.toLocaleTimeString(undefined,{hour:"numeric",minute:"2-digit"})}`
+    :cs.status==="done"?"Done + surveyed ✓"
+    :cs.status==="survey"?`${cs.completed} done · survey pending`
+    :"Not booked — nudge them";
+  $("prep-cards").innerHTML=`
+    <div class="ag"><div class="ah">This month's call</div><div class="prep-note"><b>${callTxt}</b></div></div>
+    <div class="ag"><div class="ah">Last call — action steps</div><div class="prep-note">${sv?esc(sv.ActionSteps||"—"):"no survey yet"}</div></div>
+    <div class="ag"><div class="ah">Last check-in</div><div class="prep-note">${note?[note.win&&"<b>Win:</b> "+esc(note.win),note.obs&&"<b>Obstacle:</b> "+esc(note.obs),note.commit&&"<b>Commit:</b> "+esc(note.commit)].filter(Boolean).join("<br>")||"—":"no check-ins yet"}</div></div>
+    <div class="ag"><div class="ah">Pace</div><div class="prep-note"><b style="color:${(p.ahead??0)>=0?'var(--good)':'var(--bad)'}">${pc.word}</b>${p.planShort!=null&&p.planShort>0.5?`<br><span style="color:var(--ink-soft)">plan short ${money(p.planShort)}</span>`:""}</div></div>`;
+}
 function renderRep(){
   const r=currentRep(); if(!r)return;
-  renderRepContext(r);renderHero(r);renderSummary(r);renderChart();renderChannels(r);renderDiagnostics(r);renderStandards(r);renderNotes(r);
-  renderCallNotes(r);renderRepPlanner(r);renderRepBlueprint(r);renderRepCallCard(r);
+  renderCallPrep(r);
+  renderRepContext(r);renderGoalsStrip(r);renderHero(r);renderSummary(r);renderChart();renderChannels(r);renderDiagnostics(r);renderStandards(r);renderNotes(r);
+  renderCallNotes(r);renderRepPlanner(r);renderRepCallCard(r);
+  // brand-new rep (no check-ins this campaign): collapse the data sections
+  // into one starter card so the page leads with what they can DO
+  const collapse=MODE==="rep"&&activeWeeks(r)===0;
+  document.querySelectorAll("#view-rep .rds").forEach(el=>el.classList.toggle("hidden",collapse));
+  $("starter-sec").classList.toggle("hidden",!collapse);
+  if(collapse&&SURVEY_RAW.some(x=>String(x.RepID)===String(r.id)))
+    $("call-notes-sec").classList.remove("hidden"); // call notes exist — keep them
 }
 
 /* ═══════════════ MODE CHROME + INIT ═══════════════ */
@@ -1744,14 +1804,15 @@ function renderAll(){
     return;
   }
   renderCampaignSelect();
-  renderPeriod();renderKPIs();renderCheckins();renderLeaderboard();renderHeat();renderMix();
-  renderAdminPlanner();renderAdminBlueprints();renderAdminCalls();
+  renderPeriod();renderKPIs();renderRadar();renderCheckins();renderLeaderboard();renderHeat();renderMix();
+  renderAdminPlanner();renderAdminCalls();
   fillRepSelect();renderRep();
 }
 async function init(){
   await loadData();
   if(MODE==="rep")setView("rep");
   renderAll();
+  paneIn(MODE==="locked" ? $("lockout") : $("view-"+(MODE==="rep"?"rep":"team")));
   if(CONFIG.USE_LIVE_DATA)setInterval(async()=>{await loadData();renderAll();},CONFIG.REFRESH_MS);
 }
 init();
