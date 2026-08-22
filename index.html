@@ -649,6 +649,13 @@ const REP_PARAM=(new URLSearchParams(location.search).get("rep")||"").trim();
    sync status and form link move into a light toolbar; and the page reports
    its height so the hub's iframe can grow instead of double-scrolling. ── */
 const EMBED=new URLSearchParams(location.search).has("embed");
+
+/* The coach's front door is now the hub's Performance tab. A bare visit to
+   this page — no personal ?rep= link, not embedded — goes there. Rep links,
+   the embed, the lockout for dead links, and local dev are all untouched. */
+if(!REP_PARAM && !EMBED && location.hostname === "allinalan.github.io")
+  location.replace("https://allinalan.github.io/sna-master-hub/#perf");
+
 if(EMBED){
   document.body.classList.add("embed");
   const bar=document.createElement("div"); bar.className="embed-bar";
