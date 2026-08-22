@@ -223,6 +223,24 @@
   .note .row b{color:var(--ink);font-weight:600}
 
   .hidden{display:none}
+
+  /* ── embed mode: the hub's Performance tab loads this page in an iframe with
+     ?embed=1 — no masthead, no footer, no grain (the hub provides all three).
+     The Team/Rep toggle + status + form link move into a light toolbar. ── */
+  body.embed{padding-bottom:26px}
+  body.embed header,body.embed .foot{display:none}
+  body.embed::after{display:none}
+  body.embed .period{padding-top:10px}
+  .embed-bar{display:none}
+  body.embed .embed-bar{display:flex;gap:9px;align-items:center;flex-wrap:wrap;padding:16px 0 0}
+  body.embed .embed-bar .head-right{margin-left:0;display:flex;align-items:center;gap:11px;flex-wrap:wrap;width:100%}
+  body.embed .embed-bar .status{color:var(--ink-faint);margin-left:auto;order:3}
+  body.embed .embed-bar .dot{box-shadow:none}
+  body.embed .toggle{border-color:var(--line);background:var(--paper-deep)}
+  body.embed .toggle button{color:var(--ink-soft)}
+  body.embed .toggle button:hover{color:var(--ink)}
+  body.embed .toggle button.on{background:var(--card-raised);color:var(--ink);
+    box-shadow:0 1px 3px rgba(28,23,18,.14),inset 0 0 0 1px var(--line)}
   .foot{margin-top:60px;border-top:1px solid var(--line);padding-top:20px;font-family:var(--monof);font-size:10px;letter-spacing:.03em;color:var(--ink-faint);line-height:1.8}
   .foot b{color:var(--ink-soft)}
 
@@ -325,6 +343,7 @@
   .ptable td.pw-exp,.ptable td.pw-act{font-weight:600}
   .ptable tr.wk-now td{background:var(--accent-soft)}
   @media(max-width:880px){.assume{grid-template-columns:1fr 1fr}}
+  @media(max-width:430px){.assume{grid-template-columns:1fr}}
 
   /* page entrance — once per view switch */
   @keyframes pageIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
@@ -624,6 +643,23 @@ const CONFIG = {
 /* ── Identity: ?rep=<RepID> locks the page to that one rep (their personal link).
    Bare URL = Admin (coach) view. No picker fallback — an unknown id shows a lockout. ── */
 const REP_PARAM=(new URLSearchParams(location.search).get("rep")||"").trim();
+
+/* ── ?embed=1: running inside the hub's Performance tab. The chrome the hub
+   already provides (masthead, footer, grain) comes off; the Team/Rep toggle,
+   sync status and form link move into a light toolbar; and the page reports
+   its height so the hub's iframe can grow instead of double-scrolling. ── */
+const EMBED=new URLSearchParams(location.search).has("embed");
+if(EMBED){
+  document.body.classList.add("embed");
+  const bar=document.createElement("div"); bar.className="embed-bar";
+  const wrap=document.querySelector(".wrap");
+  bar.appendChild(document.querySelector(".head-right"));
+  wrap.insertBefore(bar,wrap.firstChild);
+  const report=()=>parent.postMessage({type:"sna-dash-h",h:document.documentElement.scrollHeight},"*");
+  new ResizeObserver(report).observe(document.body);
+  window.addEventListener("load",report);
+  setInterval(report,1500);
+}
 let MODE=REP_PARAM?"pending":"admin";   // resolved to rep|locked after first data load
 let ME=null;                            // the locked rep's merged data row (rep mode)
 
