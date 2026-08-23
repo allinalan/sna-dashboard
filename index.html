@@ -624,6 +624,16 @@
     </div>
   </div>
 
+  <!-- gated: personal rep dashboards aren't launched yet (CONFIG.REP_LINKS_LIVE) -->
+  <div id="gated" class="hidden" style="text-align:center;padding:90px 20px">
+    <div class="mark serif" style="margin:0 auto 18px;width:52px;height:52px;font-size:24px">忍</div>
+    <div class="serif" style="font-size:26px;font-weight:600">Your dashboard is almost ready</div>
+    <div style="font-size:13px;color:var(--ink-soft);margin-top:10px;line-height:1.7">
+      Personal dashboards haven't launched yet &mdash; Alan will text you<br>
+      your link the moment they go live. Keep those check-ins coming. 🥷
+    </div>
+  </div>
+
 
   <div class="foot">
     <div class="foot-grid">
@@ -637,6 +647,7 @@
 /* ═══════════════ CONFIG — flip to go live ═══════════════ */
 const CONFIG = {
   USE_LIVE_DATA: true,
+  REP_LINKS_LIVE: false,   // flip to true (and redeploy) when reps may open ?rep= links; coaches unaffected
   SHEET_ID: "1tFedrarhfz2_iQ7gYEa5Foh08SawwV9MhrtAjENAlfE",
   ROSTER_TAB: "Roster",
   WEEKLY_TAB: "Weekly",
@@ -855,6 +866,7 @@ async function loadData(){
 }
 function resolveIdentity(){
   if(!REP_PARAM){MODE="admin";ME=null;return;}
+  if(!CONFIG.REP_LINKS_LIVE){MODE="gated";ME=null;return;} // rep links not launched yet
   ME=DATA.find(r=>String(r.id).toLowerCase()===REP_PARAM.toLowerCase())||null;
   // only a trusted load may declare a link dead — a failed fetch gets the
   // retrying "offline" screen, never the lockout
@@ -1844,12 +1856,14 @@ function renderRep(){
 
 /* ═══════════════ MODE CHROME + INIT ═══════════════ */
 function applyMode(){
-  const isRep=MODE==="rep", locked=MODE==="locked", offline=MODE==="offline";
-  document.querySelector(".toggle").classList.toggle("hidden",isRep||locked||offline);
-  $("view-team").classList.toggle("hidden",isRep||locked||offline);
-  $("view-rep").classList.toggle("hidden",locked||offline||(!isRep&&!$("btn-rep").classList.contains("on")));
+  const isRep=MODE==="rep", locked=MODE==="locked", offline=MODE==="offline", gated=MODE==="gated";
+  const away=locked||offline||gated;
+  document.querySelector(".toggle").classList.toggle("hidden",isRep||away);
+  $("view-team").classList.toggle("hidden",isRep||away);
+  $("view-rep").classList.toggle("hidden",away||(!isRep&&!$("btn-rep").classList.contains("on")));
   $("lockout").classList.toggle("hidden",!locked);
   $("offline").classList.toggle("hidden",!offline);
+  $("gated").classList.toggle("hidden",!gated);
   $("rep-select").classList.toggle("hidden",isRep);
   $("rep-name-lock").classList.toggle("hidden",!isRep);
   $("rep-team-block").classList.toggle("hidden",!isRep);
@@ -1860,7 +1874,7 @@ function applyMode(){
 }
 function renderAll(){
   applyMode();
-  if(MODE==="locked"||MODE==="offline")return;
+  if(MODE==="locked"||MODE==="offline"||MODE==="gated")return;
   if(MODE==="rep"){
     renderRep();
     renderTeamKpisRep();
@@ -1877,7 +1891,7 @@ async function init(){
   await loadData();
   if(MODE==="rep")setView("rep");
   renderAll();
-  paneIn(MODE==="locked" ? $("lockout") : MODE==="offline" ? $("offline") : $("view-"+(MODE==="rep"?"rep":"team")));
+  paneIn(MODE==="locked" ? $("lockout") : MODE==="offline" ? $("offline") : MODE==="gated" ? $("gated") : $("view-"+(MODE==="rep"?"rep":"team")));
   if(CONFIG.USE_LIVE_DATA)setInterval(async()=>{
     const was=MODE;
     await loadData();
