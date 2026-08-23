@@ -647,7 +647,7 @@
 /* ═══════════════ CONFIG — flip to go live ═══════════════ */
 const CONFIG = {
   USE_LIVE_DATA: true,
-  REP_LINKS_LIVE: false,   // flip to true (and redeploy) when reps may open ?rep= links; coaches unaffected
+  REP_LINKS_LIVE: false,   // offline fallback only — the LIVE value is the hub's "Rep dashboard links" toggle (Settings tab RepLinks row, read via ?action=flags each refresh)
   SHEET_ID: "1tFedrarhfz2_iQ7gYEa5Foh08SawwV9MhrtAjENAlfE",
   ROSTER_TAB: "Roster",
   WEEKLY_TAB: "Weekly",
@@ -839,8 +839,17 @@ const SEED = [
 /* ═══════════════ DATA LOAD — one fetch feeds every view ═══════════════ */
 let DATA=[], ROSTER_RAW=[], CALLS_RAW=[], SURVEY_RAW=[], PLANNER_RAW=[];
 let HAVE_DATA=false; // a trusted load happened (live fetch, or seed by config)
+let REP_LINKS=CONFIG.REP_LINKS_LIVE; // runtime value of the hub's "Rep dashboard links" toggle; sticky across failed fetches
+async function loadFlags(){
+  if(!REP_PARAM)return; // only rep links care
+  try{
+    const f=await (await fetch(CONFIG.WEBAPP_URL+"?action=flags")).json();
+    if(f&&f.ok)REP_LINKS=!!f.repLinks;
+  }catch(e){} // unreachable: keep the last known value
+}
 async function loadData(){
   if(!CONFIG.USE_LIVE_DATA){DATA=SEED;HAVE_DATA=true;setSource(false);resolveIdentity();return;}
+  await loadFlags();
   try{
     const base=`https://docs.google.com/spreadsheets/d/${CONFIG.SHEET_ID}/gviz/tq?tqx=out:json&headers=1&sheet=`;
     const tab=async(name,optional)=>{ // optional tabs return [] until they exist
@@ -866,7 +875,7 @@ async function loadData(){
 }
 function resolveIdentity(){
   if(!REP_PARAM){MODE="admin";ME=null;return;}
-  if(!CONFIG.REP_LINKS_LIVE){MODE="gated";ME=null;return;} // rep links not launched yet
+  if(!REP_LINKS){MODE="gated";ME=null;return;} // rep links not launched yet (hub toggle, checked every refresh)
   ME=DATA.find(r=>String(r.id).toLowerCase()===REP_PARAM.toLowerCase())||null;
   // only a trusted load may declare a link dead — a failed fetch gets the
   // retrying "offline" screen, never the lockout
