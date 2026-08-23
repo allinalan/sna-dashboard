@@ -614,6 +614,16 @@
     </div>
   </div>
 
+  <!-- offline: data unreachable before the first load — retried automatically -->
+  <div id="offline" class="hidden" style="text-align:center;padding:90px 20px">
+    <div class="mark serif" style="margin:0 auto 18px;width:52px;height:52px;font-size:24px">忍</div>
+    <div class="serif" style="font-size:26px;font-weight:600">Connecting to your dashboard&hellip;</div>
+    <div style="font-size:13px;color:var(--ink-soft);margin-top:10px;line-height:1.7">
+      We can't reach the data right now. This page retries on its own every minute &mdash;<br>
+      check your connection, and text Alan if it still won't load.
+    </div>
+  </div>
+
 
   <div class="foot">
     <div class="foot-grid">
@@ -817,8 +827,9 @@ const SEED = [
 
 /* ═══════════════ DATA LOAD — one fetch feeds every view ═══════════════ */
 let DATA=[], ROSTER_RAW=[], CALLS_RAW=[], SURVEY_RAW=[], PLANNER_RAW=[];
+let HAVE_DATA=false; // a trusted load happened (live fetch, or seed by config)
 async function loadData(){
-  if(!CONFIG.USE_LIVE_DATA){DATA=SEED;setSource(false);resolveIdentity();return;}
+  if(!CONFIG.USE_LIVE_DATA){DATA=SEED;HAVE_DATA=true;setSource(false);resolveIdentity();return;}
   try{
     const base=`https://docs.google.com/spreadsheets/d/${CONFIG.SHEET_ID}/gviz/tq?tqx=out:json&headers=1&sheet=`;
     const tab=async(name,optional)=>{ // optional tabs return [] until they exist
@@ -831,15 +842,23 @@ async function loadData(){
     SURVEY_RAW=await tab(CONFIG.SURVEY_TAB,true);
     PLANNER_RAW=await tab(CONFIG.PLANNER_TAB,true);
     applyCampaign();
+    HAVE_DATA=true;
     setSource(true);
   }
-  catch(e){console.warn("Live fetch failed; using seed:",e);DATA=SEED;setSource(false);}
+  catch(e){
+    console.warn("Live fetch failed:",e);
+    if(HAVE_DATA){setSource("stale");return;}          // blip mid-session: keep last good data as-is
+    if(REP_PARAM){setSource("stale");resolveIdentity();return;} // rep with no data yet: connecting screen, never seed
+    DATA=SEED;setSource(false);                        // admin with no data yet: seed beats a blank page
+  }
   resolveIdentity();
 }
 function resolveIdentity(){
   if(!REP_PARAM){MODE="admin";ME=null;return;}
   ME=DATA.find(r=>String(r.id).toLowerCase()===REP_PARAM.toLowerCase())||null;
-  MODE=ME?"rep":"locked";
+  // only a trusted load may declare a link dead — a failed fetch gets the
+  // retrying "offline" screen, never the lockout
+  MODE=ME?"rep":(HAVE_DATA?"locked":"offline");
 }
 /* rows are stamped with their campaign at submit time; unstamped rows fall back to the
    timestamp − 6 days (check-ins cover the PREVIOUS week, so a Sep 1 submission is Summer's) */
@@ -877,9 +896,11 @@ function onCampaignChange(){
   resolveIdentity();
   renderAll();
 }
-function setSource(live){
-  document.getElementById("src-dot").className="dot"+(live?"":" seed");
-  document.getElementById("src-label").textContent=live?"Live · refreshes 60s":"Seed data";
+function setSource(state){ // true=live · false=seed · "stale"=offline, last good data kept
+  const dot=document.getElementById("src-dot"),lab=document.getElementById("src-label");
+  if(state==="stale"){dot.className="dot seed";lab.textContent="Offline — retrying every 60s";return;}
+  dot.className="dot"+(state?"":" seed");
+  lab.textContent=state?"Live · refreshes 60s":"Seed data";
 }
 let WEEKLY_RAW=[];
 async function gviz(url){
@@ -1823,11 +1844,12 @@ function renderRep(){
 
 /* ═══════════════ MODE CHROME + INIT ═══════════════ */
 function applyMode(){
-  const isRep=MODE==="rep", locked=MODE==="locked";
-  document.querySelector(".toggle").classList.toggle("hidden",isRep||locked);
-  $("view-team").classList.toggle("hidden",isRep||locked);
-  $("view-rep").classList.toggle("hidden",locked||(!isRep&&!$("btn-rep").classList.contains("on")));
+  const isRep=MODE==="rep", locked=MODE==="locked", offline=MODE==="offline";
+  document.querySelector(".toggle").classList.toggle("hidden",isRep||locked||offline);
+  $("view-team").classList.toggle("hidden",isRep||locked||offline);
+  $("view-rep").classList.toggle("hidden",locked||offline||(!isRep&&!$("btn-rep").classList.contains("on")));
   $("lockout").classList.toggle("hidden",!locked);
+  $("offline").classList.toggle("hidden",!offline);
   $("rep-select").classList.toggle("hidden",isRep);
   $("rep-name-lock").classList.toggle("hidden",!isRep);
   $("rep-team-block").classList.toggle("hidden",!isRep);
@@ -1838,7 +1860,7 @@ function applyMode(){
 }
 function renderAll(){
   applyMode();
-  if(MODE==="locked")return;
+  if(MODE==="locked"||MODE==="offline")return;
   if(MODE==="rep"){
     renderRep();
     renderTeamKpisRep();
@@ -1855,8 +1877,13 @@ async function init(){
   await loadData();
   if(MODE==="rep")setView("rep");
   renderAll();
-  paneIn(MODE==="locked" ? $("lockout") : $("view-"+(MODE==="rep"?"rep":"team")));
-  if(CONFIG.USE_LIVE_DATA)setInterval(async()=>{await loadData();renderAll();},CONFIG.REFRESH_MS);
+  paneIn(MODE==="locked" ? $("lockout") : MODE==="offline" ? $("offline") : $("view-"+(MODE==="rep"?"rep":"team")));
+  if(CONFIG.USE_LIVE_DATA)setInterval(async()=>{
+    const was=MODE;
+    await loadData();
+    if(was!=="rep"&&MODE==="rep")setView("rep"); // first successful load after offline/lockout
+    renderAll();
+  },CONFIG.REFRESH_MS);
 }
 init();
 </script>
