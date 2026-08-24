@@ -1610,7 +1610,12 @@ function renderRepCallCard(r){
     <div class="cc-main">
       <div style="font-family:'Spline Sans Mono';font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:4px">Your coaching call · ${monthName()}</div>
       <div class="cc-title">${b.title}</div><div class="cc-sub">${b.sub}</div>${notes}</div>
-    ${b.btn?`<a class="form-btn" href="${b.btn.url}" target="_blank" rel="noopener">${b.btn.lab}</a>`:""}
+    ${(()=>{ // booking is ALWAYS one click away, whatever state the card is in
+      const book={lab:"Book your 1-1 ↗",url:CONFIG.CALENDLY_URL};
+      const btns=[b.btn,(!b.btn||b.btn.url!==CONFIG.CALENDLY_URL)?book:null].filter(Boolean)
+        .map(x=>`<a class="form-btn" href="${x.url}" target="_blank" rel="noopener">${x.lab}</a>`).join("");
+      return btns?`<div style="display:flex;flex-direction:column;gap:8px;align-items:stretch">${btns}</div>`:"";
+    })()}
   </div>`;
 }
 function renderAdminCalls(){
