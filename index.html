@@ -699,7 +699,7 @@ const CHANNELS = [
   {key:"marketing", label:"Marketing Sales"},
   {key:"bizgift",   label:"Biz Gift / RLT"}
 ];
-const PERIOD = { weeks:18 };  // every campaign runs weeks 1–18
+const PERIOD = { weeks:17 };  // every campaign runs weeks 1–17
 
 /* ── Campaigns: Spring (I) Jan–Apr · Summer (II) May–Aug · Fall (III) Sep–Dec.
    Every Weekly row is stamped with its campaign at submit time, so week
@@ -1062,7 +1062,9 @@ const pman=x=>{const v=pnum(x);return v&&v>0?v:null;}; // stored 0/blank = "use 
 function plannerFor(r){
   const row=PLANNER_RAW.find(p=>String(p.RepID)===String(r.id)&&String(p.Campaign||"").trim()===PLAN_CAMPAIGN)||null;
   const auto=autoAssumptions(r);
-  const weeks=(row&&+row.Weeks)||PERIOD.weeks;
+  // clamp: a planner row saved under the old 18-week campaign must not draw a
+  // longer grid than the campaign actually runs
+  const weeks=Math.min((row&&+row.Weeks)||PERIOD.weeks,PERIOD.weeks);
   const start=(row&&ciParseDate(row.CampaignStart))||campaignStartDefault(PLAN_CAMPAIGN);
   const manual={dc:pman(row&&row.DemoCompPct),dcl:pman(row&&row.DemoClosePct),dav:pman(row&&row.DemoAvgOrder),
                 sc:pman(row&&row.SvcCompPct),scl:pman(row&&row.SvcClosePct),sav:pman(row&&row.SvcAvgOrder),
