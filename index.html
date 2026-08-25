@@ -1745,9 +1745,8 @@ function renderRepContext(r){
   const chips=[`<span class="chip tier"><b>${r.tier}</b> · ${fmtPay(r.pay)}</span>`];
   if(set(r.region)) chips.push(`<span class="chip">Region <b>${set(r.region)}</b></span>`);
   if(set(r.manager))chips.push(`<span class="chip">Manager <b>${set(r.manager)}</b></span>`);
-  // "Coach target" — the free-text goal agreed with a coach, distinct from the
-  // numeric Campaign goal that drives the planner math
-  if(set(r.goal))   chips.push(`<span class="chip">Coach target <b>${set(r.goal)}</b></span>`);
+  // the roster's free-text goal is deliberately NOT shown here (Alan's call,
+  // 2026-08-24) — the planner's Campaign goal is the one number reps see
   if(r.joinWeek>1)chips.push(`<span class="chip new">Joined week ${r.joinWeek} · partial campaign</span>`);
   $("rep-context").innerHTML=chips.join("");
 }
