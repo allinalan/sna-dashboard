@@ -578,6 +578,17 @@
       <div id="rep-planner"></div>
     </div>
 
+    <!-- mini version of allinalan.github.io/sna-fall-goal-breakdown — same math,
+         plus an events input, so the goal translates into appointments to book -->
+    <div class="section" id="fall-break-sec">
+      <div class="section-head">
+        <h2 class="serif" id="fb-title">Fall Appointment Goal Breakdown</h2>
+        <span class="hint">your goal, translated into appointments —
+          <a href="https://allinalan.github.io/sna-fall-goal-breakdown/" target="_blank" rel="noopener" style="color:var(--accent)">full breakdown ↗</a></span>
+      </div>
+      <div id="fall-break"></div>
+    </div>
+
 
     <!-- team aggregates + leaderboard — the ONLY peer visibility in rep mode -->
     <div id="rep-team-block" class="hidden">
@@ -1596,6 +1607,67 @@ function callCardBits(cs){
   if(cs.status==="booked")return {title:`Booked for ${cs.upcoming.toLocaleDateString(undefined,{weekday:"long",month:"short",day:"numeric"})}`,sub:cs.upcoming.toLocaleTimeString(undefined,{hour:"numeric",minute:"2-digit"})+(cs.req>1?` · ${cs.completed}/${cs.req} this month`:""),btn:null};
   return {title:`Book your ${month} call`,sub:`${cs.req}/month for your tier · this is your formal 1-on-1, separate from weekly standards`,btn:{lab:"Book on Calendly ↗",url:CONFIG.CALENDLY_URL}};
 }
+/* ── Fall Appointment Goal Breakdown (mini) ─────────────────────────────────
+   The same chain as the standalone tool — goal ÷ avg order = orders,
+   ÷ closing% = demos held, ÷ completion% = demos to BOOK, ÷ 17 weeks —
+   with one addition: expected event sales come off the goal first, because
+   event $ doesn't need appointments. Prefills the goal from the Fall planner
+   and the ratios from the rep's own stats once the 6-check-in gate opens;
+   typed values survive the 60s refresh (the card only rebuilds on rep change). */
+function renderFallBreakdown(r){
+  const box=$("fall-break"); if(!box)return;
+  const season=PLAN_CAMPAIGN.split(" ")[0];
+  $("fb-title").textContent=(MODE==="rep"?"Your ":"")+season+" Appointment Goal Breakdown";
+  if(box.dataset.rep!==String(r.id)){
+    const plan=plannerFor(r),a=plan.auto.demo,ok=a.n>=PLAN_MIN_ENTRIES;
+    const pre={goal:plan.cpoGoal??"",avg:(ok&&a.avg)||500,close:(ok&&a.close)||50,comp:(ok&&a.comp)||80};
+    const inp=(id,lab,val,ph)=>`<label>${lab}<input id="${id}" inputmode="decimal" value="${val}" placeholder="${ph||""}" oninput="fbCalc()"></label>`;
+    box.innerHTML=`<div class="ag">
+      <div class="ah">${PLAN_CAMPAIGN} · appointments to hit your goal
+        <span class="hint" style="text-transform:none;letter-spacing:0">event sales come off the top</span></div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(115px,1fr));gap:8px">
+        ${inp("fb-goal",season+" goal $",pre.goal,"e.g. 8000")}
+        ${inp("fb-ev","Event sales $","","0 if no events")}
+        ${inp("fb-avg","Avg order $",pre.avg)}
+        ${inp("fb-close","Closing %",pre.close)}
+        ${inp("fb-comp","Completion %",pre.comp)}
+      </div>
+      <div id="fb-out" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-top:12px"></div>
+      <div class="hint" id="fb-note" style="margin-top:9px"></div>
+    </div>`;
+    box.dataset.rep=String(r.id);
+  }
+  fbCalc();
+}
+function fbCalc(){
+  const out=$("fb-out"),note=$("fb-note"); if(!out)return;
+  const g=id=>{const x=parseFloat(String(($(id)||{}).value||"").replace(/[^0-9.]/g,""));return isFinite(x)?x:0;};
+  const goal=g("fb-goal"),ev=g("fb-ev"),avg=g("fb-avg"),
+        close=Math.min(g("fb-close"),100),comp=Math.min(g("fb-comp"),100);
+  if(!(goal>0&&avg>0&&close>0&&comp>0)){
+    out.innerHTML=`<div class="hint">type in your fall goal above and the appointment math appears here</div>`;
+    note.textContent="";return;
+  }
+  const demoGoal=Math.max(0,goal-ev);
+  if(demoGoal===0){
+    out.innerHTML=`<div class="kpi"><div class="lab">Appointments needed</div><div class="val" style="font-size:22px">0</div>
+      <div class="meta">your event sales alone cover the whole goal — every appointment on top is gravy</div></div>`;
+    note.textContent="";return;
+  }
+  const orders=demoGoal/avg, held=orders/(close/100), booked=held/(comp/100);
+  const perWk=Math.ceil(booked/PERIOD.weeks), heldWk=Math.ceil(held/PERIOD.weeks);
+  out.innerHTML=
+    `<div class="kpi"><div class="lab">Book per week</div><div class="val" style="font-size:22px">${perWk}</div>
+       <div class="meta">appointments, every week for ${PERIOD.weeks}</div></div>`+
+    `<div class="kpi"><div class="lab">Whole fall</div><div class="val" style="font-size:22px">${Math.ceil(booked).toLocaleString()}</div>
+       <div class="meta">appointments booked total</div></div>`+
+    `<div class="kpi"><div class="lab">Held per week</div><div class="val" style="font-size:22px">${heldWk}</div>
+       <div class="meta">appointments that actually happen</div></div>`;
+  note.innerHTML=ev>0
+    ?`appointments carry ${money(demoGoal)} of the goal — the other ${money(Math.min(ev,goal))} rides on your event shifts`
+    :`no event sales entered, so appointments carry the whole ${money(goal)} — working events this fall? put the expected $ in`;
+}
+
 function renderRepCallCard(r){
   const sec=$("rep-call-sec");
   if(MODE!=="rep"){sec.classList.add("hidden");return;}
@@ -1866,7 +1938,7 @@ function renderRep(){
   const r=currentRep(); if(!r)return;
   renderCallPrep(r);
   renderRepContext(r);renderGoalsStrip(r);renderHero(r);renderSummary(r);renderChart();renderChannels(r);renderDiagnostics(r);renderStandards(r);renderNotes(r);
-  renderCallNotes(r);renderRepPlanner(r);renderRepCallCard(r);
+  renderCallNotes(r);renderRepPlanner(r);renderFallBreakdown(r);renderRepCallCard(r);
   // brand-new rep (no check-ins this campaign): collapse the data sections
   // into one starter card so the page leads with what they can DO
   const collapse=MODE==="rep"&&activeWeeks(r)===0;
