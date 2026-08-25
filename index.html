@@ -1828,9 +1828,11 @@ function renderGoalsStrip(r){
   const el=$("goals-strip"); if(!el)return;
   const plan=plannerFor(r);
   const season=(r.goal&&r.goal!=="—")?r.goal:null;
+  // two different numbers on purpose: the target you agreed vs the arithmetic
+  // of your own week-by-week grid. Seeing them side by side shows the gap.
   const tiles=[
-    {lab:"Season goal",val:season??"—",meta:"what you set with your coach"},
-    {lab:"Campaign plan",val:money(plan.cpoGoal),meta:"what your weekly plan adds up to"}
+    {lab:"Campaign goal",val:season??"—",meta:"the target you set with your coach"},
+    {lab:"Planned total",val:money(plan.cpoGoal),meta:"what your week-by-week planner adds up to"}
   ];
   el.classList.remove("hidden");
   el.innerHTML=tiles.map(t=>`<div class="kpi"><div class="lab">${t.lab}</div><div class="val" style="font-size:20px">${t.val}</div><div class="meta">${t.meta}</div></div>`).join("");
