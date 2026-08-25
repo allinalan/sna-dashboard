@@ -1668,12 +1668,14 @@ function fmtPay(p){
   return p||"—";
 }
 function renderRepContext(r){
-  const chips=[
-    `<span class="chip tier"><b>${r.tier}</b> · ${fmtPay(r.pay)}</span>`,
-    `<span class="chip">Region <b>${r.region}</b></span>`,
-    `<span class="chip">Manager <b>${r.manager}</b></span>`,
-    `<span class="chip">Goal <b>${r.goal}</b></span>`
-  ];
+  // blank roster fields used to render the literal word "null" at the rep
+  const set=v=>{const s=String(v??"").trim();return s&&s!=="null"&&s!=="—"?s:null;};
+  const chips=[`<span class="chip tier"><b>${r.tier}</b> · ${fmtPay(r.pay)}</span>`];
+  if(set(r.region)) chips.push(`<span class="chip">Region <b>${set(r.region)}</b></span>`);
+  if(set(r.manager))chips.push(`<span class="chip">Manager <b>${set(r.manager)}</b></span>`);
+  // "Coach target" — the free-text goal agreed with a coach, distinct from the
+  // numeric Campaign goal that drives the planner math
+  if(set(r.goal))   chips.push(`<span class="chip">Coach target <b>${set(r.goal)}</b></span>`);
   if(r.joinWeek>1)chips.push(`<span class="chip new">Joined week ${r.joinWeek} · partial campaign</span>`);
   $("rep-context").innerHTML=chips.join("");
 }
@@ -1827,12 +1829,14 @@ function renderCallNotes(r){
 function renderGoalsStrip(r){
   const el=$("goals-strip"); if(!el)return;
   const plan=plannerFor(r);
-  const season=(r.goal&&r.goal!=="—")?r.goal:null;
-  // two different numbers on purpose: the target you agreed vs the arithmetic
-  // of your own week-by-week grid. Seeing them side by side shows the gap.
+  // Deliberately the SAME two numbers, under the SAME names, as the planner
+  // below — one target, one projection. The roster's free-text goal is a coach
+  // note ("silver cup"), not a number, so it stays a context chip up top.
   const tiles=[
-    {lab:"Campaign goal",val:season??"—",meta:"the target you set with your coach"},
-    {lab:"Planned total",val:money(plan.cpoGoal),meta:"what your week-by-week planner adds up to"}
+    {lab:"Campaign goal",val:money(plan.cpoGoal),
+     meta:plan.cpoGoal==null?"set it in your planner below":"the target your plan is built to hit"},
+    {lab:"Projected total",val:money(plan.projected),
+     meta:"what your week-by-week plan adds up to"}
   ];
   el.classList.remove("hidden");
   el.innerHTML=tiles.map(t=>`<div class="kpi"><div class="lab">${t.lab}</div><div class="val" style="font-size:20px">${t.val}</div><div class="meta">${t.meta}</div></div>`).join("");
