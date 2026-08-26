@@ -620,8 +620,9 @@
     <div class="mark serif" style="margin:0 auto 18px;width:52px;height:52px;font-size:24px">忍</div>
     <div class="serif" style="font-size:26px;font-weight:600">This link isn't active</div>
     <div style="font-size:13px;color:var(--ink-soft);margin-top:10px;line-height:1.7">
-      Your personal dashboard link couldn't be matched to an active mentee.<br>
-      Text Alan for a fresh link.
+      We couldn't match this link to an active mentee.<br>
+      Try a hard refresh first &mdash; <b>Ctrl+Shift+R</b> on Windows, <b>Cmd+Shift+R</b> on Mac.<br>
+      If it still says this, text Alan for a fresh link.
     </div>
   </div>
 
@@ -891,6 +892,20 @@ function resolveIdentity(){
   // only a trusted load may declare a link dead — a failed fetch gets the
   // retrying "offline" screen, never the lockout
   MODE=ME?"rep":(HAVE_DATA?"locked":"offline");
+  // A browser running a STALE CACHED copy of this page is indistinguishable
+  // from a dead link to the rep — both land on "This link isn't active".
+  // (Romeo, 2026-08-26: fine on his phone, locked out on his laptop, which was
+  // still running pre-fix code that fell back to r01–r23 seed data.) So before
+  // accusing the link, force ONE cache-busting reload; if the id is still
+  // unknown after fresh code has run, it really is unknown.
+  if(MODE==="locked"&&!sessionStorage.getItem("sna_freshened")){
+    try{
+      sessionStorage.setItem("sna_freshened","1");
+      const u=new URL(location.href);
+      u.searchParams.set("v",Date.now());
+      location.replace(u.toString());
+    }catch(e){}   // storage blocked → skip the retry rather than risk a loop
+  }
 }
 /* rows are stamped with their campaign at submit time; unstamped rows fall back to the
    timestamp − 6 days (check-ins cover the PREVIOUS week, so a Sep 1 submission is Summer's) */
