@@ -272,6 +272,61 @@
   .cc-note{font-size:12.5px;background:rgba(255,253,246,.7);border:1px solid var(--line-soft);border-radius:10px;padding:10px 12px;line-height:1.5}
   .cc-note b{font-family:var(--monof);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft);display:block;margin-bottom:2px}
 
+  /* ═══ weekly card + assignment pills (rep page) ═══ */
+  .wk-card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px 20px;box-shadow:0 1px 2px rgba(28,23,18,.04)}
+  .wk-title{font-family:var(--serif);font-size:22px;font-weight:560;letter-spacing:-.01em;margin:6px 0 10px}
+  .wk-row{display:grid;grid-template-columns:14px minmax(0,1fr) auto;gap:12px;align-items:start;padding:11px 0;border-top:1px solid var(--line-soft)}
+  .wk-row .wd{width:9px;height:9px;border-radius:50%;margin-top:6px}
+  .wd.good{background:var(--good);box-shadow:0 0 0 3px var(--good-bg)}
+  .wd.warn{background:var(--warn);box-shadow:0 0 0 3px var(--warn-bg)}
+  .wd.bad{background:var(--bad);box-shadow:0 0 0 3px var(--bad-bg)}
+  .wd.brass{background:var(--brass);box-shadow:0 0 0 3px #EFE7D2}
+  .wk-row .wl{font-family:var(--monof);font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-soft)}
+  .wk-row .wt{font-weight:600;margin-top:2px}
+  .wk-row .ws{font-size:12.5px;color:var(--ink-soft)}
+  .wk-btns{display:flex;flex-direction:column;gap:8px;align-items:stretch}
+  button.form-btn{cursor:pointer}
+  .form-btn.ghost{background:transparent;color:var(--accent)}
+  .form-btn.ghost:hover{background:var(--accent-soft)}
+  .al{display:flex;justify-content:space-between;gap:10px;padding:4px 0;font-size:13px;cursor:pointer}
+  .al:hover{color:var(--accent)}
+  .al .ad{color:var(--ink-soft);white-space:nowrap;font-family:var(--monof);font-size:11px}
+  .pill{display:inline-block;font-family:var(--monof);font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;border-radius:999px;padding:2px 8px;margin-left:6px;font-weight:500;vertical-align:middle}
+  .pill.open{background:var(--warn-bg);color:var(--warn)}
+  .pill.late{background:var(--bad-bg);color:var(--bad)}
+  .pill.waiting,.pill.revise,.pill.approved{background:var(--good-bg);color:var(--good)}
+  .pill.na{background:var(--line-soft);color:var(--ink-faint)}
+
+  /* ═══ assignments section ═══ */
+  .as-card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px;box-shadow:0 1px 2px rgba(28,23,18,.04)}
+  .as-card.s-late{border-color:#DFBEAC}
+  .as-card.s-revise{border-color:var(--accent)}
+  .as-head{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:flex-start}
+  .as-title{font-family:var(--serif);font-size:17px;font-weight:560;letter-spacing:-.008em}
+  .as-meta{font-family:var(--monof);font-size:10.5px;color:var(--ink-soft);margin-top:4px;display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+  .as-prog{font-family:var(--monof);font-size:9px;letter-spacing:.08em;text-transform:uppercase;border:1px solid var(--line-strong);border-radius:5px;padding:1px 6px;color:var(--ink-soft)}
+  .as-prog.dojo{border-color:var(--good);color:var(--good)}
+  .as-prog.path{border-color:var(--accent);color:var(--accent)}
+  .as-prog.masters{border-color:#6B62B8;color:#6B62B8}
+  .as-instr{font-size:13px;color:var(--ink-soft);margin-top:8px;white-space:pre-wrap;line-height:1.55}
+  .as-instr.clip{max-height:44px;overflow:hidden}
+  .as-more{font-family:var(--monof);font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--accent);background:none;border:none;cursor:pointer;padding:4px 0}
+  .as-thread{margin-top:10px;display:grid;gap:8px}
+  .as-ver{background:rgba(255,253,246,.7);border:1px solid var(--line-soft);border-radius:10px;padding:10px 12px;font-size:12.5px;line-height:1.5}
+  .as-ver .vh{font-family:var(--monof);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:4px}
+  .as-ver .vt{white-space:pre-wrap}
+  .as-fb{margin-top:8px;border-left:3px solid var(--accent);padding:6px 10px;background:var(--accent-soft);border-radius:0 8px 8px 0}
+  .as-fb .vh{color:var(--accent-ink)}
+  .as-form{background:var(--card);border:1px solid var(--line-strong);border-radius:12px;padding:14px 16px;display:grid;gap:10px}
+  .as-form label{font-family:var(--monof);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft);display:block}
+  .as-form select,.as-form input[type=url],.as-form textarea{width:100%;margin-top:4px;font-family:var(--sans);font-size:13px;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:var(--paper);color:var(--ink)}
+  .as-form textarea{min-height:110px;resize:vertical}
+  .as-form input[type=file]{margin-top:4px;font-size:12px;display:block}
+  .as-msg{font-size:12.5px;color:var(--ink-soft)}
+  .as-msg.err{color:var(--bad)}
+  .as-msg.ok{color:var(--good)}
+  .as-actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+
   /* ── planner ── */
   .plan-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px 24px;margin-bottom:16px;align-items:stretch}
   .plan-hero{grid-column:span 2;background:linear-gradient(180deg,var(--shell-hi),var(--shell));color:var(--shell-text);border-radius:14px;padding:16px;
@@ -423,7 +478,7 @@
     <div class="section hidden" id="ci-section">
       <div class="section-head">
         <h2 class="serif">This Week's Check-Ins</h2>
-        <span class="hint">for coaches — reminders go out Mon &amp; Tue</span>
+        <span class="hint">for coaches — reminders go out Tue &amp; Wed</span>
       </div>
       <div class="ci-lead" id="ci-lead"></div>
       <div class="ci-grid" id="ci-grid"></div>
@@ -486,8 +541,9 @@
 
   <!-- ════ REP (admin deep-dive AND the locked rep page share this) ════ -->
   <div id="view-rep" class="hidden">
-    <div class="section hidden" id="rep-call-sec" style="margin-top:24px">
-      <div id="rep-call-card"></div>
+    <!-- the rep's week at a glance: check-in · assignments · 1-on-1 (Path/Masters) · next group call -->
+    <div class="section hidden" id="week-sec" style="margin-top:24px">
+      <div id="week-card"></div>
     </div>
 
     <div class="rep-pick">
@@ -498,6 +554,14 @@
     <div class="rep-context" id="rep-context"></div>
 
     <div class="kpis hidden" id="goals-strip" style="grid-template-columns:repeat(2,1fr);margin-top:16px"></div>
+
+    <!-- assignments: the catalog for this rep's program(s), their submissions + coach feedback -->
+    <div class="section hidden" id="assign-sec">
+      <div class="section-head"><h2 class="serif" id="as-title">Assignments</h2><span class="hint" id="as-hint"></span></div>
+      <div class="camp-pills" id="assign-pills"></div>
+      <div id="assign-form"></div>
+      <div id="assign-list" style="display:grid;gap:12px;margin-top:14px"></div>
+    </div>
 
     <!-- coaches: the 1-on-1 in one glance (admin mode only) -->
     <div class="section hidden" id="prep-sec" style="margin-top:24px">
@@ -511,7 +575,7 @@
         <div class="cc-main">
           <div class="lab" style="font-family:'Spline Sans Mono';font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft)">Your stats build here</div>
           <div class="cc-title" style="margin-top:6px">First check-in unlocks this page</div>
-          <div class="cc-sub">After your first weekly check-in, this fills with your sales, weekly trend, channel breakdowns, and standards — all computed from what you report. Two minutes, every Monday.</div>
+          <div class="cc-sub">After your first weekly check-in, this fills with your sales, weekly trend, channel breakdowns, and standards — all computed from what you report. Two minutes, every Tuesday.</div>
         </div>
         <a class="form-btn" href="https://docs.google.com/forms/d/e/1FAIpQLSdIAf_SaV1m2ASTN4YzEBeVxp7o-gkIBXqhCCbO5vmuNh7cTQ/viewform" target="_blank" rel="noopener">Do my check-in ↗</a>
       </div>
@@ -666,6 +730,13 @@ const CONFIG = {
   CALLS_TAB: "Calls",           // RepID · Month · Status · CallDateTime · Coach
   SURVEY_TAB: "CallSurvey",     // Timestamp · RepID · Month · Takeaways · ActionSteps
   PLANNER_TAB: "Planner",       // per rep per campaign planner inputs
+  ASSIGN_TAB: "Assignments",            // catalog — spec §5.1
+  OVERRIDE_TAB: "AssignmentOverrides",  // per-rep due date / NA — §5.2
+  SUBMISSION_TAB: "Submissions",        // one row per version — §5.3
+  WEEKLY_FORM_URL: "https://docs.google.com/forms/d/e/1FAIpQLSdIAf_SaV1m2ASTN4YzEBeVxp7o-gkIBXqhCCbO5vmuNh7cTQ/viewform",
+  HUB_URL: "https://allinalan.github.io/sna-master-hub/",
+  HUB_SYNC_URL: "https://script.google.com/macros/s/AKfycbyw7ngyqNuO9AHQnCeb1paTfoDRWX1sTkJMlhC2zB9BKDuo_O-SF9XWke2e1QiA_Y9A/exec?token=sharpninja", // the hub's calendar feed (token already public in the hub source)
+  ASSIGN_FILE_MAX: 25*1024*1024,
   CALENDLY_URL: "https://calendly.com/sharp-ninja-academy",
   SURVEY_FORM_URL: "https://docs.google.com/forms/d/e/1FAIpQLSedU7b3dOX6JQs8fcRJbqB5q3dmbEc9fSoUm-rmpK9484R4cQ/viewform",
   WEBAPP_URL: "https://script.google.com/macros/s/AKfycbyNFDkgEAUT5IDNw4wvCHLQZoe70XxVwgAZmG8bNTmlkY8t0d-wL2eKa53kgke2AOCHPQ/exec",
@@ -850,6 +921,9 @@ const SEED = [
 
 /* ═══════════════ DATA LOAD — one fetch feeds every view ═══════════════ */
 let DATA=[], ROSTER_RAW=[], CALLS_RAW=[], SURVEY_RAW=[], PLANNER_RAW=[];
+let ASSIGN_RAW=[], OVERRIDE_RAW=[], SUB_RAW=[];   // assignments — spec §5
+let HUB_CAL=null;                                 // {calendar,topicTiers,callTime} from the hub, or null
+let ASSIGN_CAMPAIGN=null;                         // campaign shown in the Assignments section (defaults to current)
 let HAVE_DATA=false; // a trusted load happened (live fetch, or seed by config)
 let REP_LINKS=CONFIG.REP_LINKS_LIVE; // runtime value of the hub's "Rep dashboard links" toggle; sticky across failed fetches
 async function loadFlags(){
@@ -873,6 +947,10 @@ async function loadData(){
     CALLS_RAW=await tab(CONFIG.CALLS_TAB,true);
     SURVEY_RAW=await tab(CONFIG.SURVEY_TAB,true);
     PLANNER_RAW=await tab(CONFIG.PLANNER_TAB,true);
+    const nonEmpty=rows=>rows.filter(o=>Object.values(o).some(v=>v!=null&&String(v).trim()!==""));
+    ASSIGN_RAW=nonEmpty(await tab(CONFIG.ASSIGN_TAB,true));
+    OVERRIDE_RAW=nonEmpty(await tab(CONFIG.OVERRIDE_TAB,true));
+    SUB_RAW=nonEmpty(await tab(CONFIG.SUBMISSION_TAB,true));
     applyCampaign();
     HAVE_DATA=true;
     setSource(true);
@@ -987,6 +1065,50 @@ function mergeSheet(roster,weekly){
 
 /* ═══════════════ HELPERS ═══════════════ */
 const $=id=>document.getElementById(id);
+
+/*ASSIGN_STATE_BEGIN*/
+/* Assignment state rules — ONE rule set, copied verbatim into the dashboard and
+   the hub. $S/assign-state.test.js proves the two copies agree. Spec §5.5. */
+const ASSIGN_RANK={dojo:1,path:2,masters:3};
+function tierRank(t){return ASSIGN_RANK[String(t||"").trim().toLowerCase()]||2;}
+function tierName(t){const k=String(t||"").trim().toLowerCase();return k==="dojo"?"Dojo":k==="masters"?"Masters":"Path";}
+function assignPrograms(a){
+  const out=[];
+  String((a&&a.Programs)||"").split(",").map(s=>s.trim()).filter(Boolean).forEach(s=>{const n=tierName(s);if(out.indexOf(n)<0)out.push(n);});
+  return out;
+}
+function assignBase(a){const ps=assignPrograms(a).slice().sort((x,y)=>tierRank(x)-tierRank(y));return ps[0]||"Path";}
+function dueISO(v){
+  if(v==null||v==="")return "";
+  const pad=n=>String(n).padStart(2,"0");
+  if(v instanceof Date)return isNaN(v)?"":v.getFullYear()+"-"+pad(v.getMonth()+1)+"-"+pad(v.getDate());
+  const s=String(v).trim();
+  if(/^na$/i.test(s))return "NA";
+  let m=s.match(/^(\d{4})-(\d{2})-(\d{2})/); if(m)return m[1]+"-"+m[2]+"-"+m[3];
+  m=s.match(/^Date\((\d+),(\d+),(\d+)/); if(m)return m[1]+"-"+pad(+m[2]+1)+"-"+pad(+m[3]);
+  const d=new Date(s); return isNaN(d)?"":d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate());
+}
+function assignState(rep,a,overrides,subs,today){
+  const tier=tierName(rep.tier);
+  const ov=(overrides||[]).find(o=>String(o.AssignmentID)===String(a.AssignmentID)&&String(o.RepID)===String(rep.id))||null;
+  const ovDue=ov?dueISO(ov.DueDate):"";
+  const active=String(a.Active==null||a.Active===""?"Y":a.Active).trim().toUpperCase()!=="N";
+  if(!active||assignPrograms(a).indexOf(tier)<0||ovDue==="NA")return {state:"na",due:null,versions:[],latest:null,override:ov};
+  const due=ovDue||dueISO(a.DueDate)||null;
+  const versions=(subs||[]).filter(s=>String(s.AssignmentID)===String(a.AssignmentID)&&String(s.RepID)===String(rep.id))
+    .slice().sort((x,y)=>(+x.Version||0)-(+y.Version||0));
+  const latest=versions[versions.length-1]||null;
+  let state;
+  if(!latest)state=(due&&today>due)?"late":"open";
+  else{const st=String(latest.Status||"submitted").trim().toLowerCase();state=st==="approved"?"approved":st==="revise"?"revise":"waiting";}
+  return {state,due,versions,latest,override:ov};
+}
+/*ASSIGN_STATE_END*/
+/* HTML-escape anything typed by a human before it goes into innerHTML. Also
+   closes the August audit's crash: renderCallPrep already called esc(). */
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const todayISO=()=>{const d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");};
+
 const money=n=>n==null?"—":"$"+Math.round(n).toLocaleString();
 const num=n=>n==null?"—":n.toLocaleString();
 const sum=a=>a.filter(x=>x!=null).reduce((p,c)=>p+c,0);
@@ -1027,7 +1149,8 @@ function teamStats(){
    This formal 1-on-1 is separate from the weekly "coaching interaction" standard. */
 const monthKey=d=>d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0");
 const monthName=()=>new Date().toLocaleDateString(undefined,{month:"long"});
-const callsRequired=r=>/masters/i.test(String(r.tier||""))?2:1;
+/* Dojo 0 · Path 1 · Masters 2 formal 1-on-1s per month */
+const callsRequired=r=>{const k=tierRank(r.tier);return k===1?0:k===3?2:1;};
 /* Sheets sometimes stores "2026-07" as a real date — accept either form */
 function monthNorm(v){
   const d=ciParseDate(v);
@@ -1039,6 +1162,7 @@ function callState(r){
   const mine=CALLS_RAW.filter(c=>String(c.RepID)===String(r.id)&&monthNorm(c.Month)===mk);
   const surveys=SURVEY_RAW.filter(s=>String(s.RepID)===String(r.id)&&monthNorm(s.Month)===mk);
   const req=callsRequired(r);
+  if(req===0)return {req:0,completed:0,surveyed:0,upcoming:null,status:"na",overdue:false,surveys:[]}; // The Dojo: no 1-on-1s
   const norm=c=>String(c.Status||"").trim().toLowerCase();
   const completed=mine.filter(c=>norm(c)==="completed"||norm(c)==="survey_done").length;
   const surveyed=surveys.length;
@@ -1230,8 +1354,10 @@ function renderHeat(){
 }
 /* ── This Week's Check-Ins (coach view) ──
    "submitted" = a Weekly row with a Timestamp on/after the most recent
-   Wednesday 00:00 — same window the Mon/Tue reminder texts use. */
-function ciWindowStart(){const d=new Date();d.setHours(0,0,0,0);while(d.getDay()!==3)d.setDate(d.getDate()-1);return d;}
+   Tuesday 00:00 — same window the Tue/Wed reminder texts use. */
+/* the reporting window opens on the most recent TUESDAY 00:00 — the Vector week
+   ends Monday, the nudge text goes Tuesday 9am, last-call Wednesday (sna_checkin.py) */
+function ciWindowStart(){const d=new Date();d.setHours(0,0,0,0);while(d.getDay()!==2)d.setDate(d.getDate()-1);return d;}
 function ciParseDate(v){
   if(v==null)return null;
   if(v instanceof Date)return v;
@@ -1293,7 +1419,7 @@ function renderRadar(){
       const worst=[...missing].sort((a,b)=>(streaks[b.id]||0)-(streaks[a.id]||0))[0];
       chips.push({cls:"bad",id:"ci-section",html:`<b>${missing.length}</b> check-in${missing.length>1?"s":""} missing · worst: ${worst.name.split(" ")[0]} ×${streaks[worst.id]||1}w`});
     }
-    const cs=DATA.map(r=>({r,c:callState(r)}));
+    const cs=DATA.filter(r=>callsRequired(r)>0).map(r=>({r,c:callState(r)}));
     const od=cs.filter(x=>x.c.overdue).length;
     const nb=cs.filter(x=>x.c.status==="none"&&!x.c.overdue).length;
     const sp=cs.filter(x=>x.c.status==="survey").length;
@@ -1305,9 +1431,15 @@ function renderRadar(){
     if(behind.length)chips.push({cls:"warn",id:"admin-planner-sec",html:`<b>${behind.length}</b> behind pace: ${behind.slice(0,3).map(x=>x.rep.name.split(" ")[0]).join(", ")}${behind.length>3?"…":""}`});
     const noPlan=DATA.filter(r=>!t.rows.some(x=>x.rep.id===r.id));
     if(noPlan.length)chips.push({cls:"warn",id:"admin-planner-sec",html:`<b>${noPlan.length}</b> no campaign plan yet`});
+    let waiting=0,late=0;
+    DATA.forEach(r=>assignFor(r,currentCampaign()).forEach(x=>{if(x.state==="waiting")waiting++;if(x.state==="late")late++;}));
+    if(waiting)chips.push({cls:"warn",href:CONFIG.HUB_URL+"#assign",html:`<b>${waiting}</b> assignment${waiting>1?"s":""} waiting on you`});
+    if(late)chips.push({cls:"bad",href:CONFIG.HUB_URL+"#assign",html:`<b>${late}</b> assignment${late>1?"s":""} overdue`});
   }
   el.innerHTML=chips.length
-    ?chips.map(c=>`<button class="rchip ${c.cls}" onclick="document.getElementById('${c.id}').scrollIntoView({behavior:'smooth'})"><span class="dot2"></span><span>${c.html}</span></button>`).join("")
+    ?chips.map(c=>c.href
+      ?`<a class="rchip ${c.cls}" href="${c.href}" target="_top" style="text-decoration:none"><span class="dot2"></span><span>${c.html}</span></a>`
+      :`<button class="rchip ${c.cls}" onclick="document.getElementById('${c.id}').scrollIntoView({behavior:'smooth'})"><span class="dot2"></span><span>${c.html}</span></button>`).join("")
     :`<div class="rchip ok"><span class="dot2"></span>All clear — nothing needs you right now</div>`;
 }
 function renderCheckins(){
@@ -1683,28 +1815,186 @@ function fbCalc(){
     :`no event sales entered, so appointments carry the whole ${money(goal)} — working events this fall? put the expected $ in`;
 }
 
-function renderRepCallCard(r){
-  const sec=$("rep-call-sec");
+/* ═══════════════ ASSIGNMENT DATA (rep-side) ═══════════════ */
+const STATE_LABEL={open:"Not submitted",late:"Overdue",waiting:"Submitted · waiting on coach",revise:"Feedback posted · resubmit",approved:"Approved ✓",na:"Not applicable"};
+const ASSIGN_ORDER={revise:0,late:1,open:2,waiting:3,approved:4,na:5};
+function fmtDue(iso){if(!iso)return "";const p=iso.split("-");const d=new Date(+p[0],+p[1]-1,+p[2]);return d.toLocaleDateString(undefined,{weekday:"short",month:"short",day:"numeric"});}
+/* every APPLICABLE assignment for this rep in one campaign, with its state */
+function assignFor(r,campaign){
+  const today=todayISO();
+  return ASSIGN_RAW.filter(a=>a.AssignmentID&&String(a.Campaign||"").trim()===campaign)
+    .map(a=>Object.assign({a},assignState({id:r.id,tier:r.tier},a,OVERRIDE_RAW,SUB_RAW,today)))
+    .filter(x=>x.state!=="na");
+}
+function assignSort(rows){
+  return rows.slice().sort((x,y)=>(ASSIGN_ORDER[x.state]-ASSIGN_ORDER[y.state])
+    ||String(x.due||"9999").localeCompare(String(y.due||"9999"))
+    ||String(x.a.Title||"").localeCompare(String(y.a.Title||"")));
+}
+/* ═══════════════ ASSIGNMENTS SECTION (rep: full · coach deep-dive: read-only) ═══════════════ */
+function assignCampaigns(){
+  const set=new Set([currentCampaign()]);
+  ASSIGN_RAW.forEach(a=>{if(a.AssignmentID&&a.Campaign&&String(a.Active||"Y").toUpperCase()!=="N")set.add(String(a.Campaign).trim());});
+  return [...set].sort((a,b)=>campKey(b)-campKey(a));
+}
+function assignOptionsHtml(rows){
+  return ["Dojo","Path","Masters"].map(p=>{
+    const os=rows.filter(x=>assignBase(x.a)===p);
+    return os.length?`<optgroup label="${p}">${os.map(x=>`<option value="${esc(x.a.AssignmentID)}">${esc(x.a.Title)}${x.state==="revise"?" · resubmit":""}</option>`).join("")}</optgroup>`:"";
+  }).join("");
+}
+function assignCardHtml(x){
+  const a=x.a, progs=assignPrograms(a);
+  const due=x.due?(x.state==="late"?`Overdue · was due ${fmtDue(x.due)}`:`Due ${fmtDue(x.due)}`):"No due date";
+  const instr=String(a.Instructions||"").trim();
+  const long=instr.length>160||instr.split("\n").length>2;
+  const stamp=v=>{const t=ciParseDate(v);return t?t.toLocaleDateString(undefined,{month:"short",day:"numeric"})+", "+t.toLocaleTimeString(undefined,{hour:"numeric",minute:"2-digit"}):"";};
+  const thread=x.versions.map(v=>`<div class="as-ver"><div class="vh">v${esc(v.Version)} · ${stamp(v.SubmittedAt)}</div>`+
+      (v.Text?`<div class="vt">${esc(v.Text)}</div>`:"")+
+      (v.LinkURL?`<div><a href="${esc(v.LinkURL)}" target="_blank" rel="noopener">${esc(v.LinkURL)}</a></div>`:"")+
+      (v.FileName?`<div class="ws">attached: ${esc(v.FileName)}</div>`:"")+
+      (v.Feedback?`<div class="as-fb"><div class="vh">${esc(v.ReviewedBy||"Coach")} · ${stamp(v.ReviewedAt)}${String(v.Status||"").toLowerCase()==="approved"?" · approved ✓":""}</div><div class="vt">${esc(v.Feedback)}</div></div>`:"")+
+      `</div>`).join("");
+  const btn=MODE==="rep"&&x.state!=="approved"?`<button class="form-btn${x.state==="revise"?"":" ghost"}" onclick="assignJump('${esc(a.AssignmentID)}')">${x.versions.length?"Resubmit":"Submit"}</button>`:"";
+  const id=esc(a.AssignmentID);
+  return `<div class="as-card s-${x.state}" id="as-${id}">
+    <div class="as-head"><div><div class="as-title">${esc(a.Title)}</div>
+      <div class="as-meta">${progs.map(p=>`<span class="as-prog ${p.toLowerCase()}">${p}</span>`).join("")}<span>${due}</span><span class="pill ${x.state}">${STATE_LABEL[x.state]}</span></div></div>${btn}</div>
+    ${instr?`<div class="as-instr${long?" clip":""}" id="asi-${id}">${esc(instr)}</div>${long?`<button class="as-more" onclick="const e=document.getElementById('asi-${id}');e.classList.toggle('clip');this.textContent=e.classList.contains('clip')?'more':'less'">more</button>`:""}`:""}
+    ${a.MaterialsURL?`<div style="margin-top:6px;font-size:12.5px"><a href="${esc(a.MaterialsURL)}" target="_blank" rel="noopener">Materials ↗</a></div>`:""}
+    ${thread?`<div class="as-thread">${thread}</div>`:""}
+  </div>`;
+}
+function renderAssignments(r){
+  const sec=$("assign-sec"); if(!sec)return;
+  sec.classList.remove("hidden");
+  const camps=assignCampaigns();
+  if(!ASSIGN_CAMPAIGN||!camps.includes(ASSIGN_CAMPAIGN))ASSIGN_CAMPAIGN=currentCampaign();
+  $("as-title").textContent=(MODE==="rep"?"Your ":"")+"Assignments · "+ASSIGN_CAMPAIGN;
+  $("as-hint").innerHTML=MODE==="rep"?`your program: The ${esc(tierName(r.tier))}`:`<a href="${CONFIG.HUB_URL}#assign" target="_top" style="text-decoration:none">Review on the hub ↗</a>`;
+  $("assign-pills").innerHTML=camps.length>1?camps.map(c=>`<button class="camp-pill ${c===ASSIGN_CAMPAIGN?"on":""}" onclick="ASSIGN_CAMPAIGN='${c}';$('assign-form').dataset.built='';renderAssignments(currentRep())">${c}</button>`).join(""):"";
+  const rows=assignSort(assignFor(r,ASSIGN_CAMPAIGN));
+  const formEl=$("assign-form");
+  if(MODE==="rep"){
+    const options=rows.filter(x=>x.state!=="approved");
+    if(formEl.dataset.built!=="1"){   // build once; the 60s refresh only refreshes the dropdown so typed text survives
+      formEl.innerHTML=options.length?`<div class="as-form" id="as-form">
+        <label>Assignment<select id="as-sel">${assignOptionsHtml(options)}</select></label>
+        <label>Paste your work<textarea id="as-text" placeholder="Paste your write-up here — or just attach a link or a recording below."></textarea></label>
+        <label>Link<input type="url" id="as-link" placeholder="A Google Doc, Loom, or Drive share link (https://…)"></label>
+        <label>Attach a recording<input type="file" id="as-file" onchange="assignFileCheck()"><span class="as-msg" id="as-filemsg">Up to 25 MB. Bigger? Upload it to Google Drive or Loom and paste the share link instead.</span></label>
+        <div class="as-actions"><button class="form-btn" id="as-send" onclick="assignSubmit()">Submit</button><span class="as-msg" id="as-msg"></span></div>
+      </div>`:"";
+      formEl.dataset.built="1";
+    } else {
+      const sel=$("as-sel");
+      if(sel){const cur=sel.value;sel.innerHTML=assignOptionsHtml(options);if([...sel.options].some(o=>o.value===cur))sel.value=cur;}
+      if(!options.length){formEl.innerHTML="";formEl.dataset.built="";}
+    }
+  } else formEl.innerHTML="";
+  $("assign-list").innerHTML=rows.length?rows.map(assignCardHtml).join(""):`<div class="plan-empty">No assignments posted for ${esc(ASSIGN_CAMPAIGN)} yet — they'll appear here.</div>`;
+}
+/* a card's Submit/Resubmit or a weekly-card line: pick it in the form and scroll there */
+function assignJump(id){
+  const sel=$("as-sel");
+  if(sel&&id&&[...sel.options].some(o=>o.value===id))sel.value=id;
+  const target=(MODE==="rep"&&$("as-form"))||(id&&$("as-"+id))||$("assign-sec");
+  if(target)target.scrollIntoView({behavior:"smooth",block:"start"});
+}
+function assignFileCheck(){
+  const inp=$("as-file"), m=$("as-filemsg"); if(!inp||!m)return true;
+  const f=inp.files[0];
+  if(f&&f.size>CONFIG.ASSIGN_FILE_MAX){m.className="as-msg err";m.textContent=`That file is ${Math.round(f.size/1048576)} MB. Upload it to Google Drive or Loom and paste the share link instead.`;inp.value="";return false;}
+  m.className="as-msg";m.textContent=f?`${f.name} · ${Math.max(1,Math.round(f.size/1048576))} MB`:"Up to 25 MB. Bigger? Upload it to Google Drive or Loom and paste the share link instead.";
+  return true;
+}
+const readFileB64=f=>new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(String(r.result).split(",")[1]||"");r.onerror=rej;r.readAsDataURL(f);});
+async function assignSubmit(){
+  const sel=$("as-sel"),msg=$("as-msg"),btn=$("as-send");
+  const text=$("as-text").value.trim(), link=$("as-link").value.trim(), f=$("as-file").files[0];
+  const say=(t,c)=>{msg.className="as-msg "+(c||"");msg.textContent=t;};
+  if(!sel||!sel.value)return say("Pick an assignment first.","err");
+  if(!text&&!link&&!f)return say("Add some text, a link, or a recording.","err");
+  if(link&&!/^https?:\/\//i.test(link))return say("The link needs to start with http:// or https://","err");
+  if(f&&!assignFileCheck())return;
+  btn.disabled=true; say(f?"Uploading…":"Sending…");
+  const body={action:"submitAssignment",repId:ME.id,assignmentId:sel.value,text,link};
+  if(f)body.file={name:f.name,type:f.type,b64:await readFileB64(f)};
+  let j=null;
+  for(let attempt=1;attempt<=2&&!j;attempt++){
+    try{j=await fetch(CONFIG.WEBAPP_URL,{method:"POST",body:JSON.stringify(body)}).then(r=>r.json());}
+    catch(e){if(attempt===2)j={ok:false,error:"network"};}
+  }
+  btn.disabled=false;
+  if(!j||!j.ok)return say(j&&j.error==="network"?"Couldn't send — check your connection and try again. Your work is still here.":"Couldn't send: "+((j&&j.error)||"unknown error"),"err");
+  SUB_RAW.push({SubmissionID:j.submissionId,AssignmentID:sel.value,RepID:ME.id,Version:String(j.version),Text:text,LinkURL:link,FileURL:j.fileUrl||"",FileName:f?f.name:"",SubmittedAt:new Date().toISOString(),Status:"submitted",Feedback:"",ReviewedBy:"",ReviewedAt:""});
+  $("assign-form").dataset.built="";          // rebuild so the dropdown and cards reflect the new version
+  renderAssignments(ME); renderWeekCard(ME);
+  const m2=$("as-msg"); if(m2){m2.className="as-msg ok";m2.textContent="Sent ✓ · Alan and Ben have been emailed";}
+}
+/* program week: weeks since the campaign's first Tuesday, clamped 1..17 */
+function campaignWeekNo(){const start=campaignStartDefault(currentCampaign());return Math.max(1,Math.min(PERIOD.weeks,Math.floor((Date.now()-start.getTime())/(7*86400000))+1));}
+
+/* ═══════════════ HUB CALENDAR (next group call) ═══════════════ */
+async function loadHubCalendar(){
+  try{const c=JSON.parse(sessionStorage.getItem("sna_hubcal")||"null");if(c&&Date.now()-c.t<10*60000){HUB_CAL=c.d;return;}}catch(e){}
+  try{
+    const j=await (await fetch(CONFIG.HUB_SYNC_URL)).json();
+    if(j&&j.ok&&j.data){
+      HUB_CAL={calendar:j.data.calendar||[],topicTiers:j.data.topicTiers||{},callTime:String((j.data.meta||{}).callTime||"")};
+      try{sessionStorage.setItem("sna_hubcal",JSON.stringify({t:Date.now(),d:HUB_CAL}));}catch(e){}
+    }
+  }catch(e){console.warn("hub calendar unavailable",e);}
+}
+/* first planned call on/after today that this rep's tier attends (T1 → all,
+   T2 → Path+Masters, T3 → Masters, untagged → all); null if none/unavailable */
+function nextGroupCall(r){
+  if(!HUB_CAL)return null;
+  const today=todayISO(), rank=tierRank(r.tier);
+  const tierOfRow=row=>{const t=+(HUB_CAL.topicTiers[row.topic]||0);if(t)return t;const tr=String(row.track||"").toLowerCase();return /dojo/.test(tr)?1:/master/.test(tr)?3:/path/.test(tr)?2:0;};
+  const row=HUB_CAL.calendar.filter(x=>String(x.date||"")>=today&&String(x.topic||"").trim()&&x.status!=="off"&&x.status!=="blocked"&&tierOfRow(x)<=rank)
+    .sort((a,b)=>String(a.date).localeCompare(String(b.date)))[0];
+  if(!row)return null;
+  const p=row.date.split("-"), d=new Date(+p[0],+p[1]-1,+p[2]);
+  const time=String(row.time||HUB_CAL.callTime||"").trim();
+  return {when:d.toLocaleDateString(undefined,{weekday:"short",month:"short",day:"numeric"})+(time?" · "+esc(time):""),topic:esc(row.topic),presenter:esc(row.presenter||""),extra:(row.extra||[]).length};
+}
+
+/* ═══════════════ WEEKLY CARD (rep mode) ═══════════════ */
+function renderWeekCard(r){
+  const sec=$("week-sec"); if(!sec)return;
   if(MODE!=="rep"){sec.classList.add("hidden");return;}
   sec.classList.remove("hidden");
-  const cs=callState(r), b=callCardBits(cs);
-  let notes="";
-  if(cs.status==="done"&&cs.surveys.length){
-    notes=`<div class="cc-notes">`+cs.surveys.slice(-cs.req).map(s=>
-      `<div class="cc-note"><b>Your takeaways</b>${(s.Takeaways||"—")}</div>`+
-      `<div class="cc-note"><b>Your action steps</b>${(s.ActionSteps||"—")}</div>`).join("")+`</div>`;
+  const rows=[];
+  // 1 · check-in for the week that just closed
+  const ws=ciWindowStart();
+  const filed=WEEKLY_RAW.filter(w=>String(w.RepID)===String(r.id)).map(w=>ciParseDate(w.Timestamp)).filter(t=>t&&t>=ws).sort((a,b)=>b-a)[0];
+  if(filed)rows.push({dot:"good",lab:"Weekly check-in",title:"Last week's check-in is in ✓",sub:"Filed "+filed.toLocaleDateString(undefined,{weekday:"short"})+" "+filed.toLocaleTimeString(undefined,{hour:"numeric",minute:"2-digit"}),btns:[]});
+  else rows.push({dot:"warn",lab:"Weekly check-in",title:"Last week's check-in isn't in yet",sub:"Your week closed Monday night. Two minutes, due by Wednesday.",btns:[{lab:"Do my check-in ↗",url:CONFIG.WEEKLY_FORM_URL}]});
+  // 2 · assignments still open this campaign
+  const open=assignSort(assignFor(r,currentCampaign()).filter(x=>x.state!=="approved"));
+  const urgent=open.some(x=>x.state==="late"||x.state==="revise");
+  rows.push({dot:open.length?(urgent?"bad":"warn"):"good",lab:"Assignments · "+(open.length?open.length+" open":"clear"),
+    html:open.length
+      ?open.slice(0,4).map(x=>`<div class="al" onclick="assignJump('${esc(x.a.AssignmentID)}')"><span>${esc(x.a.Title)}<span class="pill ${x.state}">${STATE_LABEL[x.state]}</span></span><span class="ad">${x.due?(x.state==="late"?"was due ":"due ")+fmtDue(x.due):"no due date"}</span></div>`).join("")
+        +(open.length>4?`<div class="ws">+${open.length-4} more below</div>`:"")
+      :`<div class="wt">You're clear on assignments</div><div class="ws">Nothing due right now.</div>`,
+    btns:open.length?[{lab:"Open ↓",js:"assignJump('')"}]:[]});
+  // 3 · the formal 1-on-1 (Path/Masters only)
+  const cs=callState(r);
+  if(cs.req>0){
+    const b=callCardBits(cs);
+    const btns=[b.btn,(!b.btn||b.btn.url!==CONFIG.CALENDLY_URL)?{lab:"Book your 1-1 ↗",url:CONFIG.CALENDLY_URL}:null].filter(Boolean);
+    rows.push({dot:cs.status==="done"?"good":cs.status==="booked"?"brass":cs.overdue?"bad":"warn",lab:"Your 1-on-1 · "+monthName(),title:b.title,sub:b.sub,btns});
   }
-  $("rep-call-card").innerHTML=`<div class="call-card s-${cs.status}">
-    <span class="cc-dot"></span>
-    <div class="cc-main">
-      <div style="font-family:'Spline Sans Mono';font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:4px">Your coaching call · ${monthName()}</div>
-      <div class="cc-title">${b.title}</div><div class="cc-sub">${b.sub}</div>${notes}</div>
-    ${(()=>{ // booking is ALWAYS one click away, whatever state the card is in
-      const book={lab:"Book your 1-1 ↗",url:CONFIG.CALENDLY_URL};
-      const btns=[b.btn,(!b.btn||b.btn.url!==CONFIG.CALENDLY_URL)?book:null].filter(Boolean)
-        .map(x=>`<a class="form-btn" href="${x.url}" target="_blank" rel="noopener">${x.lab}</a>`).join("");
-      return btns?`<div style="display:flex;flex-direction:column;gap:8px;align-items:stretch">${btns}</div>`:"";
-    })()}
+  // 4 · next group call from the hub calendar
+  const nc=nextGroupCall(r);
+  if(nc)rows.push({dot:"brass",lab:"Next group call",title:`${nc.when} · ${nc.topic}`,sub:[nc.presenter?"with "+nc.presenter:"",nc.extra?`${nc.extra} more call${nc.extra>1?"s":""} that week`:""].filter(Boolean).join(" · "),btns:[]});
+  $("week-card").innerHTML=`<div class="wk-card">
+    <div class="eyebrow">Your week · ${esc(currentCampaign())} · Week ${campaignWeekNo()}</div>
+    <div class="wk-title">${esc(String(r.name).split(" ")[0])}, here's your week</div>
+    ${rows.map(x=>`<div class="wk-row"><span class="wd ${x.dot}"></span><div><div class="wl">${x.lab}</div>${x.html||`<div class="wt">${x.title}</div><div class="ws">${x.sub||""}</div>`}</div>${
+      x.btns.length?`<div class="wk-btns">${x.btns.map((b,i)=>b.url?`<a class="form-btn${i?" ghost":""}" href="${b.url}" target="_blank" rel="noopener">${b.lab}</a>`:`<button class="form-btn ghost" onclick="${b.js}">${b.lab}</button>`).join("")}</div>`:""}</div>`).join("")}
   </div>`;
 }
 function renderAdminCalls(){
@@ -1714,7 +2004,7 @@ function renderAdminCalls(){
     $("calls-feed").innerHTML="";
     return;
   }
-  const rows=[...DATA].map(r=>({r,cs:callState(r)}))
+  const rows=DATA.filter(r=>callsRequired(r)>0).map(r=>({r,cs:callState(r)}))
     .sort((a,b)=>(a.cs.status==="done"?1:0)-(b.cs.status==="done"?1:0)||a.r.name.localeCompare(b.r.name));
   $("admin-calls").innerHTML=`<div class="calls-grid">`+rows.map(({r,cs})=>{
     const od=cs.overdue?` od`:"";
@@ -1937,7 +2227,7 @@ function renderCallPrep(r){
     .map(x=>({...x,t:ciParseDate(x.Timestamp)})).filter(x=>x.t).sort((a,b)=>b.t-a.t)[0];
   const note=(r.notes||[])[0];
   const p=plannerFor(r), pc=pace(p);
-  const callTxt=cs.status==="booked"&&cs.upcoming
+  const callTxt=cs.status==="na"?"The Dojo · no 1-on-1s":cs.status==="booked"&&cs.upcoming
     ?`Booked ${cs.upcoming.toLocaleDateString(undefined,{weekday:"short",month:"short",day:"numeric"})} · ${cs.upcoming.toLocaleTimeString(undefined,{hour:"numeric",minute:"2-digit"})}`
     :cs.status==="done"?"Done + surveyed ✓"
     :cs.status==="survey"?`${cs.completed} done · survey pending`
@@ -1952,7 +2242,7 @@ function renderRep(){
   const r=currentRep(); if(!r)return;
   renderCallPrep(r);
   renderRepContext(r);renderGoalsStrip(r);renderHero(r);renderSummary(r);renderChart();renderChannels(r);renderDiagnostics(r);renderStandards(r);renderNotes(r);
-  renderCallNotes(r);renderRepPlanner(r);renderFallBreakdown(r);renderRepCallCard(r);
+  renderCallNotes(r);renderRepPlanner(r);renderFallBreakdown(r);renderWeekCard(r);renderAssignments(r);
   // brand-new rep (no check-ins this campaign): collapse the data sections
   // into one starter card so the page leads with what they can DO
   const collapse=MODE==="rep"&&activeWeeks(r)===0;
@@ -1997,6 +2287,7 @@ function renderAll(){
 }
 async function init(){
   await loadData();
+  if(MODE==="rep"){loadHubCalendar().then(()=>{if(MODE==="rep"&&ME)renderWeekCard(ME);});setInterval(()=>loadHubCalendar().then(()=>{if(MODE==="rep"&&ME)renderWeekCard(ME);}),10*60000);}
   if(MODE==="rep")setView("rep");
   renderAll();
   paneIn(MODE==="locked" ? $("lockout") : MODE==="offline" ? $("offline") : MODE==="gated" ? $("gated") : $("view-"+(MODE==="rep"?"rep":"team")));
