@@ -1872,7 +1872,7 @@ function renderAssignments(r){
   if(!ASSIGN_CAMPAIGN||!camps.includes(ASSIGN_CAMPAIGN))ASSIGN_CAMPAIGN=currentCampaign();
   $("as-title").textContent=(MODE==="rep"?"Your ":"")+"Assignments · "+ASSIGN_CAMPAIGN;
   $("as-hint").innerHTML=MODE==="rep"?`your program: The ${esc(tierName(r.tier))}`:`<a href="${CONFIG.HUB_URL}#assign" target="_top" style="text-decoration:none">Review on the hub ↗</a>`;
-  $("assign-pills").innerHTML=camps.length>1?camps.map(c=>`<button class="camp-pill ${c===ASSIGN_CAMPAIGN?"on":""}" onclick="ASSIGN_CAMPAIGN='${c}';$('assign-form').dataset.built='';renderAssignments(currentRep())">${c}</button>`).join(""):"";
+  $("assign-pills").innerHTML=camps.length>1?camps.map(c=>`<button class="camp-pill ${c===ASSIGN_CAMPAIGN?"on":""}" onclick="ASSIGN_CAMPAIGN='${c}';$('assign-form').dataset.built='';renderAssignments(currentRep())">${esc(c)}</button>`).join(""):"";
   const rows=assignSort(assignFor(r,ASSIGN_CAMPAIGN));
   const formEl=$("assign-form");
   if(MODE==="rep"){
@@ -1885,7 +1885,7 @@ function renderAssignments(r){
         <label>Attach a recording<input type="file" id="as-file" onchange="assignFileCheck()"><span class="as-msg" id="as-filemsg">Up to 25 MB. Bigger? Upload it to Google Drive or Loom and paste the share link instead.</span></label>
         <div class="as-actions"><button class="form-btn" id="as-send" onclick="assignSubmit()">Submit</button><span class="as-msg" id="as-msg"></span></div>
       </div>`:"";
-      formEl.dataset.built="1";
+      formEl.dataset.built=options.length?"1":"";
     } else {
       const sel=$("as-sel");
       if(sel){const cur=sel.value;sel.innerHTML=assignOptionsHtml(options);if([...sel.options].some(o=>o.value===cur))sel.value=cur;}
@@ -1904,7 +1904,7 @@ function assignJump(id){
 function assignFileCheck(){
   const inp=$("as-file"), m=$("as-filemsg"); if(!inp||!m)return true;
   const f=inp.files[0];
-  if(f&&f.size>CONFIG.ASSIGN_FILE_MAX){m.className="as-msg err";m.textContent=`That file is ${Math.round(f.size/1048576)} MB. Upload it to Google Drive or Loom and paste the share link instead.`;inp.value="";return false;}
+  if(f&&f.size>CONFIG.ASSIGN_FILE_MAX){m.className="as-msg err";m.textContent=`That file is ${Math.ceil(f.size/1048576)} MB. Upload it to Google Drive or Loom and paste the share link instead.`;inp.value="";return false;}
   m.className="as-msg";m.textContent=f?`${f.name} · ${Math.max(1,Math.round(f.size/1048576))} MB`:"Up to 25 MB. Bigger? Upload it to Google Drive or Loom and paste the share link instead.";
   return true;
 }
@@ -1919,7 +1919,8 @@ async function assignSubmit(){
   if(f&&!assignFileCheck())return;
   btn.disabled=true; say(f?"Uploading…":"Sending…");
   const body={action:"submitAssignment",repId:ME.id,assignmentId:sel.value,text,link};
-  if(f)body.file={name:f.name,type:f.type,b64:await readFileB64(f)};
+  if(f){try{body.file={name:f.name,type:f.type,b64:await readFileB64(f)};}
+        catch(e){btn.disabled=false;return say("Couldn't read that file — try again, or paste a Drive or Loom link instead.","err");}}
   let j=null;
   for(let attempt=1;attempt<=2&&!j;attempt++){
     try{j=await fetch(CONFIG.WEBAPP_URL,{method:"POST",body:JSON.stringify(body)}).then(r=>r.json());}
@@ -1951,7 +1952,7 @@ async function loadHubCalendar(){
 function nextGroupCall(r){
   if(!HUB_CAL)return null;
   const today=todayISO(), rank=tierRank(r.tier);
-  const tierOfRow=row=>{const t=+(HUB_CAL.topicTiers[row.topic]||0);if(t)return t;const tr=String(row.track||"").toLowerCase();return /dojo/.test(tr)?1:/master/.test(tr)?3:/path/.test(tr)?2:0;};
+  const tierOfRow=row=>+(HUB_CAL.topicTiers[String(row.topic||"").trim()]||0);
   const row=HUB_CAL.calendar.filter(x=>String(x.date||"")>=today&&String(x.topic||"").trim()&&x.status!=="off"&&x.status!=="blocked"&&tierOfRow(x)<=rank)
     .sort((a,b)=>String(a.date).localeCompare(String(b.date)))[0];
   if(!row)return null;
