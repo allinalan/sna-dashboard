@@ -321,7 +321,6 @@
   .as-form label{font-family:var(--monof);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft);display:block}
   .as-form select,.as-form input[type=url],.as-form textarea{width:100%;margin-top:4px;font-family:var(--sans);font-size:13px;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:var(--paper);color:var(--ink)}
   .as-form textarea{min-height:110px;resize:vertical}
-  .as-form input[type=file]{margin-top:4px;font-size:12px;display:block}
   .as-msg{font-size:12.5px;color:var(--ink-soft)}
   .as-msg.err{color:var(--bad)}
   .as-msg.ok{color:var(--good)}
@@ -736,7 +735,6 @@ const CONFIG = {
   WEEKLY_FORM_URL: "https://docs.google.com/forms/d/e/1FAIpQLSdIAf_SaV1m2ASTN4YzEBeVxp7o-gkIBXqhCCbO5vmuNh7cTQ/viewform",
   HUB_URL: "https://allinalan.github.io/sna-master-hub/",
   HUB_SYNC_URL: "https://script.google.com/macros/s/AKfycbyw7ngyqNuO9AHQnCeb1paTfoDRWX1sTkJMlhC2zB9BKDuo_O-SF9XWke2e1QiA_Y9A/exec?token=sharpninja", // the hub's calendar feed (token already public in the hub source)
-  ASSIGN_FILE_MAX: 25*1024*1024,
   CALENDLY_URL: "https://calendly.com/sharp-ninja-academy",
   SURVEY_FORM_URL: "https://docs.google.com/forms/d/e/1FAIpQLSedU7b3dOX6JQs8fcRJbqB5q3dmbEc9fSoUm-rmpK9484R4cQ/viewform",
   WEBAPP_URL: "https://script.google.com/macros/s/AKfycbyNFDkgEAUT5IDNw4wvCHLQZoe70XxVwgAZmG8bNTmlkY8t0d-wL2eKa53kgke2AOCHPQ/exec",
@@ -1880,9 +1878,8 @@ function renderAssignments(r){
     if(formEl.dataset.built!=="1"){   // build once; the 60s refresh only refreshes the dropdown so typed text survives
       formEl.innerHTML=options.length?`<div class="as-form" id="as-form">
         <label>Assignment<select id="as-sel">${assignOptionsHtml(options)}</select></label>
-        <label>Paste your work<textarea id="as-text" placeholder="Paste your write-up here — or just attach a link or a recording below."></textarea></label>
-        <label>Link<input type="url" id="as-link" placeholder="A Google Doc, Loom, or Drive share link (https://…)"></label>
-        <label>Attach a recording<input type="file" id="as-file" onchange="assignFileCheck()"><span class="as-msg" id="as-filemsg">Up to 25 MB. Bigger? Upload it to Google Drive or Loom and paste the share link instead.</span></label>
+        <label>Paste your work<textarea id="as-text" placeholder="Paste your write-up here — or just add a link below."></textarea></label>
+        <label>Link<input type="url" id="as-link" placeholder="Paste a Google Doc, Loom, or Google Drive share link (https://…)"><span class="as-msg">Recordings: upload the file to Google Drive, share it with Alan and Ben, and paste the link here.</span></label>
         <div class="as-actions"><button class="form-btn" id="as-send" onclick="assignSubmit()">Submit</button><span class="as-msg" id="as-msg"></span></div>
       </div>`:"";
       formEl.dataset.built=options.length?"1":"";
@@ -1901,26 +1898,15 @@ function assignJump(id){
   const target=(MODE==="rep"&&$("as-form"))||(id&&$("as-"+id))||$("assign-sec");
   if(target)target.scrollIntoView({behavior:"smooth",block:"start"});
 }
-function assignFileCheck(){
-  const inp=$("as-file"), m=$("as-filemsg"); if(!inp||!m)return true;
-  const f=inp.files[0];
-  if(f&&f.size>CONFIG.ASSIGN_FILE_MAX){m.className="as-msg err";m.textContent=`That file is ${Math.ceil(f.size/1048576)} MB. Upload it to Google Drive or Loom and paste the share link instead.`;inp.value="";return false;}
-  m.className="as-msg";m.textContent=f?`${f.name} · ${Math.max(1,Math.round(f.size/1048576))} MB`:"Up to 25 MB. Bigger? Upload it to Google Drive or Loom and paste the share link instead.";
-  return true;
-}
-const readFileB64=f=>new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(String(r.result).split(",")[1]||"");r.onerror=rej;r.readAsDataURL(f);});
 async function assignSubmit(){
   const sel=$("as-sel"),msg=$("as-msg"),btn=$("as-send");
-  const text=$("as-text").value.trim(), link=$("as-link").value.trim(), f=$("as-file").files[0];
+  const text=$("as-text").value.trim(), link=$("as-link").value.trim();
   const say=(t,c)=>{msg.className="as-msg "+(c||"");msg.textContent=t;};
   if(!sel||!sel.value)return say("Pick an assignment first.","err");
-  if(!text&&!link&&!f)return say("Add some text, a link, or a recording.","err");
+  if(!text&&!link)return say("Add some text or a link.","err");
   if(link&&!/^https?:\/\//i.test(link))return say("The link needs to start with http:// or https://","err");
-  if(f&&!assignFileCheck())return;
-  btn.disabled=true; say(f?"Uploading…":"Sending…");
+  btn.disabled=true; say("Sending…");
   const body={action:"submitAssignment",repId:ME.id,assignmentId:sel.value,text,link};
-  if(f){try{body.file={name:f.name,type:f.type,b64:await readFileB64(f)};}
-        catch(e){btn.disabled=false;return say("Couldn't read that file — try again, or paste a Drive or Loom link instead.","err");}}
   let j=null;
   for(let attempt=1;attempt<=2&&!j;attempt++){
     try{j=await fetch(CONFIG.WEBAPP_URL,{method:"POST",body:JSON.stringify(body)}).then(r=>r.json());}
@@ -1928,7 +1914,7 @@ async function assignSubmit(){
   }
   btn.disabled=false;
   if(!j||!j.ok)return say(j&&j.error==="network"?"Couldn't send — check your connection and try again. Your work is still here.":"Couldn't send: "+((j&&j.error)||"unknown error"),"err");
-  SUB_RAW.push({SubmissionID:j.submissionId,AssignmentID:sel.value,RepID:ME.id,Version:String(j.version),Text:text,LinkURL:link,FileURL:j.fileUrl||"",FileName:f?f.name:"",SubmittedAt:new Date().toISOString(),Status:"submitted",Feedback:"",ReviewedBy:"",ReviewedAt:""});
+  SUB_RAW.push({SubmissionID:j.submissionId,AssignmentID:sel.value,RepID:ME.id,Version:String(j.version),Text:text,LinkURL:link,FileURL:j.fileUrl||"",FileName:"",SubmittedAt:new Date().toISOString(),Status:"submitted",Feedback:"",ReviewedBy:"",ReviewedAt:""});
   $("assign-form").dataset.built="";          // rebuild so the dropdown and cards reflect the new version
   renderAssignments(ME); renderWeekCard(ME);
   const m2=$("as-msg"); if(m2){m2.className="as-msg ok";m2.textContent="Sent ✓ · Alan and Ben have been emailed";}
