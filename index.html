@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='88'%3E%F0%9F%A5%B7%3C/text%3E%3C/svg%3E">
 <title>Sharp Ninja Academy — Mentee Dashboard</title>
 <meta name="description" content="Sharp Ninja Academy mentee performance — weekly check-ins, standards, and sales by channel. Live coach dashboard.">
 <meta name="theme-color" content="#191410">
@@ -319,6 +320,7 @@
   .as-fb .vh{color:var(--accent-ink)}
   .as-form{background:var(--card);border:1px solid var(--line-strong);border-radius:12px;padding:14px 16px;display:grid;gap:10px}
   .as-form label{font-family:var(--monof);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft);display:block}
+  .as-form label .as-msg{display:block;margin-top:5px;font-family:var(--sans);font-size:12.5px;letter-spacing:0;text-transform:none;color:var(--ink-soft)}
   .as-form select,.as-form input[type=url],.as-form textarea{width:100%;margin-top:4px;font-family:var(--sans);font-size:13px;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:var(--paper);color:var(--ink)}
   .as-form textarea{min-height:110px;resize:vertical}
   .as-msg{font-size:12.5px;color:var(--ink-soft)}
@@ -574,7 +576,7 @@
         <div class="cc-main">
           <div class="lab" style="font-family:'Spline Sans Mono';font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft)">Your stats build here</div>
           <div class="cc-title" style="margin-top:6px">First check-in unlocks this page</div>
-          <div class="cc-sub">After your first weekly check-in, this fills with your sales, weekly trend, channel breakdowns, and standards — all computed from what you report. Two minutes, every Tuesday.</div>
+          <div class="cc-sub">After your first weekly check-in, this fills with your sales, weekly trend, channel breakdowns, and standards — all computed from what you report. Two minutes each Tuesday, due by Wednesday.</div>
         </div>
         <a class="form-btn" href="https://docs.google.com/forms/d/e/1FAIpQLSdIAf_SaV1m2ASTN4YzEBeVxp7o-gkIBXqhCCbO5vmuNh7cTQ/viewform" target="_blank" rel="noopener">Do my check-in ↗</a>
       </div>
@@ -1432,7 +1434,7 @@ function renderRadar(){
     let waiting=0,late=0;
     DATA.forEach(r=>assignFor(r,currentCampaign()).forEach(x=>{if(x.state==="waiting")waiting++;if(x.state==="late")late++;}));
     if(waiting)chips.push({cls:"warn",href:CONFIG.HUB_URL+"#assign",html:`<b>${waiting}</b> assignment${waiting>1?"s":""} waiting on you`});
-    if(late)chips.push({cls:"bad",href:CONFIG.HUB_URL+"#assign",html:`<b>${late}</b> assignment${late>1?"s":""} overdue`});
+    if(late)chips.push({cls:"bad",href:CONFIG.HUB_URL+"#assign",html:`<b>${late}</b> assignment${late>1?"s":""} OVERDUE`});
   }
   el.innerHTML=chips.length
     ?chips.map(c=>c.href
@@ -1851,7 +1853,7 @@ function assignCardHtml(x){
       (v.Text?`<div class="vt">${esc(v.Text)}</div>`:"")+
       (v.LinkURL?`<div><a href="${esc(v.LinkURL)}" target="_blank" rel="noopener">${esc(v.LinkURL)}</a></div>`:"")+
       (v.FileName?`<div class="ws">attached: ${esc(v.FileName)}</div>`:"")+
-      (v.Feedback?`<div class="as-fb"><div class="vh">${esc(v.ReviewedBy||"Coach")} · ${stamp(v.ReviewedAt)}${String(v.Status||"").toLowerCase()==="approved"?" · approved ✓":""}</div><div class="vt">${esc(v.Feedback)}</div></div>`:"")+
+      ((v.Feedback||String(v.Status||"").toLowerCase()==="approved")?`<div class="as-fb"><div class="vh">${esc(v.ReviewedBy||"Coach")} · ${stamp(v.ReviewedAt)}${String(v.Status||"").toLowerCase()==="approved"?" · approved ✓":""}</div>${v.Feedback?`<div class="vt">${esc(v.Feedback)}</div>`:""}</div>`:"")+
       `</div>`).join("");
   const btn=MODE==="rep"&&x.state!=="approved"?`<button class="form-btn${x.state==="revise"?"":" ghost"}" onclick="assignJump('${esc(a.AssignmentID)}')">${x.versions.length?"Resubmit":"Submit"}</button>`:"";
   const id=esc(a.AssignmentID);
@@ -1971,7 +1973,7 @@ function renderWeekCard(r){
   const cs=callState(r);
   if(cs.req>0){
     const b=callCardBits(cs);
-    const btns=[b.btn,(!b.btn||b.btn.url!==CONFIG.CALENDLY_URL)?{lab:"Book your 1-1 ↗",url:CONFIG.CALENDLY_URL}:null].filter(Boolean);
+    const btns=[b.btn,(!b.btn||b.btn.url!==CONFIG.CALENDLY_URL)?{lab:"Book your 1-on-1 ↗",url:CONFIG.CALENDLY_URL}:null].filter(Boolean);
     rows.push({dot:cs.status==="done"?"good":cs.status==="booked"?"brass":cs.overdue?"bad":"warn",lab:"Your 1-on-1 · "+monthName(),title:b.title,sub:b.sub,btns});
   }
   // 4 · next group call from the hub calendar
