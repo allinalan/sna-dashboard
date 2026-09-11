@@ -2245,8 +2245,13 @@ function applyMode(){
   const isRep=MODE==="rep", locked=MODE==="locked", offline=MODE==="offline", gated=MODE==="gated";
   const away=locked||offline||gated;
   document.querySelector(".toggle").classList.toggle("hidden",isRep||away);
-  $("view-team").classList.toggle("hidden",isRep||away);
-  $("view-rep").classList.toggle("hidden",away||(!isRep&&!$("btn-rep").classList.contains("on")));
+  /* The Team/Rep toggle owns which pane shows. This runs on every 60-second
+     data refresh too, and it used to un-hide the team pane unconditionally in
+     coach mode — so a coach reading one rep's numbers had the team board pop
+     back in above them a minute later (the "kicked back to team view" bug). */
+  const repOn=$("btn-rep").classList.contains("on");
+  $("view-team").classList.toggle("hidden",isRep||away||repOn);
+  $("view-rep").classList.toggle("hidden",away||(!isRep&&!repOn));
   $("lockout").classList.toggle("hidden",!locked);
   $("offline").classList.toggle("hidden",!offline);
   $("gated").classList.toggle("hidden",!gated);
