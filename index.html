@@ -1357,6 +1357,16 @@ function renderHeat(){
 /* the reporting window opens on the most recent TUESDAY 00:00 — the Vector week
    ends Monday, the nudge text goes Tuesday 9am, last-call Wednesday (sna_checkin.py) */
 function ciWindowStart(){const d=new Date();d.setHours(0,0,0,0);while(d.getDay()!==2)d.setDate(d.getDate()-1);return d;}
+/* When a check-in COUNTS. The Vector week ends Monday, so a report filed on
+   Monday is the same "last week" report everyone else files Tuesday morning —
+   it belongs to the window that opens the next day, not the one closing. Without
+   this, an early bird who files Monday night reads as missing all week (David
+   Roesch, 2026-09-07 22:52). Sunday and earlier stay where they are. */
+function ciFiledAt(w){
+  const t=ciParseDate(w.Timestamp);
+  if(!t||t.getDay()!==1)return t;
+  const e=new Date(t);e.setDate(e.getDate()+1);e.setHours(0,0,1,0);return e;
+}
 function ciParseDate(v){
   if(v==null)return null;
   if(v instanceof Date)return v;
@@ -1378,7 +1388,7 @@ function ciStreaks(done,ws){
     while(start>=bound){
       const hit=WEEKLY_RAW.some(w=>{
         if(String(w.RepID)!==String(r.id))return false;
-        const t=ciParseDate(w.Timestamp);
+        const t=ciFiledAt(w);
         return t&&t>=start&&t<end;
       });
       if(hit)break;
@@ -1392,7 +1402,7 @@ function ciStreaks(done,ws){
 function ciHistory(rep,ws){
   const bound=ciBound(rep);
   const times=WEEKLY_RAW.filter(w=>String(w.RepID)===String(rep.id))
-    .map(w=>ciParseDate(w.Timestamp)).filter(Boolean);
+    .map(ciFiledAt).filter(Boolean);
   const hist=[];
   let end=new Date(),start=ws;
   for(let i=0;i<6;i++){
@@ -1403,7 +1413,7 @@ function ciHistory(rep,ws){
 }
 function ciData(){
   const ws=ciWindowStart(), done=new Set();
-  WEEKLY_RAW.forEach(w=>{const t=ciParseDate(w.Timestamp);if(t&&t>=ws)done.add(String(w.RepID));});
+  WEEKLY_RAW.forEach(w=>{const t=ciFiledAt(w);if(t&&t>=ws)done.add(String(w.RepID));});
   return {ws,done,streaks:ciStreaks(done,ws)};
 }
 /* ── Coach's Radar: who needs you today, computed from every board below ── */
@@ -1956,7 +1966,8 @@ function renderWeekCard(r){
   const rows=[];
   // 1 · check-in for the week that just closed
   const ws=ciWindowStart();
-  const filed=WEEKLY_RAW.filter(w=>String(w.RepID)===String(r.id)).map(w=>ciParseDate(w.Timestamp)).filter(t=>t&&t>=ws).sort((a,b)=>b-a)[0];
+  const filed=WEEKLY_RAW.filter(w=>String(w.RepID)===String(r.id)&&(ciFiledAt(w)||0)>=ws)
+    .map(w=>ciParseDate(w.Timestamp)).sort((a,b)=>b-a)[0];   // counted by ciFiledAt, shown at the real time
   if(filed)rows.push({dot:"good",lab:"Weekly check-in",title:"Last week's check-in is in ✓",sub:"Filed "+filed.toLocaleDateString(undefined,{weekday:"short"})+" "+filed.toLocaleTimeString(undefined,{hour:"numeric",minute:"2-digit"}),btns:[]});
   else rows.push({dot:"warn",lab:"Weekly check-in",title:"Last week's check-in isn't in yet",sub:"Your week closed Monday night. Two minutes, due by Wednesday.",btns:[{lab:"Do my check-in ↗",url:CONFIG.WEEKLY_FORM_URL}]});
   // 2 · assignments still open this campaign
