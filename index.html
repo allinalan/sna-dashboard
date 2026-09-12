@@ -935,6 +935,7 @@ async function loadFlags(){
 async function loadData(){
   if(!CONFIG.USE_LIVE_DATA){DATA=SEED;HAVE_DATA=true;setSource(false);resolveIdentity();return;}
   await loadFlags();
+  await loadHubCalendar(REP_PARAM?10*60000:50000);   // group-call calendar + Ben's 1-on-1 marks
   try{
     const base=`https://docs.google.com/spreadsheets/d/${CONFIG.SHEET_ID}/gviz/tq?tqx=out:json&headers=1&sheet=`;
     const tab=async(name,optional)=>{ // optional tabs return [] until they exist
@@ -1156,22 +1157,46 @@ function monthNorm(v){
   if(d&&String(v).match(/^Date\(|GMT|\//))return monthKey(d);
   return String(v||"").trim();
 }
+/* Ben's 1-on-1s book on HIS calendar, so they never reach the Calls tab (that
+   feed is Alan's Calendly). The hub's Weekly Check-ins board is where Ben records
+   them: a purple square ("one" = 1-1 call) on a week of this month counts here.
+   Weeks are Tue–Mon and belong to the month their Friday falls in — the hub's
+   own rule. A mark on a week still running reads as booked; once the week has
+   ended it reads as completed, so it flows into the survey step like any other
+   call and never trips a false OVERDUE. Returns {booked:[tueDate], done:n}. */
+function hubOneOnOnes(r,mk){
+  const marks=[];
+  for(const camp of Object.values((HUB_CAL&&HUB_CAL.checkins)||{})){
+    for(const [tue,state] of Object.entries((camp||{})[String(r.id)]||{})){
+      if(state!=="one")continue;
+      const [y,m,d]=String(tue).split("-").map(Number);
+      if(!y||!m||!d)continue;
+      const t=new Date(y,m-1,d), fri=new Date(y,m-1,d+3);      // local dates — never UTC-shifted
+      if(monthKey(fri)===mk)marks.push(t);
+    }
+  }
+  marks.sort((a,b)=>a-b);
+  const today=new Date();today.setHours(0,0,0,0);
+  const over=t=>new Date(t.getFullYear(),t.getMonth(),t.getDate()+7)<=today;   // the week's Monday has passed
+  return {booked:marks.filter(t=>!over(t)),done:marks.filter(over).length};
+}
 function callState(r){
   const mk=monthKey(new Date());
   const mine=CALLS_RAW.filter(c=>String(c.RepID)===String(r.id)&&monthNorm(c.Month)===mk);
   const surveys=SURVEY_RAW.filter(s=>String(s.RepID)===String(r.id)&&monthNorm(s.Month)===mk);
   const req=callsRequired(r);
-  if(req===0)return {req:0,completed:0,surveyed:0,upcoming:null,status:"na",overdue:false,surveys:[]}; // The Dojo: no 1-on-1s
+  if(req===0)return {req:0,completed:0,surveyed:0,upcoming:null,hubWeek:null,status:"na",overdue:false,surveys:[]}; // The Dojo: no 1-on-1s
   const norm=c=>String(c.Status||"").trim().toLowerCase();
-  const completed=mine.filter(c=>norm(c)==="completed"||norm(c)==="survey_done").length;
+  const hub=hubOneOnOnes(r,mk);
+  const completed=mine.filter(c=>norm(c)==="completed"||norm(c)==="survey_done").length+hub.done;
   const surveyed=surveys.length;
   const upcoming=mine.filter(c=>norm(c)==="booked").map(c=>ciParseDate(c.CallDateTime)).filter(Boolean).sort((a,b)=>a-b);
   let status="none";
   if(completed>=req&&surveyed>=req)status="done";
   else if(completed>surveyed)status="survey";       // a finished call is missing its survey
-  else if(upcoming.length)status="booked";
+  else if(upcoming.length||hub.booked.length)status="booked";
   const overdue=status!=="done"&&new Date().getDate()>CONFIG.CALL_CUTOFF_DAY;
-  return {req,completed,surveyed,upcoming:upcoming[0]||null,status,overdue,surveys};
+  return {req,completed,surveyed,upcoming:upcoming[0]||null,hubWeek:hub.booked[0]||null,status,overdue,surveys};
 }
 
 /* ── campaign planner — one math source for Rep card AND Admin board ── */
@@ -1760,7 +1785,8 @@ function callCardBits(cs){
   const month=monthName();
   if(cs.status==="done")return {title:`${month} call${cs.req>1?"s":""} done 🎉`,sub:`${cs.completed}/${cs.req} completed · survey in`,btn:null};
   if(cs.status==="survey")return {title:"Complete your call survey",sub:`Your ${month} call happened — lock in the takeaways while they're fresh`,btn:CONFIG.SURVEY_FORM_URL?{lab:"Open survey ↗",url:CONFIG.SURVEY_FORM_URL}:null};
-  if(cs.status==="booked")return {title:`Booked for ${cs.upcoming.toLocaleDateString(undefined,{weekday:"long",month:"short",day:"numeric"})}`,sub:cs.upcoming.toLocaleTimeString(undefined,{hour:"numeric",minute:"2-digit"})+(cs.req>1?` · ${cs.completed}/${cs.req} this month`:""),btn:null};
+  if(cs.status==="booked"&&cs.upcoming)return {title:`Booked for ${cs.upcoming.toLocaleDateString(undefined,{weekday:"long",month:"short",day:"numeric"})}`,sub:cs.upcoming.toLocaleTimeString(undefined,{hour:"numeric",minute:"2-digit"})+(cs.req>1?` · ${cs.completed}/${cs.req} this month`:""),btn:null};
+  if(cs.status==="booked")return {title:`Booked for the week of ${cs.hubWeek.toLocaleDateString(undefined,{month:"short",day:"numeric"})}`,sub:"On the coaches' check-in board"+(cs.req>1?` · ${cs.completed}/${cs.req} this month`:""),btn:null};
   return {title:`Book your ${month} call`,sub:`${cs.req}/month for your tier · this is your formal 1-on-1, separate from weekly standards`,btn:{lab:"Book on Calendly ↗",url:CONFIG.CALENDLY_URL}};
 }
 /* ── Fall Appointment Goal Breakdown (mini) ─────────────────────────────────
@@ -1934,12 +1960,17 @@ async function assignSubmit(){
 function campaignWeekNo(){const start=campaignStartDefault(currentCampaign());return Math.max(1,Math.min(PERIOD.weeks,Math.floor((Date.now()-start.getTime())/(7*86400000))+1));}
 
 /* ═══════════════ HUB CALENDAR (next group call) ═══════════════ */
-async function loadHubCalendar(){
-  try{const c=JSON.parse(sessionStorage.getItem("sna_hubcal")||"null");if(c&&Date.now()-c.t<10*60000){HUB_CAL=c.d;return;}}catch(e){}
+/* maxAge: how stale a cached copy may be. Rep pages keep 10 minutes (forty
+   browsers polling); the coach view asks every refresh so Ben's check-in marks
+   land within a minute. */
+async function loadHubCalendar(maxAge){
+  const ttl=maxAge||10*60000;
+  try{const c=JSON.parse(sessionStorage.getItem("sna_hubcal")||"null");if(c&&Date.now()-c.t<ttl&&c.d&&c.d.checkins){HUB_CAL=c.d;return;}}catch(e){}
   try{
     const j=await (await fetch(CONFIG.HUB_SYNC_URL)).json();
     if(j&&j.ok&&j.data){
-      HUB_CAL={calendar:j.data.calendar||[],topicTiers:j.data.topicTiers||{},callTime:String((j.data.meta||{}).callTime||"")};
+      HUB_CAL={calendar:j.data.calendar||[],topicTiers:j.data.topicTiers||{},callTime:String((j.data.meta||{}).callTime||""),
+               checkins:j.data.checkins||{}};   // the Weekly Check-ins board — purple squares are 1-on-1s
       try{sessionStorage.setItem("sna_hubcal",JSON.stringify({t:Date.now(),d:HUB_CAL}));}catch(e){}
     }
   }catch(e){console.warn("hub calendar unavailable",e);}
@@ -1998,7 +2029,8 @@ function renderWeekCard(r){
 }
 function renderAdminCalls(){
   $("calls-month").textContent=monthName();
-  if(!CALLS_RAW.length&&!SURVEY_RAW.length){
+  const hubMarked=DATA.some(r=>callsRequired(r)>0&&(hubOneOnOnes(r,monthKey(new Date())).booked.length||hubOneOnOnes(r,monthKey(new Date())).done));
+  if(!CALLS_RAW.length&&!SURVEY_RAW.length&&!hubMarked){
     $("admin-calls").innerHTML=`<div class="plan-empty">The <b>Calls</b> tab isn't feeding yet — once Calendly + the survey are wired, every mentee's month shows here with overdue flags.</div>`;
     $("calls-feed").innerHTML="";
     return;
@@ -2010,7 +2042,8 @@ function renderAdminCalls(){
     const lab=(cs.overdue?"OVERDUE · ":"")+(()=>{
       if(cs.status==="done")return cs.req>1?`all ${cs.req} done ✓`:"done ✓";
       if(cs.status==="survey")return `${cs.completed} done · survey pending`;
-      if(cs.status==="booked")return "booked"+(cs.upcoming?` ${cs.upcoming.getMonth()+1}/${cs.upcoming.getDate()}`:"");
+      if(cs.status==="booked")return "booked"+(cs.upcoming?` ${cs.upcoming.getMonth()+1}/${cs.upcoming.getDate()}`
+        :cs.hubWeek?` · wk of ${cs.hubWeek.getMonth()+1}/${cs.hubWeek.getDate()}`:"");
       return "not booked";
     })();
     return `<div class="call-row s-${cs.status}${od}"><span class="st"></span>${r.name}`+
@@ -2286,7 +2319,7 @@ function applyMode(){
 let LAST_PAINT="";
 function dataStamp(){
   return JSON.stringify([MODE,REP_LINKS,HAVE_DATA,SELECTED_CAMPAIGN,new Date().toDateString(),
-    ROSTER_RAW,WEEKLY_RAW,CALLS_RAW,SURVEY_RAW,PLANNER_RAW,ASSIGN_RAW,OVERRIDE_RAW,SUB_RAW]);
+    ROSTER_RAW,WEEKLY_RAW,CALLS_RAW,SURVEY_RAW,PLANNER_RAW,ASSIGN_RAW,OVERRIDE_RAW,SUB_RAW,HUB_CAL]);
 }
 function renderAll(){
   LAST_PAINT=dataStamp();
@@ -2305,8 +2338,7 @@ function renderAll(){
   fillRepSelect();renderRep();
 }
 async function init(){
-  await loadData();
-  if(MODE==="rep"){loadHubCalendar().then(()=>{if(MODE==="rep"&&ME)renderWeekCard(ME);});setInterval(()=>loadHubCalendar().then(()=>{if(MODE==="rep"&&ME)renderWeekCard(ME);}),10*60000);}
+  await loadData();                                   // loadData() also brings the hub feed in, both modes
   if(MODE==="rep")setView("rep");
   renderAll();
   paneIn(MODE==="locked" ? $("lockout") : MODE==="offline" ? $("offline") : MODE==="gated" ? $("gated") : $("view-"+(MODE==="rep"?"rep":"team")));
