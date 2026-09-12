@@ -2263,7 +2263,22 @@ function applyMode(){
     document.querySelector(".brand .sub").textContent="All in on sales. All in on life. — Your Dashboard";
   }
 }
+/* ── skip the repaint when nothing changed ──────────────────────────────
+   The 60-second refresh used to redraw every section — charts included —
+   even when the sheet came back byte-for-byte identical, so a coach mid-way
+   down a rep's page saw it flicker each minute. dataStamp() is a fingerprint
+   of everything a render reads: every raw tab, the mode, the rep-links flag,
+   the chosen campaign, and the calendar day (week and campaign boundaries
+   move on their own, so a new day always earns one repaint). It's the full
+   JSON rather than a short hash on purpose: a collision would silently hide
+   a real change, and the string is a few KB compared once a minute. */
+let LAST_PAINT="";
+function dataStamp(){
+  return JSON.stringify([MODE,REP_LINKS,HAVE_DATA,SELECTED_CAMPAIGN,new Date().toDateString(),
+    ROSTER_RAW,WEEKLY_RAW,CALLS_RAW,SURVEY_RAW,PLANNER_RAW,ASSIGN_RAW,OVERRIDE_RAW,SUB_RAW]);
+}
 function renderAll(){
+  LAST_PAINT=dataStamp();
   applyMode();
   if(MODE==="locked"||MODE==="offline"||MODE==="gated")return;
   if(MODE==="rep"){
@@ -2284,12 +2299,15 @@ async function init(){
   if(MODE==="rep")setView("rep");
   renderAll();
   paneIn(MODE==="locked" ? $("lockout") : MODE==="offline" ? $("offline") : MODE==="gated" ? $("gated") : $("view-"+(MODE==="rep"?"rep":"team")));
-  if(CONFIG.USE_LIVE_DATA)setInterval(async()=>{
-    const was=MODE;
-    await loadData();
-    if(was!=="rep"&&MODE==="rep")setView("rep"); // first successful load after offline/lockout
-    renderAll();
-  },CONFIG.REFRESH_MS);
+  if(CONFIG.USE_LIVE_DATA)setInterval(refreshTick,CONFIG.REFRESH_MS);
+}
+/* the timed refresh: reload the sheet, then repaint only if something changed */
+async function refreshTick(){
+  const was=MODE;
+  await loadData();
+  if(was!=="rep"&&MODE==="rep")setView("rep"); // first successful load after offline/lockout
+  if(dataStamp()===LAST_PAINT)return;          // same data, same day — leave the page exactly as it is
+  renderAll();
 }
 init();
 </script>
