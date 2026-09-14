@@ -1111,6 +1111,28 @@ const todayISO=()=>{const d=new Date();return d.getFullYear()+"-"+String(d.getMo
 
 const money=n=>n==null?"—":"$"+Math.round(n).toLocaleString();
 const num=n=>n==null?"—":n.toLocaleString();
+
+/* ── clock faces ───────────────────────────────────────────────────────
+   Times arrive from the sheet as floating wall-clock values — ciParseDate
+   rebuilds them component by component, so what the sheet says is what shows,
+   with no zone conversion in between. Format the face ourselves rather than
+   letting toLocaleTimeString decide: on a phone set to a 24-hour clock it was
+   rendering a 3:30 call as "15:30", which is not how anybody says it. */
+const fmtClock=d=>{
+  if(!(d instanceof Date)||isNaN(d))return "";
+  const h=d.getHours();
+  return (h%12||12)+":"+String(d.getMinutes()).padStart(2,"0")+(h<12?"AM":"PM");
+};
+/* 1-on-1s are Central, like every call on the hub's board, and Central is CDT
+   from the second Sunday in March to the first Sunday in November and CST the
+   rest of the year — so the label is read off the call's own date. */
+const firstSundayOf=(y,month)=>1+((7-new Date(y,month,1).getDay())%7);
+const centralZone=d=>{
+  const y=d.getFullYear();
+  const day=new Date(y,d.getMonth(),d.getDate());
+  return day>=new Date(y,2,firstSundayOf(y,2)+7)&&day<new Date(y,10,firstSundayOf(y,10))?"CDT":"CST";
+};
+const fmtCallTime=d=>{const face=fmtClock(d);return face?face+" "+centralZone(d):"";};
 const sum=a=>a.filter(x=>x!=null).reduce((p,c)=>p+c,0);
 const activeWeeks=r=>r.sales.filter(x=>x!=null).length;
 const totalSales=r=>sum(r.sales);
@@ -1785,7 +1807,7 @@ function callCardBits(cs){
   const month=monthName();
   if(cs.status==="done")return {title:`${month} call${cs.req>1?"s":""} done 🎉`,sub:`${cs.completed}/${cs.req} completed · survey in`,btn:null};
   if(cs.status==="survey")return {title:"Complete your call survey",sub:`Your ${month} call happened — lock in the takeaways while they're fresh`,btn:CONFIG.SURVEY_FORM_URL?{lab:"Open survey ↗",url:CONFIG.SURVEY_FORM_URL}:null};
-  if(cs.status==="booked"&&cs.upcoming)return {title:`Booked for ${cs.upcoming.toLocaleDateString(undefined,{weekday:"long",month:"short",day:"numeric"})}`,sub:cs.upcoming.toLocaleTimeString(undefined,{hour:"numeric",minute:"2-digit"})+(cs.req>1?` · ${cs.completed}/${cs.req} this month`:""),btn:null};
+  if(cs.status==="booked"&&cs.upcoming)return {title:`Booked for ${cs.upcoming.toLocaleDateString(undefined,{weekday:"long",month:"short",day:"numeric"})}`,sub:fmtCallTime(cs.upcoming)+(cs.req>1?` · ${cs.completed}/${cs.req} this month`:""),btn:null};
   if(cs.status==="booked")return {title:`Booked for the week of ${cs.hubWeek.toLocaleDateString(undefined,{month:"short",day:"numeric"})}`,sub:"On the coaches' check-in board"+(cs.req>1?` · ${cs.completed}/${cs.req} this month`:""),btn:null};
   return {title:`Book your ${month} call`,sub:`${cs.req}/month for your tier · this is your formal 1-on-1, separate from weekly standards`,btn:{lab:"Book on Calendly ↗",url:CONFIG.CALENDLY_URL}};
 }
@@ -1883,7 +1905,7 @@ function assignCardHtml(x){
   const due=x.due?(x.state==="late"?`Overdue · was due ${fmtDue(x.due)}`:`Due ${fmtDue(x.due)}`):"No due date";
   const instr=String(a.Instructions||"").trim();
   const long=instr.length>160||instr.split("\n").length>2;
-  const stamp=v=>{const t=ciParseDate(v);return t?t.toLocaleDateString(undefined,{month:"short",day:"numeric"})+", "+t.toLocaleTimeString(undefined,{hour:"numeric",minute:"2-digit"}):"";};
+  const stamp=v=>{const t=ciParseDate(v);return t?t.toLocaleDateString(undefined,{month:"short",day:"numeric"})+", "+fmtClock(t):"";};
   const thread=x.versions.map(v=>`<div class="as-ver"><div class="vh">v${esc(v.Version)} · ${stamp(v.SubmittedAt)}</div>`+
       (v.Text?`<div class="vt">${esc(v.Text)}</div>`:"")+
       (v.LinkURL?`<div><a href="${esc(v.LinkURL)}" target="_blank" rel="noopener">${esc(v.LinkURL)}</a></div>`:"")+
@@ -1999,7 +2021,7 @@ function renderWeekCard(r){
   const ws=ciWindowStart();
   const filed=WEEKLY_RAW.filter(w=>String(w.RepID)===String(r.id)&&(ciFiledAt(w)||0)>=ws)
     .map(w=>ciParseDate(w.Timestamp)).sort((a,b)=>b-a)[0];   // counted by ciFiledAt, shown at the real time
-  if(filed)rows.push({dot:"good",lab:"Weekly check-in",title:"Last week's check-in is in ✓",sub:"Filed "+filed.toLocaleDateString(undefined,{weekday:"short"})+" "+filed.toLocaleTimeString(undefined,{hour:"numeric",minute:"2-digit"}),btns:[]});
+  if(filed)rows.push({dot:"good",lab:"Weekly check-in",title:"Last week's check-in is in ✓",sub:"Filed "+filed.toLocaleDateString(undefined,{weekday:"short"})+" "+fmtClock(filed),btns:[]});
   else rows.push({dot:"warn",lab:"Weekly check-in",title:"Last week's check-in isn't in yet",sub:"Your week closed Monday night. Two minutes, due by Wednesday.",btns:[{lab:"Do my check-in ↗",url:CONFIG.WEEKLY_FORM_URL}]});
   // 2 · assignments still open this campaign
   const open=assignSort(assignFor(r,currentCampaign()).filter(x=>x.state!=="approved"));
@@ -2260,7 +2282,7 @@ function renderCallPrep(r){
   const note=(r.notes||[])[0];
   const p=plannerFor(r), pc=pace(p);
   const callTxt=cs.status==="na"?"The Dojo · no 1-on-1s":cs.status==="booked"&&cs.upcoming
-    ?`Booked ${cs.upcoming.toLocaleDateString(undefined,{weekday:"short",month:"short",day:"numeric"})} · ${cs.upcoming.toLocaleTimeString(undefined,{hour:"numeric",minute:"2-digit"})}`
+    ?`Booked ${cs.upcoming.toLocaleDateString(undefined,{weekday:"short",month:"short",day:"numeric"})} · ${fmtCallTime(cs.upcoming)}`
     :cs.status==="done"?"Done + surveyed ✓"
     :cs.status==="survey"?`${cs.completed} done · survey pending`
     :"Not booked — nudge them";
