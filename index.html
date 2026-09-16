@@ -355,6 +355,115 @@
   .camp-pill .tag{opacity:.6;margin-left:5px;font-size:8px;text-transform:uppercase;letter-spacing:.08em}
   .plan-empty{font-size:12.5px;color:var(--ink-faint);background:var(--card);border:1px dashed var(--line-strong);border-radius:12px;padding:20px;text-align:center}
 
+  /* ═══ skillset tracker ═══
+     The rep view carries two boards now, so it needs its own tab strip. It sits
+     on the paper (the masthead toggle is on the dark shell) and reads as a pair
+     of file tabs rather than buttons. */
+  .subtabs{display:flex;gap:4px;margin:24px 0 0;border-bottom:2px solid var(--ink);padding:0 0 0 2px}
+  .subtabs button{font-family:var(--monof);font-size:11px;letter-spacing:.11em;text-transform:uppercase;
+    border:1px solid transparent;border-bottom:none;background:none;border-radius:9px 9px 0 0;
+    padding:10px 20px 9px;cursor:pointer;color:var(--ink-faint);transition:color .15s,background .15s;
+    position:relative;top:2px}
+  .subtabs button:hover{color:var(--ink-soft)}
+  .subtabs button.on{background:var(--card-raised);border-color:var(--line);color:var(--ink);font-weight:600;
+    box-shadow:0 -1px 2px rgba(28,23,18,.04)}
+  .subtabs button .tcount{font-size:9px;letter-spacing:.06em;color:var(--ink-faint);margin-left:7px;font-weight:400}
+  .subtabs button.on .tcount{color:var(--accent)}
+
+  /* the four-up summary above the ratings */
+  .sk-top{display:grid;grid-template-columns:repeat(4,1fr);gap:14px 24px;margin:22px 0 4px}
+  .sk-top .kpi .val small{font-family:var(--sans);font-size:13px;font-weight:500;color:var(--ink-faint);letter-spacing:0}
+  .sk-top .kpi .val .nm{font-family:var(--sans);font-size:15px;font-weight:600;letter-spacing:-.01em;line-height:1.25;display:block}
+
+  /* category bars — the whole skillset in six lines */
+  .sk-bars{display:grid;gap:9px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 18px}
+  .sk-bar{display:grid;grid-template-columns:132px 1fr 84px;align-items:center;gap:12px;cursor:pointer}
+  .sk-bar:hover .sk-bl{color:var(--accent)}
+  .sk-bar.on .sk-bl{color:var(--accent);font-weight:600}
+  .sk-bars.wide .sk-bar{grid-template-columns:190px 1fr 156px;cursor:default}
+  .sk-bl{font-family:var(--monof);font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-soft);
+    transition:color .15s;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .sk-btrack{height:8px;background:var(--paper-deep);border-radius:999px;overflow:hidden}
+  .sk-bfill{height:100%;border-radius:999px;transition:width .5s cubic-bezier(.2,.7,.3,1)}
+  .sk-bv{font-family:var(--monof);font-size:11px;text-align:right;font-variant-numeric:tabular-nums;color:var(--ink)}
+  .sk-bv .un{color:var(--ink-faint)}
+  .sk-bv .d{font-size:9.5px;margin-left:5px}
+  .sk-bv .d.up{color:var(--good)} .sk-bv .d.down{color:var(--bad)}
+
+  /* the rating list */
+  .sk-grp{margin-top:22px}
+  .sk-ghead{display:flex;align-items:baseline;justify-content:space-between;gap:10px;flex-wrap:wrap;
+    border-bottom:1px solid var(--line-strong);padding-bottom:7px;margin-bottom:2px}
+  .sk-gname{font-family:var(--serif);font-size:15px;font-weight:600;letter-spacing:-.01em}
+  .sk-gavg{font-family:var(--monof);font-size:10px;letter-spacing:.06em;color:var(--ink-faint);font-variant-numeric:tabular-nums}
+  .sk-row{display:grid;grid-template-columns:1fr auto;align-items:center;gap:10px 16px;
+    padding:9px 2px;border-bottom:1px solid var(--line-soft)}
+  .sk-row:last-child{border-bottom:none}
+  .sk-row.focus{background:linear-gradient(90deg,var(--accent-soft),transparent 60%);
+    box-shadow:inset 3px 0 0 var(--accent);padding-left:11px;border-radius:3px}
+  .sk-nm{font-size:13px;line-height:1.35;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .sk-star{border:none;background:none;cursor:pointer;font-size:12px;line-height:1;padding:2px 3px;
+    color:var(--ink-faint);opacity:0;transition:opacity .15s,color .15s}
+  .sk-row:hover .sk-star,.sk-star.on{opacity:1}
+  .sk-star.on{color:var(--accent)}
+  .sk-star:hover{color:var(--accent)}
+  .sk-gap{font-family:var(--monof);font-size:8.5px;letter-spacing:.07em;text-transform:uppercase;
+    border:1px solid var(--bad);color:var(--bad);background:var(--bad-bg);border-radius:5px;padding:1px 5px}
+  .sk-coachv{font-family:var(--monof);font-size:9px;letter-spacing:.06em;text-transform:uppercase;
+    border:1px solid var(--line);color:var(--ink-soft);background:var(--card);border-radius:5px;padding:1px 6px}
+  .sk-coachv b{color:var(--ink);font-weight:600}
+
+  /* 1–10. Ten taps is the whole interaction, so they are real buttons, big
+     enough for a thumb, and they read as one continuous ruler. */
+  .sk-scale{display:flex;gap:3px}
+  .sk-scale button{font-family:var(--monof);font-size:11px;width:27px;height:27px;padding:0;
+    border:1px solid var(--line);background:var(--card);border-radius:6px;cursor:pointer;color:var(--ink-faint);
+    font-variant-numeric:tabular-nums;transition:border-color .12s,background .12s,color .12s}
+  .sk-scale button:hover{border-color:var(--ink-soft);color:var(--ink)}
+  .sk-scale button.on{color:#FFF9F1;font-weight:600;border-color:transparent}
+  .sk-scale button.lo.on{background:#A33512}
+  .sk-scale button.mid.on{background:#96760A}
+  .sk-scale button.hi.on{background:#3D6B4F}
+  .sk-scale button.top.on{background:#1C1712}
+  .sk-scale.ro button{cursor:default}
+  .sk-scale.ro button:hover{border-color:var(--line);color:var(--ink-faint)}
+  .sk-scale.coach button.on{box-shadow:inset 0 0 0 2px var(--card),inset 0 0 0 3px currentColor}
+
+  .sk-legend{display:flex;gap:16px;flex-wrap:wrap;font-family:var(--monof);font-size:9.5px;
+    letter-spacing:.06em;text-transform:uppercase;color:var(--ink-faint);margin:14px 0 2px}
+  .sk-legend span{display:flex;align-items:center;gap:6px}
+  .sk-legend i{width:10px;height:10px;border-radius:3px;display:block}
+
+  .sk-note{font-size:12.5px;color:var(--ink-soft);background:var(--card);border:1px solid var(--line);
+    border-left:3px solid var(--brass);border-radius:10px;padding:13px 16px;line-height:1.65;margin:16px 0 0}
+  .sk-note b{color:var(--ink)}
+  .sk-save{font-family:var(--monof);font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-faint)}
+  .sk-save.ok{color:var(--good)} .sk-save.err{color:var(--bad)}
+
+  /* coach's team board */
+  .sk-team{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px}
+  .sk-tc{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:13px 15px;cursor:pointer;
+    transition:border-color .15s,transform .15s}
+  .sk-tc:hover{border-color:var(--accent);transform:translateY(-1px)}
+  .sk-tc .n{font-size:13.5px;font-weight:600;letter-spacing:-.01em}
+  .sk-tc .m{font-family:var(--monof);font-size:9.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-faint);margin-top:5px}
+  .sk-tc .s{font-family:var(--serif);font-size:23px;font-weight:560;margin-top:7px;line-height:1}
+  .sk-tc.none .s{color:var(--ink-faint)}
+
+  @media(max-width:860px){
+    .sk-top{grid-template-columns:repeat(2,1fr)}
+    .sk-bar{grid-template-columns:104px 1fr 72px;gap:9px}
+    .sk-bars.wide .sk-bar{grid-template-columns:130px 1fr 132px}
+  }
+  @media(max-width:620px){
+    .subtabs button{padding:9px 13px;font-size:10px;letter-spacing:.07em}
+    .sk-row{grid-template-columns:1fr}
+    .sk-scale{gap:2px;justify-content:space-between}
+    .sk-scale button{width:100%;max-width:34px;height:31px}
+    .sk-bar,.sk-bars.wide .sk-bar{grid-template-columns:1fr;gap:4px}
+    .sk-bv{text-align:left}
+  }
+
   /* ── admin calls board ── */
   .calls-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:8px}
   .call-row{display:flex;align-items:center;gap:9px;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 13px;font-size:12.5px;font-weight:500}
@@ -537,19 +646,36 @@
       </div>
       <div class="mix" id="mix"></div>
     </div>
+
+    <div class="section hidden" id="skills-team-sec">
+      <div class="section-head">
+        <h2 class="serif">Skillset</h2>
+        <span class="hint">what everyone says they can do — tap a mentee for their board</span>
+      </div>
+      <div id="skills-team"></div>
+    </div>
   </div>
 
   <!-- ════ REP (admin deep-dive AND the locked rep page share this) ════ -->
   <div id="view-rep" class="hidden">
-    <!-- the rep's week at a glance: check-in · assignments · 1-on-1 (Path/Masters) · next group call -->
-    <div class="section hidden" id="week-sec" style="margin-top:24px">
-      <div id="week-card"></div>
-    </div>
-
+    <!-- who we're looking at comes first, then which of their boards -->
     <div class="rep-pick">
       <div class="eyebrow">Mentee</div>
       <select id="rep-select" onchange="renderRep()"></select>
       <div class="serif hidden" id="rep-name-lock" style="font-size:26px;font-weight:600;letter-spacing:-.01em"></div>
+    </div>
+
+    <!-- Two boards per mentee, each on its own tab. The skillset is 137 rows —
+         on the performance page it would bury the numbers reps come here for. -->
+    <div class="subtabs" id="rep-tabs">
+      <button type="button" data-tab="perf" class="on" onclick="setRepTab('perf')">Performance</button>
+      <button type="button" data-tab="skills" onclick="setRepTab('skills')">Skillset<span class="tcount" id="sk-tabcount"></span></button>
+    </div>
+
+    <div id="rep-pane-perf">
+    <!-- the rep's week at a glance: check-in · assignments · 1-on-1 (Path/Masters) · next group call -->
+    <div class="section hidden" id="week-sec" style="margin-top:24px">
+      <div id="week-card"></div>
     </div>
     <div class="rep-context" id="rep-context"></div>
 
@@ -677,6 +803,10 @@
         <div class="mix" id="mix-rep"></div>
       </div>
     </div>
+    </div><!-- /rep-pane-perf -->
+
+    <!-- ════ SKILLSET ════ built by renderSkills() ════ -->
+    <div id="rep-pane-skills" class="hidden"></div>
   </div>
 
   <!-- lockout: unknown ?rep= id -->
@@ -740,12 +870,22 @@ const CONFIG = {
   SURVEY_FORM_URL: "https://docs.google.com/forms/d/e/1FAIpQLSedU7b3dOX6JQs8fcRJbqB5q3dmbEc9fSoUm-rmpK9484R4cQ/viewform",
   WEBAPP_URL: "https://script.google.com/macros/s/AKfycbyNFDkgEAUT5IDNw4wvCHLQZoe70XxVwgAZmG8bNTmlkY8t0d-wL2eKa53kgke2AOCHPQ/exec",
   CALL_CUTOFF_DAY: 20,          // after this day of month, an unfinished call shows OVERDUE
-  REFRESH_MS: 60000
+  REFRESH_MS: 60000,
+  /* Skillset tracker storage — its own Apps Script, its own spreadsheet, so a
+     rep rating themselves can never touch the performance sheet. Paste the
+     /exec URL from SNA-Skills-Sync.gs here to switch the shared copy on; until
+     then the tracker runs against this browser's localStorage and says so. */
+  SKILLS_URL: "",
+  SKILLS_TOKEN: "sharpninja"
 };
 
 /* ── Identity: ?rep=<RepID> locks the page to that one rep (their personal link).
    Bare URL = Admin (coach) view. No picker fallback — an unknown id shows a lockout. ── */
 const REP_PARAM=(new URLSearchParams(location.search).get("rep")||"").trim();
+
+/* ?tab=skills (or #skills) opens straight onto the skillset board — the link a
+   coach texts when they want someone to go and rate themselves. */
+const TAB_PARAM=((new URLSearchParams(location.search).get("tab")||"")+location.hash.replace("#","")).trim().toLowerCase();
 
 /* ── ?embed=1: running inside the hub's Performance tab. The chrome the hub
    already provides (masthead, footer, grain) comes off; the Team/Rep toggle,
@@ -2304,6 +2444,677 @@ function renderRep(){
   $("starter-sec").classList.toggle("hidden",!collapse);
   if(collapse&&SURVEY_RAW.some(x=>String(x.RepID)===String(r.id)))
     $("call-notes-sec").classList.remove("hidden"); // call notes exist — keep them
+  /* the starter-card collapse above hides .rds sections — the skillset is on
+     its own tab and deliberately never collapses: a brand-new rep with no
+     check-ins yet can still rate themselves on day one. */
+  skTabCount(); renderSkills();
+}
+/* the count on the Skillset tab — how much of it they've actually done */
+function skTabCount(){
+  const el=$("sk-tabcount"); if(!el)return;
+  const r=skTarget();
+  if(!r||!SK_LOADED){el.textContent="";return;}
+  const n=Object.keys(skRow(r.id,SK_CAMPAIGN||currentCampaign()).Self||{}).length;
+  el.textContent=n?n+"/"+SKILL_COUNT:"";
+}
+
+/* ═══════════════ SKILLSET TRACKER ═══════════════
+   The 137 skills off Alan's sheet, in their six categories, rated 1–10 — by
+   the rep on their own tab, and by their coach from the Performance tab. It
+   gets its own board rather than another section on the performance page:
+   137 rows would bury the numbers reps actually open the page for.
+
+   Storage is its own small Apps Script (SNA-Skills-Sync.gs) writing to its own
+   spreadsheet — ONE ROW per rep per campaign holding a JSON map of ratings, so
+   forty reps rating themselves on a Tuesday night never collide, and a whole
+   board saves in one write. Ratings are stamped with the campaign they were
+   given in, so the same skill rated again in January sits next to September's
+   number instead of overwriting it — that delta is the entire point.
+
+   Until that script is deployed CONFIG.SKILLS_URL is empty, and everything
+   below falls back to localStorage: a rep can still rate themselves and see
+   their board, and the page says plainly that the numbers haven't left their
+   phone yet. Nothing here can break the performance board — the skills feed is
+   fetched lazily, only when someone opens the tab. */
+const SKILL_CATS=[
+  {k:"demos",n:"Demos",g:[
+    {k:"selling-ultimates",n:"Selling Ultimates",s:[
+      ["demos.selling-ultimates.selling-ultimates","Selling Ultimates"],
+      ["demos.selling-ultimates.creating-needs","Creating Needs"],
+      ["demos.selling-ultimates.building-value","Building Value"],
+      ["demos.selling-ultimates.price-positioning","Price Positioning"],
+      ["demos.selling-ultimates.value-in-ultimate","Value in Ultimate"],
+      ["demos.selling-ultimates.closing","Closing"],
+    ]},
+    {k:"handling-objections",n:"Handling Objections",s:[
+      ["demos.handling-objections.handling-objections","Handling Objections"],
+      ["demos.handling-objections.wouldn-t-use-it","Wouldn't use it"],
+      ["demos.handling-objections.too-much-money-for-knives","Too much money for knives"],
+      ["demos.handling-objections.spouse","Spouse"],
+      ["demos.handling-objections.think-about-it","Think About it"],
+      ["demos.handling-objections.all-or-nothing","All or Nothing"],
+    ]},
+    {k:"dropping-down-sets",n:"Dropping Down Sets",s:[
+      ["demos.dropping-down-sets.dropping-down-sets","Dropping Down Sets"],
+      ["demos.dropping-down-sets.ulti-to-siggy","Ulti -> Siggy"],
+      ["demos.dropping-down-sets.ulti-to-homi-steak","Ulti -> Homi steak"],
+      ["demos.dropping-down-sets.siggy-to-homi-steak","Siggy -> Homi steak"],
+      ["demos.dropping-down-sets.homi-to-galley","Homi -> Galley"],
+      ["demos.dropping-down-sets.galley-to-13pc-or-11pc","Galley -> 13pc or 11pc"],
+      ["demos.dropping-down-sets.13-or-11-to-5pc","13 or 11 -> 5pc"],
+      ["demos.dropping-down-sets.steak-to-table-knives","Steak -> Table knives"],
+    ]},
+  ]},
+  {k:"service-calls",n:"Service Calls",g:[
+    {k:"selling-ultimate-upgrades",n:"Selling Ultimate Upgrades",s:[
+      ["service-calls.selling-ultimate-upgrades.selling-ultimate-upgrades","Selling Ultimate Upgrades"],
+      ["service-calls.selling-ultimate-upgrades.creating-needs","Creating Needs"],
+      ["service-calls.selling-ultimate-upgrades.upgrade-preframe","Upgrade Preframe"],
+      ["service-calls.selling-ultimate-upgrades.focus-5","Focus 5"],
+      ["service-calls.selling-ultimate-upgrades.stacking-value","Stacking Value"],
+      ["service-calls.selling-ultimate-upgrades.closing","Closing"],
+    ]},
+    {k:"handling-objections",n:"Handling Objections",s:[
+      ["service-calls.handling-objections.handling-objections","Handling Objections"],
+      ["service-calls.handling-objections.wouldn-t-use-it","Wouldn't use it"],
+      ["service-calls.handling-objections.too-much-money-for-knives","Too much money for knives"],
+      ["service-calls.handling-objections.spouse","Spouse"],
+      ["service-calls.handling-objections.think-about-it","Think About it"],
+      ["service-calls.handling-objections.don-t-want-a-block","Don't want a block"],
+    ]},
+    {k:"dropping-down-upgrades",n:"Dropping Down Upgrades",s:[
+      ["service-calls.dropping-down-upgrades.dropping-down-upgrades","Dropping Down Upgrades"],
+      ["service-calls.dropping-down-upgrades.ulti-steak-to-ulti-table","Ulti Steak -> Ulti Table"],
+      ["service-calls.dropping-down-upgrades.ulti-table-to-builder","Ulti Table -> Builder"],
+      ["service-calls.dropping-down-upgrades.builder-to-5pc-block","Builder -> 5pc block"],
+      ["service-calls.dropping-down-upgrades.builder-to-siggy-upgrade","Builder -> siggy upgrade"],
+      ["service-calls.dropping-down-upgrades.siggy-or-5pc-to-5pc-special","Siggy or 5pc -> 5pc special"],
+      ["service-calls.dropping-down-upgrades.ulti-steak-to-fam-to-ulti-upgrade","Ulti Steak -> Fam to Ulti Upgrade"],
+      ["service-calls.dropping-down-upgrades.fam-to-ulti-to-siggy-steak","Fam to Ulti -> Siggy Steak"],
+      ["service-calls.dropping-down-upgrades.siggy-steak-to-13pc-set","Siggy steak -> 13pc set"],
+      ["service-calls.dropping-down-upgrades.13pc-to-11pc-or-5pc","13pc -> 11pc or 5pc"],
+    ]},
+  ]},
+  {k:"events",n:"Events",g:[
+    {k:"selling-ultimates",n:"Selling Ultimates",s:[
+      ["events.selling-ultimates.selling-ultimates","Selling Ultimates"],
+      ["events.selling-ultimates.qualifying","Qualifying"],
+      ["events.selling-ultimates.power-intro","Power Intro"],
+      ["events.selling-ultimates.value-build","Value Build"],
+      ["events.selling-ultimates.price-positioning","Price Positioning"],
+      ["events.selling-ultimates.set-positioning","Set Positioning"],
+      ["events.selling-ultimates.closing","Closing"],
+      ["events.selling-ultimates.cutco-kitchen-intro","Cutco Kitchen Intro"],
+    ]},
+    {k:"selling-ultimate-upgrades",n:"Selling Ultimate Upgrades",s:[
+      ["events.selling-ultimate-upgrades.selling-ultimate-upgrades","Selling Ultimate Upgrades"],
+      ["events.selling-ultimate-upgrades.bringing-people-to-booth","Bringing People to Booth"],
+      ["events.selling-ultimate-upgrades.gaining-permission","Gaining Permission"],
+      ["events.selling-ultimate-upgrades.focus-5","Focus 5"],
+      ["events.selling-ultimate-upgrades.upgrade-description","Upgrade Description"],
+      ["events.selling-ultimate-upgrades.price-positioning","Price Positioning"],
+      ["events.selling-ultimate-upgrades.stacking-value","Stacking Value"],
+      ["events.selling-ultimate-upgrades.closing","Closing"],
+    ]},
+    {k:"handling-objections",n:"Handling Objections",s:[
+      ["events.handling-objections.handling-objections","Handling Objections"],
+      ["events.handling-objections.i-need-to-think-about-1st","I need to think about 1st"],
+      ["events.handling-objections.i-need-to-think-about-it-2nd","I need to think about it 2nd"],
+      ["events.handling-objections.spouse-stall","Spouse Stall"],
+      ["events.handling-objections.wouldn-t-use-it","Wouldn't Use It"],
+      ["events.handling-objections.too-much-money-for-knives","Too much Money for Knives"],
+      ["events.handling-objections.all-or-nothing","All or Nothing"],
+    ]},
+  ]},
+  {k:"general-skills",n:"General Skills",g:[
+    {k:"referrals",n:"Referrals",s:[
+      ["general-skills.referrals.referrals","Referrals"],
+      ["general-skills.referrals.goal-sharing-10-step","Goal Sharing 10 Step"],
+      ["general-skills.referrals.social-proof","Social Proof"],
+      ["general-skills.referrals.rec-approach","Rec Approach"],
+      ["general-skills.referrals.rec-upserving","Rec Upserving"],
+      ["general-skills.referrals.hypertargeting","Hypertargeting"],
+      ["general-skills.referrals.can-i-send-you-names-later","Can I send you names later?"],
+      ["general-skills.referrals.can-i-talk-to-my-friends-first","Can I talk to my friends first?"],
+      ["general-skills.referrals.i-don-t-know-anyone","I don't know anyone"],
+      ["general-skills.referrals.i-don-t-feel-comfortable-with-it","I don't feel comfortable with it?"],
+    ]},
+    {k:"upserving",n:"Upserving",s:[
+      ["general-skills.upserving.upserving","Upserving"],
+      ["general-skills.upserving.sets-to-packages","Sets -> Packages"],
+      ["general-skills.upserving.5pc-to-steak-knives","5pc -> steak knives"],
+      ["general-skills.upserving.pcs-to-upgrade","Pcs -> Upgrade"],
+      ["general-skills.upserving.1-or-2-to-5pc","1 or 2 -> 5pc"],
+      ["general-skills.upserving.family-program","Family Program"],
+    ]},
+    {k:"gifts",n:"Gifts",s:[
+      ["general-skills.gifts.gifts","Gifts"],
+      ["general-skills.gifts.how-many","How Many"],
+      ["general-skills.gifts.initial-set-to-dream-set","Initial Set -> Dream Set"],
+    ]},
+    {k:"cookware",n:"Cookware",s:[
+      ["general-skills.cookware.cookware","Cookware"],
+      ["general-skills.cookware.power-intro","Power Intro"],
+      ["general-skills.cookware.value-build","Value Build"],
+      ["general-skills.cookware.price-positioning","Price Positioning"],
+      ["general-skills.cookware.cooking-explanation","Cooking Explanation"],
+      ["general-skills.cookware.set-positioning","Set Positioning"],
+      ["general-skills.cookware.closing","Closing"],
+      ["general-skills.cookware.dropping-down","Dropping Down"],
+      ["general-skills.cookware.doesn-t-stainless-stick","Doesn't Stainless Stick?"],
+      ["general-skills.cookware.too-much-money-for-pans","Too Much Money For Pans"],
+    ]},
+    {k:"flatware",n:"Flatware",s:[
+      ["general-skills.flatware.flatware","Flatware"],
+      ["general-skills.flatware.power-intro","Power Intro"],
+      ["general-skills.flatware.value-build","Value Build"],
+      ["general-skills.flatware.price-positioning","Price Positioning"],
+      ["general-skills.flatware.closing","Closing"],
+      ["general-skills.flatware.too-light","Too Light"],
+      ["general-skills.flatware.don-t-love-the-pattern","Don't Love the Pattern"],
+    ]},
+    {k:"accesory-package",n:"Accesory Package",s:[
+      ["general-skills.accesory-package.accesory-package","Accesory Package"],
+      ["general-skills.accesory-package.power-intro","Power Intro"],
+      ["general-skills.accesory-package.value-build","Value Build"],
+      ["general-skills.accesory-package.closing","Closing"],
+      ["general-skills.accesory-package.dropping-down","Dropping Down"],
+    ]},
+    {k:"famous-let-go",n:"Famous Let Go",s:[
+      ["general-skills.famous-let-go.famous-let-go","Famous Let Go"],
+      ["general-skills.famous-let-go.setting-future-expectations","Setting Future Expectations"],
+      ["general-skills.famous-let-go.creating-future-wishlist","Creating Future Wishlist"],
+    ]},
+  ]},
+  {k:"biz-gifts",n:"Biz Gifts",g:[
+    {k:"asking-everyone-what-you-do",n:"Asking EVERYONE what you do",s:[
+      ["biz-gifts.asking-everyone-what-you-do.asking-everyone-what-you-do","Asking EVERYONE what you do"],
+      ["biz-gifts.asking-everyone-what-you-do.gaining-permission","Gaining Permission"],
+      ["biz-gifts.asking-everyone-what-you-do.60-sec-pitch","60 sec Pitch"],
+      ["biz-gifts.asking-everyone-what-you-do.questions","Questions"],
+      ["biz-gifts.asking-everyone-what-you-do.closing","Closing"],
+      ["biz-gifts.asking-everyone-what-you-do.1st-option-to-smaller-option","1st Option -> Smaller Option"],
+      ["biz-gifts.asking-everyone-what-you-do.smaller-to-pilot-program","Smaller -> Pilot Program"],
+      ["biz-gifts.asking-everyone-what-you-do.pilot-to-they-buy-sample","Pilot -> They buy sample"],
+      ["biz-gifts.asking-everyone-what-you-do.they-buy-sample-to-i-buy-sample","They buy sample -> I buy sample"],
+      ["biz-gifts.asking-everyone-what-you-do.scheduling-follow-up-meeting","Scheduling Follow Up Meeting"],
+      ["biz-gifts.asking-everyone-what-you-do.after-order-follow-up","After Order Follow Up"],
+      ["biz-gifts.asking-everyone-what-you-do.setting-up-annual-biz-review","Setting Up Annual Biz Review"],
+      ["biz-gifts.asking-everyone-what-you-do.getting-2nd-order","Getting 2nd Order"],
+      ["biz-gifts.asking-everyone-what-you-do.why-knives","Why Knives?"],
+    ]},
+    {k:"real-estate",n:"Real Estate",s:[
+      ["biz-gifts.real-estate.real-estate","Real Estate"],
+      ["biz-gifts.real-estate.building-value","Building Value"],
+      ["biz-gifts.real-estate.questions","Questions"],
+      ["biz-gifts.real-estate.closing","Closing"],
+      ["biz-gifts.real-estate.booking-team-meetings","Booking Team Meetings"],
+      ["biz-gifts.real-estate.setting-follow-ups","Setting Follow Ups"],
+    ]},
+  ]},
+  {k:"productivity",n:"Productivity",g:[
+    {k:"scheduling",n:"Scheduling",s:[
+      ["productivity.scheduling.scheduling","Scheduling"],
+      ["productivity.scheduling.priority-planning","Priority Planning"],
+      ["productivity.scheduling.morning-routine","Morning Routine"],
+      ["productivity.scheduling.night-routine","Night Routine"],
+      ["productivity.scheduling.weekly-reflection","Weekly Reflection"],
+      ["productivity.scheduling.screen-time","Screen Time"],
+      ["productivity.scheduling.daily-accountability","Daily Accountability"],
+      ["productivity.scheduling.weekly-accountability","Weekly Accountability"],
+    ]},
+  ]},
+];
+
+/* flat index: id → {id,n,cat,catName,grp,grpName} */
+const SKILL_FLAT=[], SKILL_BY_ID={};
+SKILL_CATS.forEach(c=>c.g.forEach(g=>g.s.forEach(([id,n])=>{
+  const rec={id,n,cat:c.k,catName:c.n,grp:g.k,grpName:g.n};
+  SKILL_FLAT.push(rec); SKILL_BY_ID[id]=rec;
+})));
+const SKILL_COUNT=SKILL_FLAT.length;
+const SK_MAX_FOCUS=5;
+
+/* ── state ── */
+let SK_ROWS=[];            // every row the feed returned: {RepID,Campaign,Self,Coach,Focus,...}
+let SK_LOADED=false, SK_LOADING=null, SK_FETCHED_AT=0, SK_SCOPE="";
+let SK_CAMPAIGN=null;      // the campaign being rated / read
+let SK_CAT=null;           // which category pane is open — null = the overview
+let SK_LENS="self";        // coach view only: whose numbers the scale edits
+let SK_PENDING=null;       // {repId,campaign,self:{},coach:{},focus:null|[]}
+let SK_TIMER=null;
+let REP_TAB="perf";        // which rep-view board is showing
+
+const skKey=(repId,camp)=>repId+"||"+camp;
+const skTone=v=>v==null?"":v<=3?"lo":v<=6?"mid":v<=8?"hi":"top";
+const SK_TONE_HEX={lo:"#A33512",mid:"#96760A",hi:"#3D6B4F",top:"#1C1712"};
+const skLocalKey=(repId,camp)=>"sna_skills::"+repId+"::"+camp;
+const skillsLive=()=>!!CONFIG.SKILLS_URL;
+
+/* a rep's row for a campaign — always an object, never null */
+function skRow(repId,camp){
+  const hit=SK_ROWS.find(x=>String(x.RepID)===String(repId)&&String(x.Campaign)===String(camp));
+  if(hit)return hit;
+  const blank={RepID:String(repId),Campaign:String(camp),Self:{},Coach:{},Focus:[],UpdatedAt:"",UpdatedBy:""};
+  SK_ROWS.push(blank); return blank;
+}
+/* campaigns worth offering: this one, plus any the rep has already rated in */
+function skillCampaigns(repId){
+  const set=new Set([currentCampaign()]);
+  SK_ROWS.forEach(x=>{if(String(x.RepID)===String(repId)&&x.Campaign)set.add(String(x.Campaign));});
+  return [...set].sort((a,b)=>campKey(a)-campKey(b));
+}
+/* the newest campaign BEFORE this one that carries any self rating — the
+   comparison every delta on the board is drawn against */
+function skPrevCampaign(repId,camp){
+  return skillCampaigns(repId)
+    .filter(c=>campKey(c)<campKey(camp))
+    .filter(c=>Object.keys(skRow(repId,c).Self||{}).length)
+    .pop()||null;
+}
+
+/* ── stats for one board ── */
+function skStats(map){
+  const vals=[],byCat={},byGrp={};
+  SKILL_CATS.forEach(c=>byCat[c.k]={sum:0,n:0});
+  SKILL_FLAT.forEach(s=>{
+    const v=map[s.id];
+    if(v==null)return;
+    vals.push({id:s.id,n:s.n,catName:s.catName,v});
+    byCat[s.cat].sum+=v; byCat[s.cat].n++;
+    (byGrp[s.cat+"/"+s.grp]=byGrp[s.cat+"/"+s.grp]||{sum:0,n:0});
+    byGrp[s.cat+"/"+s.grp].sum+=v; byGrp[s.cat+"/"+s.grp].n++;
+  });
+  const avg=vals.length?vals.reduce((a,b)=>a+b.v,0)/vals.length:null;
+  const sorted=[...vals].sort((a,b)=>b.v-a.v||a.n.localeCompare(b.n));
+  return {n:vals.length,avg,byCat,byGrp,
+    sharpest:sorted[0]||null,
+    dullest:sorted.length?sorted[sorted.length-1]:null,
+    lowest:[...vals].sort((a,b)=>a.v-b.v||a.n.localeCompare(b.n))};
+}
+const skCatAvg=(st,k)=>st.byCat[k]&&st.byCat[k].n?st.byCat[k].sum/st.byCat[k].n:null;
+const skGrpAvg=(st,ck,gk)=>{const b=st.byGrp[ck+"/"+gk];return b&&b.n?b.sum/b.n:null;};
+const sk1=v=>v==null?"—":(Math.round(v*10)/10).toFixed(1);
+
+/* ── load ──────────────────────────────────────────────────────────────
+   A rep's page asks only for its own row. The coach's asks for everyone —
+   the team board is the whole point of their copy. Cached for a minute so
+   flipping between tabs doesn't re-fetch. */
+async function loadSkills(force){
+  const scope=(MODE==="rep"&&ME)?String(ME.id):"*";
+  if(!force&&SK_LOADED&&SK_SCOPE===scope&&Date.now()-SK_FETCHED_AT<60000)return;
+  if(SK_LOADING)return SK_LOADING;
+  SK_LOADING=(async()=>{
+    if(!skillsLive()){ skLoadLocal(scope); }
+    else{
+      try{
+        const u=CONFIG.SKILLS_URL+"?token="+encodeURIComponent(CONFIG.SKILLS_TOKEN)
+          +(scope==="*"?"":"&rep="+encodeURIComponent(scope));
+        const j=await (await fetch(u)).json();
+        if(j&&j.ok&&Array.isArray(j.rows)){
+          SK_ROWS=j.rows.map(r=>({RepID:String(r.RepID||""),Campaign:String(r.Campaign||""),
+            Self:r.Self||{},Coach:r.Coach||{},Focus:Array.isArray(r.Focus)?r.Focus:[],
+            UpdatedAt:r.UpdatedAt||"",UpdatedBy:r.UpdatedBy||""}));
+        } else throw new Error((j&&j.error)||"bad reply");
+      }catch(e){
+        console.warn("skills feed unavailable — falling back to this device",e);
+        skLoadLocal(scope);
+      }
+    }
+    SK_LOADED=true; SK_SCOPE=scope; SK_FETCHED_AT=Date.now();
+  })().finally(()=>{SK_LOADING=null;});
+  return SK_LOADING;
+}
+/* offline / not-yet-deployed: whatever this browser has kept */
+function skLoadLocal(scope){
+  SK_ROWS=[];
+  for(let i=0;i<localStorage.length;i++){
+    const k=localStorage.key(i);
+    if(!k||k.indexOf("sna_skills::")!==0)continue;
+    const [,repId,camp]=k.split("::");
+    if(scope!=="*"&&repId!==scope)continue;
+    try{
+      const v=JSON.parse(localStorage.getItem(k))||{};
+      SK_ROWS.push({RepID:repId,Campaign:camp,Self:v.self||{},Coach:v.coach||{},
+        Focus:Array.isArray(v.focus)?v.focus:[],UpdatedAt:v.at||"",UpdatedBy:"this device"});
+    }catch(e){}
+  }
+}
+function skWriteLocal(repId,camp){
+  const row=skRow(repId,camp);
+  try{localStorage.setItem(skLocalKey(repId,camp),
+    JSON.stringify({self:row.Self,coach:row.Coach,focus:row.Focus,at:new Date().toISOString()}));}catch(e){}
+}
+
+/* ── write ─────────────────────────────────────────────────────────────
+   Only the cells that CHANGED go up, and the script merges them into the
+   stored map. Two people on the same board (a rep rating themselves while
+   their coach rates them) therefore can't wipe each other's work — the only
+   thing that can collide is the same person on the same skill twice. */
+function skQueue(repId,campaign,patch){
+  if(!SK_PENDING||SK_PENDING.repId!==repId||SK_PENDING.campaign!==campaign)
+    SK_PENDING={repId,campaign,self:{},coach:{},focus:null};
+  if(patch.self)Object.assign(SK_PENDING.self,patch.self);
+  if(patch.coach)Object.assign(SK_PENDING.coach,patch.coach);
+  if(patch.focus)SK_PENDING.focus=patch.focus.slice();
+  skSay("saving…","");
+  clearTimeout(SK_TIMER);
+  SK_TIMER=setTimeout(skSave,900);
+}
+function skSay(t,cls){const el=$("sk-save");if(el){el.className="sk-save "+(cls||"");el.textContent=t;}}
+async function skSave(){
+  SK_TIMER=null;
+  const p=SK_PENDING; SK_PENDING=null;
+  if(!p)return;
+  skWriteLocal(p.repId,p.campaign);                     // this device keeps a copy either way
+  if(!skillsLive()){skSay("saved on this device","ok");return;}
+  const body={token:CONFIG.SKILLS_TOKEN,action:"saveSkills",repId:p.repId,campaign:p.campaign,
+    self:p.self,coach:p.coach,focus:p.focus,by:(MODE==="rep"?(ME&&ME.name)||"rep":"coach")};
+  let j=null;
+  for(let attempt=1;attempt<=2&&!j;attempt++){
+    try{j=await fetch(CONFIG.SKILLS_URL,{method:"POST",body:JSON.stringify(body)}).then(r=>r.json());}
+    catch(e){if(attempt===2)j={ok:false,error:"network"};}
+  }
+  if(!j||!j.ok){skSay(j&&j.error==="network"?"⚠ offline — kept on this device":"⚠ not saved","err");return;}
+  SK_FETCHED_AT=Date.now();
+  skSay("saved ✓","ok");
+}
+/* set one rating. Optimistic: the board moves now, the write follows. */
+function skSet(id,v){
+  const r=skTarget(); if(!r)return;
+  const coach=(MODE!=="rep"&&SK_LENS==="coach");
+  const row=skRow(r.id,SK_CAMPAIGN);
+  const bag=coach?(row.Coach=row.Coach||{}):(row.Self=row.Self||{});
+  if(bag[id]===v)delete bag[id]; else bag[id]=v;           // tapping the live number clears it
+  skQueue(r.id,SK_CAMPAIGN,coach?{coach:{[id]:bag[id]??null}}:{self:{[id]:bag[id]??null}});
+  renderSkills({keepScroll:true});
+}
+/* star a skill as one of this campaign's focus few */
+function skFocus(id){
+  const r=skTarget(); if(!r)return;
+  const row=skRow(r.id,SK_CAMPAIGN);
+  const f=(row.Focus=Array.isArray(row.Focus)?row.Focus:[]);
+  const i=f.indexOf(id);
+  if(i>=0)f.splice(i,1);
+  else{
+    if(f.length>=SK_MAX_FOCUS){skSay(`focus tops out at ${SK_MAX_FOCUS} — unstar one first`,"err");return;}
+    f.push(id);
+  }
+  skQueue(r.id,SK_CAMPAIGN,{focus:f});
+  renderSkills({keepScroll:true});
+}
+/* whose board is on screen: the locked rep, or whoever the coach picked */
+function skTarget(){return currentRep();}
+
+/* ── tabs ── */
+function setRepTab(t){
+  REP_TAB=t==="skills"?"skills":"perf";
+  $("rep-pane-perf").classList.toggle("hidden",REP_TAB!=="perf");
+  $("rep-pane-skills").classList.toggle("hidden",REP_TAB!=="skills");
+  document.querySelectorAll("#rep-tabs button").forEach(b=>b.classList.toggle("on",b.dataset.tab===REP_TAB));
+  if(REP_TAB==="skills"){
+    paneIn($("rep-pane-skills"));
+    renderSkills();                                   // draws at once, then again when the feed lands
+    loadSkills().then(()=>{if(REP_TAB==="skills")renderSkills();});
+  } else paneIn($("rep-pane-perf"));
+  try{history.replaceState(null,"",skShareUrl(null,REP_TAB));}catch(e){}
+}
+/* a link that opens straight onto a board — what a coach texts a rep */
+function skShareUrl(repId,tab){
+  const u=new URL(location.href);
+  if(repId)u.searchParams.set("rep",repId);
+  if(tab==="skills")u.searchParams.set("tab","skills"); else u.searchParams.delete("tab");
+  return u.pathname+u.search+u.hash;
+}
+/* the coach's jump-off point: open this mentee, on their skills board */
+function openRepSkills(repId){
+  if(MODE!=="rep"){setView("rep");$("rep-select").value=repId;renderRep();}
+  setRepTab("skills");
+  const el=$("rep-pane-skills"); if(el)el.scrollIntoView({behavior:"smooth",block:"start"});
+}
+function setSkillCampaign(c){if(c===SK_CAMPAIGN)return;SK_CAMPAIGN=c;SK_CAT=null;renderSkills();}
+function setSkillCat(k){SK_CAT=(SK_CAT===k?null:k);renderSkills();}
+function setSkillLens(l){SK_LENS=l;renderSkills();}
+
+/* ── the 1–10 ruler ── */
+function skScaleHtml(id,val,editable,isCoach){
+  let h=`<div class="sk-scale${editable?"":" ro"}${isCoach?" coach":""}" role="group" aria-label="rating out of 10">`;
+  for(let i=1;i<=10;i++)
+    h+=`<button type="button" class="${skTone(i)}${val===i?" on":""}"${editable?` onclick="skSet('${id}',${i})"`:""}`
+      +` aria-pressed="${val===i}" title="${i} of 10">${i}</button>`;
+  return h+`</div>`;
+}
+function skRowHtml(sk,self,coach,focused,editable,lensCoach){
+  const shown=lensCoach?coach:self;
+  const other=lensCoach?self:coach;
+  const otherLab=lensCoach?"Self":"Coach";
+  const gap=(self!=null&&coach!=null&&Math.abs(self-coach)>=3);
+  const chips=[
+    other!=null?`<span class="sk-coachv">${otherLab} <b>${other}</b></span>`:"",
+    gap?`<span class="sk-gap" title="self and coach are ${Math.abs(self-coach)} apart">gap ${Math.abs(self-coach)}</span>`:""
+  ].join("");
+  return `<div class="sk-row${focused?" focus":""}">
+    <div class="sk-nm">
+      <button type="button" class="sk-star${focused?" on":""}" onclick="skFocus('${sk.id}')"
+        title="${focused?"Remove from focus":"Make this a focus skill"}" aria-label="focus">${focused?"★":"☆"}</button>
+      <span>${esc(sk.n)}</span>${chips}
+    </div>
+    ${skScaleHtml(sk.id,shown,editable,lensCoach)}
+  </div>`;
+}
+
+/* ── the board ── */
+function renderSkills(){
+  const pane=$("rep-pane-skills"); if(!pane)return;
+  if(REP_TAB!=="skills")return;                       // only paint the board that's showing
+  const r=skTarget();
+  if(!r){pane.innerHTML=`<div class="plan-empty" style="margin-top:26px">Pick a mentee to see their skillset.</div>`;return;}
+
+  const camps=skillCampaigns(r.id);
+  if(!SK_CAMPAIGN||camps.indexOf(SK_CAMPAIGN)<0)SK_CAMPAIGN=currentCampaign();
+  const row=skRow(r.id,SK_CAMPAIGN);
+  const isRep=MODE==="rep";
+  const lensCoach=!isRep&&SK_LENS==="coach";
+  const editable=isRep?!lensCoach:true;               // a coach edits the COACH column, never the rep's own
+  const selfMap=row.Self||{}, coachMap=row.Coach||{}, focus=row.Focus||[];
+  const shownMap=lensCoach?coachMap:selfMap;
+  const st=skStats(shownMap);
+  const prev=skPrevCampaign(r.id,SK_CAMPAIGN);
+  const prevSt=prev?skStats(skRow(r.id,prev).Self||{}):null;
+
+  /* nothing rated yet and no category chosen — open one so the first visit has
+     something to do rather than six empty bars */
+  if(SK_CAT===null&&st.n===0&&editable)SK_CAT=SKILL_CATS[0].k;
+
+  const who=isRep?"Your Skillset":esc(r.name)+" — Skillset";
+  let h=`<div class="section" style="margin-top:22px">
+    <div class="section-head">
+      <h2 class="serif">${who}</h2>
+      <span class="hint" id="sk-save">${st.n?`${st.n} of ${SKILL_COUNT} rated`:"rate yourself 1–10"}</span>
+    </div>`;
+
+  /* campaign + lens */
+  h+=`<div class="camp-pills">`+camps.map(c=>{
+      const tag=c===currentCampaign()?"now":(campaignEnded(c)?"done":"");
+      return `<button class="camp-pill ${c===SK_CAMPAIGN?"on":""}" onclick="setSkillCampaign('${c}')">${c}${tag?`<span class="tag">${tag}</span>`:""}</button>`;
+    }).join("")
+    +(isRep?"":`<span style="flex:1"></span>`
+      +`<button class="camp-pill ${SK_LENS==="self"?"on":""}" onclick="setSkillLens('self')" title="what they scored themselves">Self rating</button>`
+      +`<button class="camp-pill ${SK_LENS==="coach"?"on":""}" onclick="setSkillLens('coach')" title="your read — shown beside theirs">Coach rating</button>`)
+    +`</div>`;
+
+  if(!skillsLive())
+    h+=`<div class="sk-note"><b>These numbers are only on this device so far.</b>
+      The shared copy switches on the moment <span style="font-family:var(--monof);font-size:11px">SNA-Skills-Sync.gs</span>
+      is deployed and its URL goes into <span style="font-family:var(--monof);font-size:11px">CONFIG.SKILLS_URL</span> —
+      about three minutes, once. Rate away in the meantime; nothing is lost.</div>`;
+  if(!isRep&&lensCoach)
+    h+=`<div class="sk-note">You're editing <b>your</b> read of ${esc(r.name)}. Their own number sits beside each
+      skill, and anything <b>3 or more apart</b> gets flagged — those gaps are the conversation.</div>`;
+
+  /* ── four numbers that say where they stand ── */
+  const pct=Math.round(st.n/SKILL_COUNT*100);
+  const dAvg=(prevSt&&prevSt.avg!=null&&st.avg!=null&&!lensCoach)?st.avg-prevSt.avg:null;
+  const gaps=SKILL_FLAT.filter(s=>selfMap[s.id]!=null&&coachMap[s.id]!=null&&Math.abs(selfMap[s.id]-coachMap[s.id])>=3);
+  h+=`<div class="sk-top">
+    <div class="kpi"><div class="lab">Overall</div>
+      <div class="val">${sk1(st.avg)}<small> / 10</small>${dAvg!=null?` <small style="color:${dAvg>=0?"var(--good)":"var(--bad)"}">${dAvg>=0?"▲":"▼"} ${Math.abs(dAvg).toFixed(1)}</small>`:""}</div>
+      <div class="meta">${prev&&dAvg!=null?"vs "+esc(prev):"average of what's rated"}</div></div>
+    <div class="kpi"><div class="lab">Rated</div><div class="val">${st.n}<small> / ${SKILL_COUNT}</small></div>
+      <div class="meta">${pct}% of the skillset</div></div>
+    <div class="kpi"><div class="lab">Sharpest</div>
+      <div class="val"><span class="nm">${st.sharpest?esc(st.sharpest.n):"—"}</span></div>
+      <div class="meta">${st.sharpest?`${st.sharpest.v}/10 · ${esc(st.sharpest.catName)}`:"rate a few to see this"}</div></div>
+    <div class="kpi ${st.dullest&&st.dullest.v<=4?"alert":""}"><div class="lab">Needs the reps</div>
+      <div class="val"><span class="nm">${st.dullest?esc(st.dullest.n):"—"}</span></div>
+      <div class="meta">${st.dullest?`${st.dullest.v}/10 · ${esc(st.dullest.catName)}`:"rate a few to see this"}</div></div>
+  </div>`;
+
+  /* ── six bars: the whole skillset at a glance, tap one to open it ── */
+  h+=`<div class="sk-bars" style="margin-top:18px">`+SKILL_CATS.map(c=>{
+    const a=skCatAvg(st,c.k), n=st.byCat[c.k].n, tot=c.g.reduce((x,g)=>x+g.s.length,0);
+    const pa=prevSt?skCatAvg(prevSt,c.k):null;
+    const d=(a!=null&&pa!=null&&!lensCoach)?a-pa:null;
+    const tone=skTone(a==null?null:Math.round(a));
+    return `<div class="sk-bar${SK_CAT===c.k?" on":""}" onclick="setSkillCat('${c.k}')" title="open ${esc(c.n)}">
+      <div class="sk-bl">${esc(c.n)}</div>
+      <div class="sk-btrack"><div class="sk-bfill" style="width:${a?Math.max(3,a*10):0}%;background:${SK_TONE_HEX[tone]||"var(--line-strong)"}"></div></div>
+      <div class="sk-bv">${a==null?`<span class="un">${n}/${tot}</span>`:`${sk1(a)}<span class="un"> · ${n}/${tot}</span>`}${
+        d!=null&&Math.abs(d)>=.05?`<span class="d ${d>=0?"up":"down"}">${d>=0?"▲":"▼"}${Math.abs(d).toFixed(1)}</span>`:""}</div>
+    </div>`;
+  }).join("")+`</div>`;
+
+  /* ── focus few ── */
+  if(focus.length){
+    h+=`<div class="section" style="margin-top:34px"><div class="section-head">
+      <h2 class="serif" style="font-size:17px">Focus this campaign</h2>
+      <span class="hint">${focus.length} of ${SK_MAX_FOCUS} · star any skill to add it</span></div>`;
+    h+=focus.map(id=>{
+      const sk=SKILL_BY_ID[id]; if(!sk)return "";
+      return skRowHtml(sk,selfMap[id]??null,coachMap[id]??null,true,editable,lensCoach);
+    }).join("")+`</div>`;
+  }
+
+  /* ── pick a category ── */
+  h+=`<div class="camp-pills" style="margin:32px 0 4px">
+    <button class="camp-pill ${SK_CAT===null?"on":""}" onclick="setSkillCat(null)">Overview</button>`
+    +SKILL_CATS.map(c=>{
+      const n=st.byCat[c.k].n, tot=c.g.reduce((x,g)=>x+g.s.length,0);
+      return `<button class="camp-pill ${SK_CAT===c.k?"on":""}" onclick="setSkillCat('${c.k}')">${esc(c.n)}<span class="tag">${n}/${tot}</span></button>`;
+    }).join("")+`</div>`;
+
+  if(SK_CAT===null){
+    h+=`<div class="plan-empty" style="margin-top:14px">${
+      st.n?`Tap a category above — or a bar — to rate those skills.`
+        :`Tap a category above to start. There's no prize for a 10: the honest number is the one that makes the next call better.`}</div>`;
+  } else {
+    const cat=SKILL_CATS.find(c=>c.k===SK_CAT);
+    h+=`<div class="sk-legend"><span><i style="background:#A33512"></i>1–3 learning</span>
+      <span><i style="background:#96760A"></i>4–6 workable</span>
+      <span><i style="background:#3D6B4F"></i>7–8 strong</span>
+      <span><i style="background:#1C1712"></i>9–10 teach it</span>
+      <span style="margin-left:auto">☆ star up to ${SK_MAX_FOCUS} to focus on</span></div>`;
+    h+=cat.g.map(g=>{
+      const ga=skGrpAvg(st,cat.k,g.k);
+      const rated=g.s.filter(([id])=>shownMap[id]!=null).length;
+      return `<div class="sk-grp"><div class="sk-ghead">
+          <div class="sk-gname">${esc(g.n)}</div>
+          <div class="sk-gavg">${ga==null?"":"avg "+sk1(ga)+" · "}${rated}/${g.s.length} rated</div>
+        </div>`
+        +g.s.map(([id,n])=>skRowHtml({id,n},selfMap[id]??null,coachMap[id]??null,
+            focus.indexOf(id)>=0,editable,lensCoach)).join("")
+        +`</div>`;
+    }).join("");
+  }
+
+  /* ── gaps, once both columns exist ── */
+  if(gaps.length){
+    h+=`<div class="section" style="margin-top:38px"><div class="section-head">
+      <h2 class="serif" style="font-size:17px">Blind spots</h2>
+      <span class="hint">${gaps.length} skill${gaps.length===1?"":"s"} where self and coach are 3+ apart</span></div>`
+      +gaps.sort((a,b)=>Math.abs(selfMap[b.id]-coachMap[b.id])-Math.abs(selfMap[a.id]-coachMap[a.id]))
+        .slice(0,12).map(s=>skRowHtml(s,selfMap[s.id],coachMap[s.id],focus.indexOf(s.id)>=0,editable,lensCoach)).join("")
+      +`</div>`;
+  }
+
+  const stamp=row.UpdatedAt?new Date(row.UpdatedAt):null;
+  h+=`<div class="hint" style="margin-top:26px;font-family:var(--monof);font-size:9.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-faint)">
+    ${stamp&&!isNaN(stamp)?`Last updated ${stamp.toLocaleDateString(undefined,{month:"short",day:"numeric"})} ${fmtClock(stamp)}${row.UpdatedBy?" · "+esc(row.UpdatedBy):""}`:"Nothing rated yet"}
+    ${skillsLive()?"":" · saved on this device only"}</div>`;
+
+  h+=`</div>`;
+  pane.innerHTML=h;
+  skTabCount();                       // the badge follows every rating, not just the first load
+}
+
+/* ── the coach's team board ────────────────────────────────────────────
+   Not a second copy of the tracker — just enough to answer two questions:
+   who has actually done it, and what is the whole academy worst at. That
+   second answer is what the hub's Topic Bank wants: teach the thing forty
+   people rated a 4, not the thing you taught last year. */
+function renderSkillsTeam(){
+  const sec=$("skills-team-sec"); if(!sec)return;
+  if(MODE==="rep"){sec.classList.add("hidden");return;}
+  sec.classList.remove("hidden");
+  if(!SK_LOADED){
+    $("skills-team").innerHTML=`<div class="plan-empty">Loading skillsets…</div>`;
+    loadSkills().then(()=>{if(MODE!=="rep")renderSkillsTeam();});
+    return;
+  }
+  const camp=currentCampaign();
+  const per=DATA.map(r=>{
+    const row=skRow(r.id,camp);
+    const st=skStats(row.Self||{});
+    return {rep:r,st,focus:(row.Focus||[]).length,updated:row.UpdatedAt};
+  });
+  const done=per.filter(p=>p.st.n>0);
+  const rated=per.filter(p=>p.st.n>=Math.round(SKILL_COUNT*.6));
+
+  /* academy-wide weak spots: lowest mean among skills at least two people rated */
+  const agg={};
+  per.forEach(p=>SKILL_FLAT.forEach(s=>{
+    const v=(skRow(p.rep.id,camp).Self||{})[s.id];
+    if(v==null)return;
+    (agg[s.id]=agg[s.id]||{sum:0,n:0,lo:0}); agg[s.id].sum+=v; agg[s.id].n++; if(v<=4)agg[s.id].lo++;
+  }));
+  const weak=Object.keys(agg).filter(id=>agg[id].n>=2)
+    .map(id=>({sk:SKILL_BY_ID[id],avg:agg[id].sum/agg[id].n,n:agg[id].n,lo:agg[id].lo}))
+    .sort((a,b)=>a.avg-b.avg).slice(0,6);
+
+  const teamAvg=done.length?done.reduce((a,p)=>a+p.st.avg*p.st.n,0)/done.reduce((a,p)=>a+p.st.n,0):null;
+
+  let h=`<div class="kpis" style="grid-template-columns:repeat(3,1fr);margin-top:0">
+    <div class="kpi"><div class="lab">Team average</div><div class="val">${sk1(teamAvg)}<small style="font-family:var(--sans);font-size:13px;color:var(--ink-faint)"> / 10</small></div>
+      <div class="meta">across every rating given</div></div>
+    <div class="kpi ${done.length<DATA.length?"alert":""}"><div class="lab">Have started</div><div class="val">${done.length}<small style="font-family:var(--sans);font-size:13px;color:var(--ink-faint)"> / ${DATA.length}</small></div>
+      <div class="meta">${rated.length} have rated most of it</div></div>
+    <div class="kpi"><div class="lab">Skills tracked</div><div class="val">${SKILL_COUNT}</div>
+      <div class="meta">${SKILL_CATS.length} categories · ${esc(camp)}</div></div>
+  </div>`;
+
+  if(weak.length){
+    h+=`<div class="feed-h eyebrow" style="margin:26px 0 10px">Where the academy is thinnest — call topics pick themselves</div>
+      <div class="sk-bars wide">`+weak.map(w=>`
+      <div class="sk-bar">
+        <div class="sk-bl" title="${esc(w.sk.catName)} · ${esc(w.sk.grpName)}">${esc(w.sk.n)}</div>
+        <div class="sk-btrack"><div class="sk-bfill" style="width:${Math.max(3,w.avg*10)}%;background:${SK_TONE_HEX[skTone(Math.round(w.avg))]}"></div></div>
+        <div class="sk-bv">${sk1(w.avg)}<span class="un"> · ${w.n} rated${w.lo?`, ${w.lo} at 4−`:""}</span></div>
+      </div>`).join("")+`</div>`;
+  }
+
+  h+=`<div class="feed-h eyebrow" style="margin:26px 0 10px">Every mentee — tap to open their board</div><div class="sk-team">`
+    +per.sort((a,b)=>(b.st.n-a.st.n)||a.rep.name.localeCompare(b.rep.name)).map(p=>`
+      <div class="sk-tc ${p.st.n?"":"none"}" onclick="openRepSkills('${p.rep.id}')">
+        <div class="n">${esc(p.rep.name)}</div>
+        <div class="s">${p.st.n?sk1(p.st.avg):"—"}</div>
+        <div class="m">${p.st.n?`${p.st.n}/${SKILL_COUNT} rated${p.focus?` · ${p.focus} focus`:""}`:"hasn't rated yet"}</div>
+      </div>`).join("")+`</div>`;
+
+  if(!skillsLive())
+    h+=`<div class="sk-note" style="margin-top:18px"><b>Shared storage isn't switched on yet.</b>
+      Until <span style="font-family:var(--monof);font-size:11px">SNA-Skills-Sync.gs</span> is deployed, every rating
+      stays in the browser that made it — so this board can only ever show your own. Setup is in the README.</div>`;
+  $("skills-team").innerHTML=h;
 }
 
 /* ═══════════════ MODE CHROME + INIT ═══════════════ */
@@ -2356,13 +3167,17 @@ function renderAll(){
   }
   renderCampaignSelect();
   renderPeriod();renderKPIs();renderRadar();renderCheckins();renderLeaderboard();renderHeat();renderMix();
-  renderAdminPlanner();renderAdminCalls();
+  renderAdminPlanner();renderAdminCalls();renderSkillsTeam();
   fillRepSelect();renderRep();
 }
 async function init(){
   await loadData();                                   // loadData() also brings the hub feed in, both modes
   if(MODE==="rep")setView("rep");
   renderAll();
+  /* the skillset feed is lazy — but a rep's own row is small and makes the tab
+     badge honest from the first paint, so fetch it once in the background. */
+  if(MODE==="rep"||MODE==="admin")loadSkills().then(()=>{skTabCount();if(REP_TAB==="skills")renderSkills();});
+  if(TAB_PARAM.indexOf("skill")===0){if(MODE!=="rep")setView("rep");setRepTab("skills");}
   paneIn(MODE==="locked" ? $("lockout") : MODE==="offline" ? $("offline") : MODE==="gated" ? $("gated") : $("view-"+(MODE==="rep"?"rep":"team")));
   if(CONFIG.USE_LIVE_DATA)setInterval(refreshTick,CONFIG.REFRESH_MS);
 }
