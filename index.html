@@ -377,10 +377,10 @@
 
   /* category bars — the whole skillset in six lines */
   .sk-bars{display:grid;gap:9px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 18px}
-  .sk-bar{display:grid;grid-template-columns:132px 1fr 84px;align-items:center;gap:12px;cursor:pointer}
+  .sk-bar{display:grid;grid-template-columns:132px 1fr 124px;align-items:center;gap:12px;cursor:pointer}
   .sk-bar:hover .sk-bl{color:var(--accent)}
   .sk-bar.on .sk-bl{color:var(--accent);font-weight:600}
-  .sk-bars.wide .sk-bar{grid-template-columns:190px 1fr 156px;cursor:default}
+  .sk-bars.wide .sk-bar{grid-template-columns:190px 1fr 172px;cursor:default}
   .sk-bl{font-family:var(--monof);font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-soft);
     transition:color .15s;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   .sk-btrack{height:8px;background:var(--paper-deep);border-radius:999px;overflow:hidden}
@@ -452,8 +452,8 @@
 
   @media(max-width:860px){
     .sk-top{grid-template-columns:repeat(2,1fr)}
-    .sk-bar{grid-template-columns:104px 1fr 72px;gap:9px}
-    .sk-bars.wide .sk-bar{grid-template-columns:130px 1fr 132px}
+    .sk-bar{grid-template-columns:104px 1fr 108px;gap:9px}
+    .sk-bars.wide .sk-bar{grid-template-columns:130px 1fr 150px}
   }
   @media(max-width:620px){
     .subtabs button{padding:9px 13px;font-size:10px;letter-spacing:.07em}
@@ -462,6 +462,68 @@
     .sk-scale button{width:100%;max-width:34px;height:31px}
     .sk-bar,.sk-bars.wide .sk-bar{grid-template-columns:1fr;gap:4px}
     .sk-bv{text-align:left}
+  }
+
+  /* ═══ skillset: versions, ranked focus, sorting, the catalog editor ═══ */
+  .mono{font-family:var(--monof);font-size:11px}
+  .sk-note.shut{border-left-color:var(--ink-faint);color:var(--ink-faint)}
+  .sk-foot{margin-top:26px;font-family:var(--monof);font-size:9.5px;letter-spacing:.06em;
+    text-transform:uppercase;color:var(--ink-faint)}
+  .kpi .val small.u{font-family:var(--sans);font-size:13px;color:var(--ink-faint);font-weight:500;letter-spacing:0}
+
+  /* the strip over the ratings: which category, how it's sorted, the editor */
+  .sk-toolbar{display:flex;align-items:center;justify-content:space-between;gap:14px;
+    flex-wrap:wrap;margin:32px 0 6px}
+  .sk-tools{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .sk-tools select{font-size:11px;padding:6px 28px 6px 11px}
+  .rowbtn.on{border-color:var(--accent);color:var(--accent);background:var(--accent-soft)}
+  .camp-pill.add{border-style:dashed;color:var(--ink-faint)}
+
+  /* focus is ranked now — #1 to #5, and the top three carry the weight */
+  .sk-rank{font-family:var(--monof);font-size:9px;letter-spacing:.06em;border-radius:5px;padding:1px 6px;
+    border:1px solid var(--line-strong);color:var(--ink-soft);background:var(--card)}
+  .sk-rank.top{border-color:var(--accent);color:#FFF9F1;background:var(--accent);font-weight:600}
+  .sk-row.focus.top{box-shadow:inset 3px 0 0 var(--accent)}
+  .sk-row.focus:not(.top){background:linear-gradient(90deg,rgba(241,223,210,.45),transparent 60%);
+    box-shadow:inset 3px 0 0 var(--line-strong)}
+  .sk-mv{display:inline-flex;gap:2px;margin-left:2px}
+  .sk-mv button{font-size:10px;line-height:1;padding:2px 5px;border:1px solid var(--line);
+    background:var(--card);border-radius:5px;cursor:pointer;color:var(--ink-soft)}
+  .sk-mv button:hover{border-color:var(--accent);color:var(--accent)}
+
+  /* a sorted list dissolves its blocks, so each row says where it came from */
+  .sk-sub{display:block;font-family:var(--monof);font-size:9px;letter-spacing:.06em;
+    text-transform:uppercase;color:var(--ink-faint);margin-top:3px}
+  .sk-d{font-family:var(--monof);font-size:9px;letter-spacing:.04em;border-radius:5px;padding:1px 5px;
+    border:1px solid currentColor}
+  .sk-d.up{color:var(--good)} .sk-d.down{color:var(--bad)}
+
+  /* catalog editor */
+  .sk-cathead{display:flex;align-items:center;gap:10px;margin:26px 0 4px}
+  .sk-ren{font-family:var(--sans);font-size:13px;padding:6px 10px;border:1px solid var(--line-strong);
+    border-radius:7px;background:var(--card-raised);color:var(--ink);min-width:200px;flex:1;max-width:420px}
+  .sk-ren.big{font-family:var(--serif);font-size:17px;font-weight:600}
+  .sk-ren:focus{outline:none;border-color:var(--accent)}
+  .sk-mini{font-family:var(--monof);font-size:9.5px;letter-spacing:.06em;text-transform:uppercase;
+    border:1px solid var(--line-strong);background:none;border-radius:6px;padding:4px 9px;cursor:pointer;
+    color:var(--ink-soft);white-space:nowrap}
+  .sk-mini:hover{border-color:var(--accent);color:var(--accent)}
+  .sk-mini.danger:hover{border-color:var(--bad);color:var(--bad)}
+  .sk-row.ed{grid-template-columns:1fr}
+  .sk-row.ed .sk-nm{gap:10px}
+  .sk-row.arch{opacity:.5}
+
+  /* team cards carry their movement and their top focus */
+  .sk-tc .s{display:flex;align-items:baseline;gap:8px}
+  .sk-tc .s .dd{font-family:var(--monof);font-size:10px;font-weight:500}
+  .sk-tc .s .dd.up{color:var(--good)} .sk-tc .s .dd.down{color:var(--bad)}
+  .sk-tc .f{margin-top:8px;display:grid;gap:2px;border-top:1px solid var(--line-soft);padding-top:7px}
+  .sk-tc .f span{font-size:11px;color:var(--ink-soft);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+  @media(max-width:620px){
+    .sk-toolbar{align-items:stretch}
+    .sk-tools{justify-content:space-between}
+    .sk-ren{max-width:none}
   }
 
   /* ── admin calls board ── */
@@ -2449,34 +2511,34 @@ function renderRep(){
      check-ins yet can still rate themselves on day one. */
   skTabCount(); renderSkills();
 }
-/* the count on the Skillset tab — how much of it they've actually done */
-function skTabCount(){
-  const el=$("sk-tabcount"); if(!el)return;
-  const r=skTarget();
-  if(!r||!SK_LOADED){el.textContent="";return;}
-  const n=Object.keys(skRow(r.id,SK_CAMPAIGN||currentCampaign()).Self||{}).length;
-  el.textContent=n?n+"/"+SKILL_COUNT:"";
-}
 
 /* ═══════════════ SKILLSET TRACKER ═══════════════
-   The 137 skills off Alan's sheet, in their six categories, rated 1–10 — by
-   the rep on their own tab, and by their coach from the Performance tab. It
-   gets its own board rather than another section on the performance page:
-   137 rows would bury the numbers reps actually open the page for.
+   The skills off Alan's sheet, in their categories, rated 1–10 — by the rep on
+   their own tab, and by their coach from the Performance tab. It gets its own
+   board rather than another section on the performance page: 137 rows would
+   bury the numbers reps actually open the page for.
 
-   Storage is its own small Apps Script (SNA-Skills-Sync.gs) writing to its own
-   spreadsheet — ONE ROW per rep per campaign holding a JSON map of ratings, so
-   forty reps rating themselves on a Tuesday night never collide, and a whole
-   board saves in one write. Ratings are stamped with the campaign they were
-   given in, so the same skill rated again in January sits next to September's
-   number instead of overwriting it — that delta is the entire point.
+   ── How it stores things (Ben, 2026-09-21) ──────────────────────────────
+   Ratings are NOT overwritten in place and they do not reset. Each rep's board
+   is a series of dated VERSIONS: a version stays editable for a week, and the
+   first edit after that week closes opens a new one, carrying every rating
+   forward. So a rep always edits "now" without thinking about it, the board
+   they filled in September is still there in January, and the delta between
+   two versions is the progress. Rollover is decided by the SERVER, so forty
+   browsers with forty slightly wrong clocks can't disagree about it.
 
-   Until that script is deployed CONFIG.SKILLS_URL is empty, and everything
-   below falls back to localStorage: a rep can still rate themselves and see
-   their board, and the page says plainly that the numbers haven't left their
-   phone yet. Nothing here can break the performance board — the skills feed is
-   fetched lazily, only when someone opens the tab. */
-const SKILL_CATS=[
+   The CATALOG is stored too, not hardcoded: coaches add, rename and retire
+   skills from the board itself. SKILL_SEED below is only the first-run
+   default — the stored copy wins the moment there is one. Retiring a skill
+   archives it rather than deleting it, so the ratings already given to it
+   survive in the versions that carry them.
+
+   Storage is its own small Apps Script (SNA-Skills-Sync.gs) with its own
+   spreadsheet, separate from the performance sheet. Until it's deployed
+   CONFIG.SKILLS_URL is empty and everything falls back to this browser's
+   localStorage, and the page says so rather than pretending. The feed is
+   fetched lazily — nothing here can slow the performance board down. */
+const SKILL_SEED=[
   {k:"demos",n:"Demos",g:[
     {k:"selling-ultimates",n:"Selling Ultimates",s:[
       ["demos.selling-ultimates.selling-ultimates","Selling Ultimates"],
@@ -2613,8 +2675,8 @@ const SKILL_CATS=[
       ["general-skills.flatware.too-light","Too Light"],
       ["general-skills.flatware.don-t-love-the-pattern","Don't Love the Pattern"],
     ]},
-    {k:"accesory-package",n:"Accesory Package",s:[
-      ["general-skills.accesory-package.accesory-package","Accesory Package"],
+    {k:"accesory-package",n:"Accessory Package",s:[
+      ["general-skills.accesory-package.accesory-package","Accessory Package"],
       ["general-skills.accesory-package.power-intro","Power Intro"],
       ["general-skills.accesory-package.value-build","Value Build"],
       ["general-skills.accesory-package.closing","Closing"],
@@ -2627,8 +2689,8 @@ const SKILL_CATS=[
     ]},
   ]},
   {k:"biz-gifts",n:"Biz Gifts",g:[
-    {k:"asking-everyone-what-you-do",n:"Asking EVERYONE what you do",s:[
-      ["biz-gifts.asking-everyone-what-you-do.asking-everyone-what-you-do","Asking EVERYONE what you do"],
+    {k:"asking-everyone-what-you-do",n:"Creating Pitches",s:[
+      ["biz-gifts.asking-everyone-what-you-do.asking-everyone-what-you-do","Creating Pitches"],
       ["biz-gifts.asking-everyone-what-you-do.gaining-permission","Gaining Permission"],
       ["biz-gifts.asking-everyone-what-you-do.60-sec-pitch","60 sec Pitch"],
       ["biz-gifts.asking-everyone-what-you-do.questions","Questions"],
@@ -2666,80 +2728,96 @@ const SKILL_CATS=[
   ]},
 ];
 
-/* flat index: id → {id,n,cat,catName,grp,grpName} */
-const SKILL_FLAT=[], SKILL_BY_ID={};
-SKILL_CATS.forEach(c=>c.g.forEach(g=>g.s.forEach(([id,n])=>{
-  const rec={id,n,cat:c.k,catName:c.n,grp:g.k,grpName:g.n};
-  SKILL_FLAT.push(rec); SKILL_BY_ID[id]=rec;
-})));
-const SKILL_COUNT=SKILL_FLAT.length;
-const SK_MAX_FOCUS=5;
+/* ── the live catalog: the stored one once it lands, the seed until then ── */
+let SKILL_CATS=SKILL_SEED, CATALOG_REV=0, CATALOG_STORED=false;
+let SKILL_FLAT=[], SKILL_BY_ID={}, SKILL_COUNT=0;
+function rebuildSkillIndex(){
+  SKILL_FLAT=[]; SKILL_BY_ID={};
+  SKILL_CATS.forEach(c=>(c.g||[]).forEach(g=>(g.s||[]).forEach(row=>{
+    const [id,n,archived]=row;
+    const rec={id,n,archived:!!archived,cat:c.k,catName:c.n,grp:g.k,grpName:g.n};
+    SKILL_BY_ID[id]=rec;
+    if(!rec.archived)SKILL_FLAT.push(rec);      // archived skills keep their ratings but leave the board
+  })));
+  SKILL_COUNT=SKILL_FLAT.length;
+}
+rebuildSkillIndex();
+const catWeight=c=>(c.w==null?1:+c.w)||0;       // "we can weight them later" — the hook is here, all 1 today
+
+const SK_MAX_FOCUS=5;      // Ben: five, ranked, with the top 3 the ones that matter
+const SK_TOP_FOCUS=3;
+const SK_WINDOW_DAYS=7;    // a version stays editable for a week
+
+/* the bands, in Ben's words */
+const SK_BANDS=[
+  {lo:1,hi:3, k:"lo",  n:"Learning it",  d:"new or revisiting this skill",        hex:"#A33512"},
+  {lo:4,hi:6, k:"mid", n:"Adequate",     d:"getting consistent results",          hex:"#96760A"},
+  {lo:7,hi:8, k:"hi",  n:"Strong",       d:"can teach it confidently to the program", hex:"#3D6B4F"},
+  {lo:9,hi:10,k:"top", n:"Master",       d:"almost the level of Ben, Alan, Brandon Brown, Josh Mueller, Christian Hogg", hex:"#1C1712"}
+];
+const skBand=v=>v==null?null:SK_BANDS.find(b=>v>=b.lo&&v<=b.hi)||null;
+const skTone=v=>{const b=skBand(v);return b?b.k:"";};
+const SK_TONE_HEX={}; SK_BANDS.forEach(b=>SK_TONE_HEX[b.k]=b.hex);
 
 /* ── state ── */
-let SK_ROWS=[];            // every row the feed returned: {RepID,Campaign,Self,Coach,Focus,...}
+let SK_VERSIONS=[];        // every version row the feed returned
 let SK_LOADED=false, SK_LOADING=null, SK_FETCHED_AT=0, SK_SCOPE="";
-let SK_CAMPAIGN=null;      // the campaign being rated / read
+let SK_VER=null;           // the VersionID being looked at — null = the newest
 let SK_CAT=null;           // which category pane is open — null = the overview
 let SK_LENS="self";        // coach view only: whose numbers the scale edits
-let SK_PENDING=null;       // {repId,campaign,self:{},coach:{},focus:null|[]}
-let SK_TIMER=null;
-let REP_TAB="perf";        // which rep-view board is showing
+let SK_SORT="sheet";
+let SK_TEAM_SORT="rated";
+let SK_EDIT=false;         // coaches: the catalog editor
+let SK_SHOW_ARCHIVED=false;
+let SK_PENDING=null, SK_TIMER=null;
+let REP_TAB="perf";
 
-const skKey=(repId,camp)=>repId+"||"+camp;
-const skTone=v=>v==null?"":v<=3?"lo":v<=6?"mid":v<=8?"hi":"top";
-const SK_TONE_HEX={lo:"#A33512",mid:"#96760A",hi:"#3D6B4F",top:"#1C1712"};
-const skLocalKey=(repId,camp)=>"sna_skills::"+repId+"::"+camp;
+const skLocalKey=repId=>"sna_skills::"+repId;
 const skillsLive=()=>!!CONFIG.SKILLS_URL;
-
-/* a rep's row for a campaign — always an object, never null */
-function skRow(repId,camp){
-  const hit=SK_ROWS.find(x=>String(x.RepID)===String(repId)&&String(x.Campaign)===String(camp));
-  if(hit)return hit;
-  const blank={RepID:String(repId),Campaign:String(camp),Self:{},Coach:{},Focus:[],UpdatedAt:"",UpdatedBy:""};
-  SK_ROWS.push(blank); return blank;
-}
-/* campaigns worth offering: this one, plus any the rep has already rated in */
-function skillCampaigns(repId){
-  const set=new Set([currentCampaign()]);
-  SK_ROWS.forEach(x=>{if(String(x.RepID)===String(repId)&&x.Campaign)set.add(String(x.Campaign));});
-  return [...set].sort((a,b)=>campKey(a)-campKey(b));
-}
-/* the newest campaign BEFORE this one that carries any self rating — the
-   comparison every delta on the board is drawn against */
-function skPrevCampaign(repId,camp){
-  return skillCampaigns(repId)
-    .filter(c=>campKey(c)<campKey(camp))
-    .filter(c=>Object.keys(skRow(repId,c).Self||{}).length)
-    .pop()||null;
-}
-
-/* ── stats for one board ── */
-function skStats(map){
-  const vals=[],byCat={},byGrp={};
-  SKILL_CATS.forEach(c=>byCat[c.k]={sum:0,n:0});
-  SKILL_FLAT.forEach(s=>{
-    const v=map[s.id];
-    if(v==null)return;
-    vals.push({id:s.id,n:s.n,catName:s.catName,v});
-    byCat[s.cat].sum+=v; byCat[s.cat].n++;
-    (byGrp[s.cat+"/"+s.grp]=byGrp[s.cat+"/"+s.grp]||{sum:0,n:0});
-    byGrp[s.cat+"/"+s.grp].sum+=v; byGrp[s.cat+"/"+s.grp].n++;
-  });
-  const avg=vals.length?vals.reduce((a,b)=>a+b.v,0)/vals.length:null;
-  const sorted=[...vals].sort((a,b)=>b.v-a.v||a.n.localeCompare(b.n));
-  return {n:vals.length,avg,byCat,byGrp,
-    sharpest:sorted[0]||null,
-    dullest:sorted.length?sorted[sorted.length-1]:null,
-    lowest:[...vals].sort((a,b)=>a.v-b.v||a.n.localeCompare(b.n))};
-}
-const skCatAvg=(st,k)=>st.byCat[k]&&st.byCat[k].n?st.byCat[k].sum/st.byCat[k].n:null;
-const skGrpAvg=(st,ck,gk)=>{const b=st.byGrp[ck+"/"+gk];return b&&b.n?b.sum/b.n:null;};
 const sk1=v=>v==null?"—":(Math.round(v*10)/10).toFixed(1);
+const skDay=d=>{const x=new Date(d);return isNaN(x)?"":x.toLocaleDateString(undefined,{month:"short",day:"numeric"});};
+
+/* ── versions ─────────────────────────────────────────────────────────── */
+const repVersions=repId=>SK_VERSIONS.filter(v=>String(v.RepID)===String(repId))
+  .sort((a,b)=>new Date(a.CreatedAt)-new Date(b.CreatedAt));
+const verOpen=v=>!!v&&Date.now()<new Date(v.ClosesAt).getTime();
+function latestVersion(repId){const a=repVersions(repId);return a.length?a[a.length-1]:null;}
+/* the one on screen: whatever the picker says, else the newest */
+function viewedVersion(repId){
+  const all=repVersions(repId);
+  if(!all.length)return null;
+  return (SK_VER&&all.find(v=>v.VersionID===SK_VER))||all[all.length-1];
+}
+function prevVersion(repId,ver){
+  const all=repVersions(repId);
+  const i=all.findIndex(v=>v.VersionID===(ver&&ver.VersionID));
+  return i>0?all[i-1]:null;
+}
+function blankVersion(repId,from){
+  const now=new Date();
+  return {RepID:String(repId),VersionID:"v"+now.getTime(),CreatedAt:now.toISOString(),
+    ClosesAt:new Date(now.getTime()+SK_WINDOW_DAYS*86400000).toISOString(),
+    Campaign:currentCampaign(),
+    Self:Object.assign({},(from&&from.Self)||{}),      // carried forward, never reset
+    Coach:Object.assign({},(from&&from.Coach)||{}),
+    Focus:((from&&from.Focus)||[]).slice(),
+    UpdatedAt:"",UpdatedBy:"",_local:true};   // until the script confirms it
+}
+/* the version an edit lands in: the open one, or a fresh one carrying it all
+   forward. The server decides the same way and its answer wins. */
+function ensureOpenVersion(repId){
+  const last=latestVersion(repId);
+  if(verOpen(last))return last;
+  const next=blankVersion(repId,last);
+  SK_VERSIONS.push(next);
+  SK_VER=next.VersionID;
+  return next;
+}
 
 /* ── load ──────────────────────────────────────────────────────────────
-   A rep's page asks only for its own row. The coach's asks for everyone —
-   the team board is the whole point of their copy. Cached for a minute so
-   flipping between tabs doesn't re-fetch. */
+   A rep's page asks only for its own versions. The coaches' asks for
+   everyone — the team board is the point of their copy. Both get the
+   catalog, which is shared. Cached for a minute. */
 async function loadSkills(force){
   const scope=(MODE==="rep"&&ME)?String(ME.id):"*";
   if(!force&&SK_LOADED&&SK_SCOPE===scope&&Date.now()-SK_FETCHED_AT<60000)return;
@@ -2751,11 +2829,12 @@ async function loadSkills(force){
         const u=CONFIG.SKILLS_URL+"?token="+encodeURIComponent(CONFIG.SKILLS_TOKEN)
           +(scope==="*"?"":"&rep="+encodeURIComponent(scope));
         const j=await (await fetch(u)).json();
-        if(j&&j.ok&&Array.isArray(j.rows)){
-          SK_ROWS=j.rows.map(r=>({RepID:String(r.RepID||""),Campaign:String(r.Campaign||""),
-            Self:r.Self||{},Coach:r.Coach||{},Focus:Array.isArray(r.Focus)?r.Focus:[],
-            UpdatedAt:r.UpdatedAt||"",UpdatedBy:r.UpdatedBy||""}));
-        } else throw new Error((j&&j.error)||"bad reply");
+        if(!j||!j.ok)throw new Error((j&&j.error)||"bad reply");
+        SK_VERSIONS=(j.versions||[]).map(normVersion);
+        applyCatalog(j.catalog,j.catalogRev);
+        /* first run anywhere: hand the built-in list up so there's something
+           to edit. The script only takes it if it has nothing. */
+        if(!CATALOG_STORED)skSeedCatalog();
       }catch(e){
         console.warn("skills feed unavailable — falling back to this device",e);
         skLoadLocal(scope);
@@ -2765,38 +2844,62 @@ async function loadSkills(force){
   })().finally(()=>{SK_LOADING=null;});
   return SK_LOADING;
 }
+function normVersion(v){
+  return {RepID:String(v.RepID||""),VersionID:String(v.VersionID||""),
+    CreatedAt:v.CreatedAt||"",ClosesAt:v.ClosesAt||"",Campaign:v.Campaign||"",
+    Self:v.Self||{},Coach:v.Coach||{},Focus:Array.isArray(v.Focus)?v.Focus:[],
+    UpdatedAt:v.UpdatedAt||"",UpdatedBy:v.UpdatedBy||""};
+}
+function applyCatalog(cat,rev){
+  if(Array.isArray(cat)&&cat.length){
+    SKILL_CATS=cat; CATALOG_REV=+rev||0; CATALOG_STORED=true;
+  } else { SKILL_CATS=SKILL_SEED; CATALOG_STORED=false; }
+  rebuildSkillIndex();
+}
+async function skSeedCatalog(){
+  if(!skillsLive())return;
+  try{
+    const j=await fetch(CONFIG.SKILLS_URL,{method:"POST",body:JSON.stringify(
+      {token:CONFIG.SKILLS_TOKEN,action:"seedCatalog",catalog:SKILL_SEED})}).then(r=>r.json());
+    if(j&&j.ok&&j.catalog){applyCatalog(j.catalog,j.catalogRev);}
+  }catch(e){}
+}
 /* offline / not-yet-deployed: whatever this browser has kept */
 function skLoadLocal(scope){
-  SK_ROWS=[];
+  SK_VERSIONS=[];
   for(let i=0;i<localStorage.length;i++){
     const k=localStorage.key(i);
     if(!k||k.indexOf("sna_skills::")!==0)continue;
-    const [,repId,camp]=k.split("::");
+    const repId=k.slice("sna_skills::".length);
     if(scope!=="*"&&repId!==scope)continue;
     try{
       const v=JSON.parse(localStorage.getItem(k))||{};
-      SK_ROWS.push({RepID:repId,Campaign:camp,Self:v.self||{},Coach:v.coach||{},
-        Focus:Array.isArray(v.focus)?v.focus:[],UpdatedAt:v.at||"",UpdatedBy:"this device"});
+      (v.versions||[]).forEach(x=>SK_VERSIONS.push(normVersion(Object.assign({RepID:repId},x))));
     }catch(e){}
   }
+  try{
+    const c=JSON.parse(localStorage.getItem("sna_skills_catalog")||"null");
+    if(c&&Array.isArray(c.catalog))applyCatalog(c.catalog,c.rev);
+  }catch(e){}
 }
-function skWriteLocal(repId,camp){
-  const row=skRow(repId,camp);
-  try{localStorage.setItem(skLocalKey(repId,camp),
-    JSON.stringify({self:row.Self,coach:row.Coach,focus:row.Focus,at:new Date().toISOString()}));}catch(e){}
+function skWriteLocal(repId){
+  try{localStorage.setItem(skLocalKey(repId),JSON.stringify(
+    {versions:repVersions(repId).map(v=>{const o=Object.assign({},v);delete o.RepID;return o;})}));}catch(e){}
+}
+function skWriteLocalCatalog(){
+  try{localStorage.setItem("sna_skills_catalog",JSON.stringify({catalog:SKILL_CATS,rev:CATALOG_REV}));}catch(e){}
 }
 
 /* ── write ─────────────────────────────────────────────────────────────
    Only the cells that CHANGED go up, and the script merges them into the
-   stored map. Two people on the same board (a rep rating themselves while
-   their coach rates them) therefore can't wipe each other's work — the only
-   thing that can collide is the same person on the same skill twice. */
-function skQueue(repId,campaign,patch){
-  if(!SK_PENDING||SK_PENDING.repId!==repId||SK_PENDING.campaign!==campaign)
-    SK_PENDING={repId,campaign,self:{},coach:{},focus:null};
+   open version. A rep and their coach on the same board therefore can't
+   wipe each other — the only collision left is one person twice. */
+function skQueue(repId,patch){
+  if(!SK_PENDING||SK_PENDING.repId!==repId)SK_PENDING={repId,self:{},coach:{},focus:null};
   if(patch.self)Object.assign(SK_PENDING.self,patch.self);
   if(patch.coach)Object.assign(SK_PENDING.coach,patch.coach);
   if(patch.focus)SK_PENDING.focus=patch.focus.slice();
+  if(patch.newVersionId)SK_PENDING.newVersionId=patch.newVersionId;
   skSay("saving…","");
   clearTimeout(SK_TIMER);
   SK_TIMER=setTimeout(skSave,900);
@@ -2806,45 +2909,243 @@ async function skSave(){
   SK_TIMER=null;
   const p=SK_PENDING; SK_PENDING=null;
   if(!p)return;
-  skWriteLocal(p.repId,p.campaign);                     // this device keeps a copy either way
+  skWriteLocal(p.repId);
   if(!skillsLive()){skSay("saved on this device","ok");return;}
-  const body={token:CONFIG.SKILLS_TOKEN,action:"saveSkills",repId:p.repId,campaign:p.campaign,
-    self:p.self,coach:p.coach,focus:p.focus,by:(MODE==="rep"?(ME&&ME.name)||"rep":"coach")};
+  const body={token:CONFIG.SKILLS_TOKEN,action:"saveSkills",repId:p.repId,
+    self:p.self,coach:p.coach,focus:p.focus,campaign:currentCampaign(),
+    windowDays:SK_WINDOW_DAYS,newVersionId:p.newVersionId||null,
+    by:(MODE==="rep"?(ME&&ME.name)||"rep":"coach")};
   let j=null;
   for(let attempt=1;attempt<=2&&!j;attempt++){
     try{j=await fetch(CONFIG.SKILLS_URL,{method:"POST",body:JSON.stringify(body)}).then(r=>r.json());}
     catch(e){if(attempt===2)j={ok:false,error:"network"};}
   }
   if(!j||!j.ok){skSay(j&&j.error==="network"?"⚠ offline — kept on this device":"⚠ not saved","err");return;}
+  /* the server has the last word on which version an edit belongs to —
+     it may have merged into one another device opened first */
+  if(j.version){
+    const v=normVersion(j.version);
+    const i=SK_VERSIONS.findIndex(x=>String(x.RepID)===String(v.RepID)&&x.VersionID===v.VersionID);
+    if(i>=0)SK_VERSIONS[i]=v; else SK_VERSIONS.push(v);
+    /* our proposal wasn't taken (someone else's version was already open):
+       drop the local placeholder rather than leave a version nobody has */
+    if(p.newVersionId&&p.newVersionId!==v.VersionID)
+      SK_VERSIONS=SK_VERSIONS.filter(x=>!(String(x.RepID)===String(v.RepID)&&x.VersionID===p.newVersionId&&x._local));
+    delete v._local;
+    if(SK_VER&&!repVersions(v.RepID).some(x=>x.VersionID===SK_VER))SK_VER=v.VersionID;
+    skWriteLocal(v.RepID);
+  }
   SK_FETCHED_AT=Date.now();
   skSay("saved ✓","ok");
+  renderSkills();
 }
-/* set one rating. Optimistic: the board moves now, the write follows. */
+
+/* ── stats ─────────────────────────────────────────────────────────────
+   Ben: the overall is the average of the SECTION averages, not of every
+   skill. Otherwise General Skills — 44 of the 137 — quietly decides a rep's
+   number on its own, and Productivity's 8 barely register. Each category
+   carries a weight so they can tilt that later; every weight is 1 today. */
+function skStats(map){
+  const vals=[],byCat={},byGrp={};
+  SKILL_CATS.forEach(c=>byCat[c.k]={sum:0,n:0,tot:0});
+  SKILL_FLAT.forEach(s=>{
+    byCat[s.cat].tot++;
+    const v=map[s.id];
+    if(v==null)return;
+    vals.push({id:s.id,n:s.n,catName:s.catName,grpName:s.grpName,v});
+    byCat[s.cat].sum+=v; byCat[s.cat].n++;
+    (byGrp[s.cat+"/"+s.grp]=byGrp[s.cat+"/"+s.grp]||{sum:0,n:0});
+    byGrp[s.cat+"/"+s.grp].sum+=v; byGrp[s.cat+"/"+s.grp].n++;
+  });
+  let wsum=0,wtot=0;
+  SKILL_CATS.forEach(c=>{
+    const b=byCat[c.k]; if(!b||!b.n)return;
+    const w=catWeight(c); if(!w)return;
+    wsum+=(b.sum/b.n)*w; wtot+=w;
+  });
+  const sorted=[...vals].sort((a,b)=>b.v-a.v||a.n.localeCompare(b.n));
+  return {n:vals.length,avg:wtot?wsum/wtot:null,byCat,byGrp,
+    sharpest:sorted[0]||null,
+    dullest:sorted.length?sorted[sorted.length-1]:null};
+}
+const skCatAvg=(st,k)=>st.byCat[k]&&st.byCat[k].n?st.byCat[k].sum/st.byCat[k].n:null;
+const skGrpAvg=(st,ck,gk)=>{const b=st.byGrp[ck+"/"+gk];return b&&b.n?b.sum/b.n:null;};
+
+/* ── sorting ── */
+const SK_SORTS=[
+  {k:"sheet",n:"Sheet order"},
+  {k:"low",  n:"Lowest first"},
+  {k:"high", n:"Highest first"},
+  {k:"az",   n:"A–Z"},
+  {k:"moved",n:"Biggest change"},
+  {k:"gap",  n:"Biggest gap"}
+];
+const SK_TEAM_SORTS=[
+  {k:"rated",n:"Most rated"},
+  {k:"score",n:"Highest overall"},
+  {k:"low",  n:"Lowest overall"},
+  {k:"moved",n:"Most improved"},
+  {k:"name", n:"Name"}
+];
+/* Sorting by anything but sheet order dissolves the groups: when you ask for
+   "lowest first" you want the weakest skills in the category, not the weakest
+   inside each block. Each row then wears its block name instead. */
+function skSortRows(rows,sort,shownMap,prevMap,selfMap,coachMap){
+  const val=r=>shownMap[r.id], was=r=>prevMap?prevMap[r.id]:null;
+  const last=9e9;
+  const by={
+    low:  (a,b)=>(val(a)??last)-(val(b)??last)||a.n.localeCompare(b.n),
+    high: (a,b)=>(val(b)??-last)-(val(a)??-last)||a.n.localeCompare(b.n),
+    az:   (a,b)=>a.n.localeCompare(b.n),
+    moved:(a,b)=>{
+      const d=x=>(val(x)!=null&&was(x)!=null)?Math.abs(val(x)-was(x)):-1;
+      return d(b)-d(a)||a.n.localeCompare(b.n);},
+    gap:  (a,b)=>{
+      const d=x=>(selfMap[x.id]!=null&&coachMap[x.id]!=null)?Math.abs(selfMap[x.id]-coachMap[x.id]):-1;
+      return d(b)-d(a)||a.n.localeCompare(b.n);}
+  };
+  return by[sort]?[...rows].sort(by[sort]):rows;
+}
+
+/* ── editing a rating ── */
 function skSet(id,v){
   const r=skTarget(); if(!r)return;
   const coach=(MODE!=="rep"&&SK_LENS==="coach");
-  const row=skRow(r.id,SK_CAMPAIGN);
-  const bag=coach?(row.Coach=row.Coach||{}):(row.Self=row.Self||{});
-  if(bag[id]===v)delete bag[id]; else bag[id]=v;           // tapping the live number clears it
-  skQueue(r.id,SK_CAMPAIGN,coach?{coach:{[id]:bag[id]??null}}:{self:{[id]:bag[id]??null}});
-  renderSkills({keepScroll:true});
+  if(MODE==="rep"&&coach)return;
+  const latest=latestVersion(r.id);
+  if(SK_VER&&latest&&SK_VER!==latest.VersionID)return;   // looking at history
+  const ver=ensureOpenVersion(r.id);
+  const bag=coach?(ver.Coach=ver.Coach||{}):(ver.Self=ver.Self||{});
+  if(bag[id]===v)delete bag[id]; else bag[id]=v;     // tapping the live number clears it
+  SK_VER=ver.VersionID;
+  const patch=coach?{coach:{[id]:bag[id]??null}}:{self:{[id]:bag[id]??null}};
+  if(ver._local)patch.newVersionId=ver.VersionID;
+  skQueue(r.id,patch);
+  renderSkills();
 }
-/* star a skill as one of this campaign's focus few */
+/* focus is RANKED — the order in the list is the rank, and the first three
+   are the ones that are supposed to matter this campaign */
 function skFocus(id){
   const r=skTarget(); if(!r)return;
-  const row=skRow(r.id,SK_CAMPAIGN);
-  const f=(row.Focus=Array.isArray(row.Focus)?row.Focus:[]);
+  const latest=latestVersion(r.id);
+  if(SK_VER&&latest&&SK_VER!==latest.VersionID)return;
+  const ver=ensureOpenVersion(r.id);
+  const f=(ver.Focus=Array.isArray(ver.Focus)?ver.Focus:[]);
   const i=f.indexOf(id);
   if(i>=0)f.splice(i,1);
   else{
-    if(f.length>=SK_MAX_FOCUS){skSay(`focus tops out at ${SK_MAX_FOCUS} — unstar one first`,"err");return;}
+    if(f.length>=SK_MAX_FOCUS){skSay(`focus tops out at ${SK_MAX_FOCUS} — drop one first`,"err");return;}
     f.push(id);
   }
-  skQueue(r.id,SK_CAMPAIGN,{focus:f});
-  renderSkills({keepScroll:true});
+  SK_VER=ver.VersionID;
+  skQueue(r.id,ver._local?{focus:f,newVersionId:ver.VersionID}:{focus:f});
+  renderSkills();
 }
-/* whose board is on screen: the locked rep, or whoever the coach picked */
+function skFocusMove(id,dir){
+  const r=skTarget(); if(!r)return;
+  const ver=ensureOpenVersion(r.id);
+  const f=ver.Focus||[], i=f.indexOf(id), j=i+dir;
+  if(i<0||j<0||j>=f.length)return;
+  f.splice(j,0,f.splice(i,1)[0]);
+  skQueue(r.id,ver._local?{focus:f,newVersionId:ver.VersionID}:{focus:f});
+  renderSkills();
+}
 function skTarget(){return currentRep();}
+
+/* ── the catalog editor (coaches only) ─────────────────────────────────
+   Ben wanted to add, rename and retire skills without a code change. Ids are
+   minted once and never regenerated, so renaming "Spouse" to "Spouse Stall"
+   keeps every rating anyone ever gave it. Retiring archives rather than
+   deletes, for the same reason. */
+function catCanEdit(){return MODE!=="rep";}
+function catSlug(s){return String(s||"").toLowerCase().replace(/->/g,"to").replace(/&/g,"and")
+  .replace(/[^a-z0-9]+/g,"-").replace(/^-+|-+$/g,"")||"item";}
+function catNewId(catKey,grpKey,name){
+  const base=catKey+"."+grpKey+"."+catSlug(name);
+  let id=base,i=2;
+  while(SKILL_BY_ID[id])id=base+"-"+(i++);
+  return id;
+}
+function catFind(catKey,grpKey){
+  const c=SKILL_CATS.find(x=>x.k===catKey);
+  return {c,g:c&&grpKey?(c.g||[]).find(x=>x.k===grpKey):null};
+}
+async function catSave(msg){
+  rebuildSkillIndex();
+  skWriteLocalCatalog();
+  renderSkills();
+  if(!skillsLive()){skSay((msg||"Saved")+" · on this device","ok");return;}
+  skSay("saving…","");
+  try{
+    const j=await fetch(CONFIG.SKILLS_URL,{method:"POST",body:JSON.stringify(
+      {token:CONFIG.SKILLS_TOKEN,action:"saveCatalog",catalog:SKILL_CATS,baseRev:CATALOG_REV,
+       by:"coach"})}).then(r=>r.json());
+    if(j&&j.conflict){
+      applyCatalog(j.catalog,j.catalogRev);
+      skWriteLocalCatalog(); renderSkills();
+      return skSay("⚠ someone else edited the skills — reloaded theirs","err");
+    }
+    if(!j||!j.ok)throw new Error((j&&j.error)||"save failed");
+    CATALOG_REV=+j.catalogRev||CATALOG_REV+1; CATALOG_STORED=true;
+    skWriteLocalCatalog();
+    skSay((msg||"Saved")+" ✓","ok");
+  }catch(e){skSay("⚠ not saved — "+e.message,"err");}
+}
+function catRenameSkill(id,name){
+  const rec=SKILL_BY_ID[id]; if(!rec||!catCanEdit())return;
+  name=String(name||"").trim(); if(!name||name===rec.n)return;
+  const {g}=catFind(rec.cat,rec.grp); if(!g)return;
+  const row=g.s.find(r=>r[0]===id); if(!row)return;
+  row[1]=name;
+  catSave("Renamed");
+}
+function catArchiveSkill(id,on){
+  const rec=SKILL_BY_ID[id]; if(!rec||!catCanEdit())return;
+  const {g}=catFind(rec.cat,rec.grp); if(!g)return;
+  const row=g.s.find(r=>r[0]===id); if(!row)return;
+  if(on)row[2]=1; else row.length=2;
+  catSave(on?"Retired":"Restored");
+}
+function catAddSkill(catKey,grpKey){
+  if(!catCanEdit())return;
+  const name=prompt("New skill in this block:"); if(!name||!name.trim())return;
+  const {g}=catFind(catKey,grpKey); if(!g)return;
+  g.s.push([catNewId(catKey,grpKey,name.trim()),name.trim()]);
+  catSave("Added");
+}
+function catRenameGroup(catKey,grpKey,name){
+  if(!catCanEdit())return;
+  const {g}=catFind(catKey,grpKey); if(!g)return;
+  name=String(name||"").trim(); if(!name||name===g.n)return;
+  g.n=name; catSave("Renamed");
+}
+function catAddGroup(catKey){
+  if(!catCanEdit())return;
+  const name=prompt("New block in this category:"); if(!name||!name.trim())return;
+  const {c}=catFind(catKey); if(!c)return;
+  let k=catSlug(name),i=2; while((c.g||[]).some(g=>g.k===k))k=catSlug(name)+"-"+(i++);
+  (c.g=c.g||[]).push({k,n:name.trim(),s:[]});
+  catSave("Block added");
+}
+function catRenameCat(catKey,name){
+  if(!catCanEdit())return;
+  const {c}=catFind(catKey); if(!c)return;
+  name=String(name||"").trim(); if(!name||name===c.n)return;
+  c.n=name; catSave("Renamed");
+}
+function catAddCat(){
+  if(!catCanEdit())return;
+  const name=prompt("New category:"); if(!name||!name.trim())return;
+  let k=catSlug(name),i=2; while(SKILL_CATS.some(c=>c.k===k))k=catSlug(name)+"-"+(i++);
+  SKILL_CATS.push({k,n:name.trim(),g:[{k:"general",n:name.trim(),s:[]}]});
+  SK_CAT=k; catSave("Category added");
+}
+function catReset(){
+  if(!catCanEdit())return;
+  if(!confirm("Put every skill, block and category back to the original sheet? Ratings are kept."))return;
+  SKILL_CATS=JSON.parse(JSON.stringify(SKILL_SEED));
+  catSave("Back to the sheet");
+}
 
 /* ── tabs ── */
 function setRepTab(t){
@@ -2854,112 +3155,146 @@ function setRepTab(t){
   document.querySelectorAll("#rep-tabs button").forEach(b=>b.classList.toggle("on",b.dataset.tab===REP_TAB));
   if(REP_TAB==="skills"){
     paneIn($("rep-pane-skills"));
-    renderSkills();                                   // draws at once, then again when the feed lands
+    renderSkills();
     loadSkills().then(()=>{if(REP_TAB==="skills")renderSkills();});
   } else paneIn($("rep-pane-perf"));
   try{history.replaceState(null,"",skShareUrl(null,REP_TAB));}catch(e){}
 }
-/* a link that opens straight onto a board — what a coach texts a rep */
 function skShareUrl(repId,tab){
   const u=new URL(location.href);
   if(repId)u.searchParams.set("rep",repId);
   if(tab==="skills")u.searchParams.set("tab","skills"); else u.searchParams.delete("tab");
   return u.pathname+u.search+u.hash;
 }
-/* the coach's jump-off point: open this mentee, on their skills board */
 function openRepSkills(repId){
-  if(MODE!=="rep"){setView("rep");$("rep-select").value=repId;renderRep();}
+  if(MODE!=="rep"){setView("rep");$("rep-select").value=repId;SK_VER=null;renderRep();}
   setRepTab("skills");
   const el=$("rep-pane-skills"); if(el)el.scrollIntoView({behavior:"smooth",block:"start"});
 }
-function setSkillCampaign(c){if(c===SK_CAMPAIGN)return;SK_CAMPAIGN=c;SK_CAT=null;renderSkills();}
+function setSkillVersion(v){if(v===SK_VER)return;SK_VER=v||null;renderSkills();}
 function setSkillCat(k){SK_CAT=(SK_CAT===k?null:k);renderSkills();}
 function setSkillLens(l){SK_LENS=l;renderSkills();}
+function setSkillSort(s){SK_SORT=s;renderSkills();}
+function setTeamSort(s){SK_TEAM_SORT=s;renderSkillsTeam();}
+function toggleSkillEdit(){SK_EDIT=!SK_EDIT;if(!SK_EDIT)SK_SHOW_ARCHIVED=false;renderSkills();}
+function toggleArchived(){SK_SHOW_ARCHIVED=!SK_SHOW_ARCHIVED;renderSkills();}
 
 /* ── the 1–10 ruler ── */
 function skScaleHtml(id,val,editable,isCoach){
   let h=`<div class="sk-scale${editable?"":" ro"}${isCoach?" coach":""}" role="group" aria-label="rating out of 10">`;
   for(let i=1;i<=10;i++)
     h+=`<button type="button" class="${skTone(i)}${val===i?" on":""}"${editable?` onclick="skSet('${id}',${i})"`:""}`
-      +` aria-pressed="${val===i}" title="${i} of 10">${i}</button>`;
+      +` aria-pressed="${val===i}" title="${i} — ${skBand(i).n}">${i}</button>`;
   return h+`</div>`;
 }
-function skRowHtml(sk,self,coach,focused,editable,lensCoach){
+function skRowHtml(sk,o){
+  o=o||{};
+  const self=o.self??null, coach=o.coach??null, lensCoach=!!o.lensCoach, isRep=MODE==="rep";
   const shown=lensCoach?coach:self;
-  const other=lensCoach?self:coach;
+  /* Ben: the coach column is ours. A rep never sees it, and never sees a gap. */
+  const other=isRep?null:(lensCoach?self:coach);
   const otherLab=lensCoach?"Self":"Coach";
-  const gap=(self!=null&&coach!=null&&Math.abs(self-coach)>=3);
+  const gap=(!isRep&&self!=null&&coach!=null&&Math.abs(self-coach)>=3)?Math.abs(self-coach):0;
+  const d=(o.prev!=null&&shown!=null)?shown-o.prev:null;
   const chips=[
+    o.rank?`<span class="sk-rank${o.rank<=SK_TOP_FOCUS?" top":""}">#${o.rank}</span>`:"",
     other!=null?`<span class="sk-coachv">${otherLab} <b>${other}</b></span>`:"",
-    gap?`<span class="sk-gap" title="self and coach are ${Math.abs(self-coach)} apart">gap ${Math.abs(self-coach)}</span>`:""
+    gap?`<span class="sk-gap" title="self and coach are ${gap} apart">gap ${gap}</span>`:"",
+    d!=null&&d!==0?`<span class="sk-d ${d>0?"up":"down"}" title="vs ${esc(o.prevLabel||"last version")}">${d>0?"▲":"▼"}${Math.abs(d)}</span>`:""
   ].join("");
-  return `<div class="sk-row${focused?" focus":""}">
+  if(o.edit){
+    return `<div class="sk-row ed${sk.archived?" arch":""}">
+      <div class="sk-nm">
+        <input class="sk-ren" value="${esc(sk.n)}" aria-label="skill name"
+          onchange="catRenameSkill('${sk.id}',this.value)">
+        ${sk.archived?`<button type="button" class="sk-mini" onclick="catArchiveSkill('${sk.id}',false)">restore</button>`
+                     :`<button type="button" class="sk-mini danger" onclick="catArchiveSkill('${sk.id}',true)">retire</button>`}
+      </div></div>`;
+  }
+  return `<div class="sk-row${o.rank?" focus":""}${o.rank&&o.rank<=SK_TOP_FOCUS?" top":""}">
     <div class="sk-nm">
-      <button type="button" class="sk-star${focused?" on":""}" onclick="skFocus('${sk.id}')"
-        title="${focused?"Remove from focus":"Make this a focus skill"}" aria-label="focus">${focused?"★":"☆"}</button>
-      <span>${esc(sk.n)}</span>${chips}
+      ${o.canFocus?`<button type="button" class="sk-star${o.rank?" on":""}" onclick="skFocus('${sk.id}')"
+        title="${o.rank?"Drop from focus":"Make this a focus skill"}" aria-label="focus">${o.rank?"★":"☆"}</button>`:""}
+      <span>${esc(sk.n)}${o.showGroup?`<span class="sk-sub">${esc(sk.catName)} · ${esc(sk.grpName)}</span>`:""}</span>${chips}
+      ${o.rank&&o.canFocus?`<span class="sk-mv"><button type="button" onclick="skFocusMove('${sk.id}',-1)" title="up">↑</button><button type="button" onclick="skFocusMove('${sk.id}',1)" title="down">↓</button></span>`:""}
     </div>
-    ${skScaleHtml(sk.id,shown,editable,lensCoach)}
+    ${skScaleHtml(sk.id,shown,o.editable,lensCoach)}
   </div>`;
 }
 
 /* ── the board ── */
 function renderSkills(){
   const pane=$("rep-pane-skills"); if(!pane)return;
-  if(REP_TAB!=="skills")return;                       // only paint the board that's showing
+  if(REP_TAB!=="skills")return;
   const r=skTarget();
   if(!r){pane.innerHTML=`<div class="plan-empty" style="margin-top:26px">Pick a mentee to see their skillset.</div>`;return;}
 
-  const camps=skillCampaigns(r.id);
-  if(!SK_CAMPAIGN||camps.indexOf(SK_CAMPAIGN)<0)SK_CAMPAIGN=currentCampaign();
-  const row=skRow(r.id,SK_CAMPAIGN);
   const isRep=MODE==="rep";
+  const all=repVersions(r.id);
+  const ver=viewedVersion(r.id);
+  const prev=prevVersion(r.id,ver);
+  const open=verOpen(ver);
   const lensCoach=!isRep&&SK_LENS==="coach";
-  const editable=isRep?!lensCoach:true;               // a coach edits the COACH column, never the rep's own
-  const selfMap=row.Self||{}, coachMap=row.Coach||{}, focus=row.Focus||[];
+  const latest=latestVersion(r.id);
+  const isLatest=!ver||(latest&&ver.VersionID===latest.VersionID);
+  /* You can always rate the newest board: with no version yet the first tap
+     starts one, and on a closed one it rolls over carrying everything forward.
+     Older versions are the record — they stay read-only. */
+  const canRate=isLatest&&!(isRep&&lensCoach);
+  const edit=SK_EDIT&&catCanEdit();
+  const selfMap=(ver&&ver.Self)||{}, coachMap=(ver&&ver.Coach)||{}, focus=(ver&&ver.Focus)||[];
   const shownMap=lensCoach?coachMap:selfMap;
+  const prevMap=prev?(lensCoach?(prev.Coach||{}):(prev.Self||{})):null;
   const st=skStats(shownMap);
-  const prev=skPrevCampaign(r.id,SK_CAMPAIGN);
-  const prevSt=prev?skStats(skRow(r.id,prev).Self||{}):null;
+  const prevSt=prevMap?skStats(prevMap):null;
+  if(SK_CAT===null&&st.n===0&&canRate&&!edit)SK_CAT=SKILL_CATS[0]&&SKILL_CATS[0].k;
 
-  /* nothing rated yet and no category chosen — open one so the first visit has
-     something to do rather than six empty bars */
-  if(SK_CAT===null&&st.n===0&&editable)SK_CAT=SKILL_CATS[0].k;
-
-  const who=isRep?"Your Skillset":esc(r.name)+" — Skillset";
   let h=`<div class="section" style="margin-top:22px">
     <div class="section-head">
-      <h2 class="serif">${who}</h2>
+      <h2 class="serif">${isRep?"Your Skillset":esc(r.name)+" — Skillset"}</h2>
       <span class="hint" id="sk-save">${st.n?`${st.n} of ${SKILL_COUNT} rated`:"rate yourself 1–10"}</span>
     </div>`;
 
-  /* campaign + lens */
-  h+=`<div class="camp-pills">`+camps.map(c=>{
-      const tag=c===currentCampaign()?"now":(campaignEnded(c)?"done":"");
-      return `<button class="camp-pill ${c===SK_CAMPAIGN?"on":""}" onclick="setSkillCampaign('${c}')">${c}${tag?`<span class="tag">${tag}</span>`:""}</button>`;
-    }).join("")
+  /* versions — the history, not a reset */
+  h+=`<div class="camp-pills">`+(all.length?all.map(v=>{
+      const on=ver&&v.VersionID===ver.VersionID;
+      return `<button class="camp-pill ${on?"on":""}" onclick="setSkillVersion('${v.VersionID}')">${skDay(v.CreatedAt)}${
+        verOpen(v)?`<span class="tag">open</span>`:""}</button>`;
+    }).join(""):`<span class="hint">no versions yet — your first rating starts one</span>`)
     +(isRep?"":`<span style="flex:1"></span>`
       +`<button class="camp-pill ${SK_LENS==="self"?"on":""}" onclick="setSkillLens('self')" title="what they scored themselves">Self rating</button>`
-      +`<button class="camp-pill ${SK_LENS==="coach"?"on":""}" onclick="setSkillLens('coach')" title="your read — shown beside theirs">Coach rating</button>`)
+      +`<button class="camp-pill ${SK_LENS==="coach"?"on":""}" onclick="setSkillLens('coach')" title="your read — they never see it">Coach rating</button>`)
     +`</div>`;
 
   if(!skillsLive())
     h+=`<div class="sk-note"><b>These numbers are only on this device so far.</b>
-      The shared copy switches on the moment <span style="font-family:var(--monof);font-size:11px">SNA-Skills-Sync.gs</span>
-      is deployed and its URL goes into <span style="font-family:var(--monof);font-size:11px">CONFIG.SKILLS_URL</span> —
-      about three minutes, once. Rate away in the meantime; nothing is lost.</div>`;
+      The shared copy switches on the moment <span class="mono">SNA-Skills-Sync.gs</span> is deployed and its URL goes
+      into <span class="mono">CONFIG.SKILLS_URL</span> — about three minutes, once. Rate away meanwhile; nothing is lost.</div>`;
+  if(!ver)
+    h+=`<div class="sk-note">Nothing rated yet. Your first rating starts a version dated today, <b>open for
+      ${SK_WINDOW_DAYS} days</b>. After that the next rating opens a new one carrying all of these forward — the
+      numbers never reset, so the gap between two versions is the progress.</div>`;
+  else if(open&&isLatest)
+    h+=`<div class="sk-note">This version is <b>open until ${skDay(ver.ClosesAt)}</b> — everything you tap lands here.
+      After that the next rating opens a new one, carrying all of these forward, so nothing ever resets.</div>`;
+  else if(isLatest)
+    h+=`<div class="sk-note shut">Version of <b>${skDay(ver.CreatedAt)}</b>, closed ${skDay(ver.ClosesAt)}.
+      Rate anything and a fresh version opens with these numbers carried into it.</div>`;
+  else
+    h+=`<div class="sk-note shut">Version of <b>${skDay(ver.CreatedAt)}</b> — a past board, kept as the record.
+      Read only; pick the newest version to rate.</div>`;
   if(!isRep&&lensCoach)
-    h+=`<div class="sk-note">You're editing <b>your</b> read of ${esc(r.name)}. Their own number sits beside each
-      skill, and anything <b>3 or more apart</b> gets flagged — those gaps are the conversation.</div>`;
+    h+=`<div class="sk-note">You're editing <b>your</b> read of ${esc(r.name)}. They never see this column.
+      Their own number sits beside each skill and anything <b>3 or more apart</b> is flagged — those gaps are the conversation.</div>`;
 
-  /* ── four numbers that say where they stand ── */
-  const pct=Math.round(st.n/SKILL_COUNT*100);
-  const dAvg=(prevSt&&prevSt.avg!=null&&st.avg!=null&&!lensCoach)?st.avg-prevSt.avg:null;
-  const gaps=SKILL_FLAT.filter(s=>selfMap[s.id]!=null&&coachMap[s.id]!=null&&Math.abs(selfMap[s.id]-coachMap[s.id])>=3);
+  /* four numbers */
+  const pct=SKILL_COUNT?Math.round(st.n/SKILL_COUNT*100):0;
+  const dAvg=(prevSt&&prevSt.avg!=null&&st.avg!=null)?st.avg-prevSt.avg:null;
+  const gaps=isRep?[]:SKILL_FLAT.filter(s=>selfMap[s.id]!=null&&coachMap[s.id]!=null&&Math.abs(selfMap[s.id]-coachMap[s.id])>=3);
   h+=`<div class="sk-top">
     <div class="kpi"><div class="lab">Overall</div>
-      <div class="val">${sk1(st.avg)}<small> / 10</small>${dAvg!=null?` <small style="color:${dAvg>=0?"var(--good)":"var(--bad)"}">${dAvg>=0?"▲":"▼"} ${Math.abs(dAvg).toFixed(1)}</small>`:""}</div>
-      <div class="meta">${prev&&dAvg!=null?"vs "+esc(prev):"average of what's rated"}</div></div>
+      <div class="val">${sk1(st.avg)}<small> / 10</small>${dAvg!=null&&Math.abs(dAvg)>=.05?` <small style="color:${dAvg>=0?"var(--good)":"var(--bad)"}">${dAvg>=0?"▲":"▼"} ${Math.abs(dAvg).toFixed(1)}</small>`:""}</div>
+      <div class="meta">${prev&&dAvg!=null?"vs "+skDay(prev.CreatedAt):"average of the section averages"}</div></div>
     <div class="kpi"><div class="lab">Rated</div><div class="val">${st.n}<small> / ${SKILL_COUNT}</small></div>
       <div class="meta">${pct}% of the skillset</div></div>
     <div class="kpi"><div class="lab">Sharpest</div>
@@ -2970,88 +3305,128 @@ function renderSkills(){
       <div class="meta">${st.dullest?`${st.dullest.v}/10 · ${esc(st.dullest.catName)}`:"rate a few to see this"}</div></div>
   </div>`;
 
-  /* ── six bars: the whole skillset at a glance, tap one to open it ── */
+  /* the categories at a glance */
   h+=`<div class="sk-bars" style="margin-top:18px">`+SKILL_CATS.map(c=>{
-    const a=skCatAvg(st,c.k), n=st.byCat[c.k].n, tot=c.g.reduce((x,g)=>x+g.s.length,0);
+    const a=skCatAvg(st,c.k), b=st.byCat[c.k]||{n:0,tot:0};
     const pa=prevSt?skCatAvg(prevSt,c.k):null;
-    const d=(a!=null&&pa!=null&&!lensCoach)?a-pa:null;
-    const tone=skTone(a==null?null:Math.round(a));
+    const d=(a!=null&&pa!=null)?a-pa:null;
     return `<div class="sk-bar${SK_CAT===c.k?" on":""}" onclick="setSkillCat('${c.k}')" title="open ${esc(c.n)}">
       <div class="sk-bl">${esc(c.n)}</div>
-      <div class="sk-btrack"><div class="sk-bfill" style="width:${a?Math.max(3,a*10):0}%;background:${SK_TONE_HEX[tone]||"var(--line-strong)"}"></div></div>
-      <div class="sk-bv">${a==null?`<span class="un">${n}/${tot}</span>`:`${sk1(a)}<span class="un"> · ${n}/${tot}</span>`}${
+      <div class="sk-btrack"><div class="sk-bfill" style="width:${a?Math.max(3,a*10):0}%;background:${SK_TONE_HEX[skTone(a==null?null:Math.round(a))]||"var(--line-strong)"}"></div></div>
+      <div class="sk-bv">${a==null?`<span class="un">${b.n}/${b.tot}</span>`:`${sk1(a)}<span class="un"> · ${b.n}/${b.tot}</span>`}${
         d!=null&&Math.abs(d)>=.05?`<span class="d ${d>=0?"up":"down"}">${d>=0?"▲":"▼"}${Math.abs(d).toFixed(1)}</span>`:""}</div>
     </div>`;
   }).join("")+`</div>`;
 
-  /* ── focus few ── */
+  /* focus, ranked */
   if(focus.length){
     h+=`<div class="section" style="margin-top:34px"><div class="section-head">
       <h2 class="serif" style="font-size:17px">Focus this campaign</h2>
-      <span class="hint">${focus.length} of ${SK_MAX_FOCUS} · star any skill to add it</span></div>`;
-    h+=focus.map(id=>{
+      <span class="hint">ranked · the top ${SK_TOP_FOCUS} are the ones that count · ${focus.length} of ${SK_MAX_FOCUS}</span></div>`;
+    h+=focus.map((id,i)=>{
       const sk=SKILL_BY_ID[id]; if(!sk)return "";
-      return skRowHtml(sk,selfMap[id]??null,coachMap[id]??null,true,editable,lensCoach);
+      return skRowHtml(sk,{self:selfMap[id]??null,coach:coachMap[id]??null,rank:i+1,
+        editable:canRate,lensCoach,canFocus:canRate,showGroup:true,
+        prev:prevMap?prevMap[id]:null,prevLabel:prev&&skDay(prev.CreatedAt)});
     }).join("")+`</div>`;
   }
 
-  /* ── pick a category ── */
-  h+=`<div class="camp-pills" style="margin:32px 0 4px">
-    <button class="camp-pill ${SK_CAT===null?"on":""}" onclick="setSkillCat(null)">Overview</button>`
-    +SKILL_CATS.map(c=>{
-      const n=st.byCat[c.k].n, tot=c.g.reduce((x,g)=>x+g.s.length,0);
-      return `<button class="camp-pill ${SK_CAT===c.k?"on":""}" onclick="setSkillCat('${c.k}')">${esc(c.n)}<span class="tag">${n}/${tot}</span></button>`;
-    }).join("")+`</div>`;
+  /* toolbar: which category, how it's sorted, and (coaches) the editor */
+  h+=`<div class="sk-toolbar">
+    <div class="camp-pills" style="margin:0">
+      <button class="camp-pill ${SK_CAT===null?"on":""}" onclick="setSkillCat(null)">Overview</button>`
+    +SKILL_CATS.map(c=>{const b=st.byCat[c.k]||{n:0,tot:0};
+      return `<button class="camp-pill ${SK_CAT===c.k?"on":""}" onclick="setSkillCat('${c.k}')">${esc(c.n)}<span class="tag">${b.n}/${b.tot}</span></button>`;
+    }).join("")
+    +(edit?`<button class="camp-pill add" onclick="catAddCat()">+ category</button>`:"")
+    +`</div>
+    <div class="sk-tools">
+      <select id="sk-sort" onchange="setSkillSort(this.value)" title="how the skills are ordered">
+        ${SK_SORTS.filter(s=>s.k!=="gap"||!isRep).map(s=>`<option value="${s.k}"${SK_SORT===s.k?" selected":""}>${s.n}</option>`).join("")}
+      </select>
+      ${catCanEdit()?`<button class="rowbtn${edit?" on":""}" onclick="toggleSkillEdit()">${edit?"Done editing":"Edit skills"}</button>`:""}
+      ${edit?`<button class="rowbtn${SK_SHOW_ARCHIVED?" on":""}" onclick="toggleArchived()">Retired</button>
+              <button class="rowbtn" onclick="catReset()">Reset to sheet</button>`:""}
+    </div>
+  </div>`;
 
-  if(SK_CAT===null){
+  if(SK_CAT===null&&!edit){
     h+=`<div class="plan-empty" style="margin-top:14px">${
       st.n?`Tap a category above — or a bar — to rate those skills.`
         :`Tap a category above to start. There's no prize for a 10: the honest number is the one that makes the next call better.`}</div>`;
   } else {
-    const cat=SKILL_CATS.find(c=>c.k===SK_CAT);
-    h+=`<div class="sk-legend"><span><i style="background:#A33512"></i>1–3 learning</span>
-      <span><i style="background:#96760A"></i>4–6 workable</span>
-      <span><i style="background:#3D6B4F"></i>7–8 strong</span>
-      <span><i style="background:#1C1712"></i>9–10 teach it</span>
-      <span style="margin-left:auto">☆ star up to ${SK_MAX_FOCUS} to focus on</span></div>`;
-    h+=cat.g.map(g=>{
-      const ga=skGrpAvg(st,cat.k,g.k);
-      const rated=g.s.filter(([id])=>shownMap[id]!=null).length;
-      return `<div class="sk-grp"><div class="sk-ghead">
-          <div class="sk-gname">${esc(g.n)}</div>
-          <div class="sk-gavg">${ga==null?"":"avg "+sk1(ga)+" · "}${rated}/${g.s.length} rated</div>
-        </div>`
-        +g.s.map(([id,n])=>skRowHtml({id,n},selfMap[id]??null,coachMap[id]??null,
-            focus.indexOf(id)>=0,editable,lensCoach)).join("")
-        +`</div>`;
-    }).join("");
+    h+=`<div class="sk-legend">`+SK_BANDS.map(b=>
+        `<span title="${esc(b.d)}"><i style="background:${b.hex}"></i>${b.lo}–${b.hi} ${b.n}</span>`).join("")
+      +(canRate?`<span style="margin-left:auto">☆ star up to ${SK_MAX_FOCUS}, ranked</span>`:"")+`</div>`;
+    const cats=SK_CAT===null?SKILL_CATS:SKILL_CATS.filter(c=>c.k===SK_CAT);
+    h+=cats.map(cat=>skCategoryHtml(cat,{st,shownMap,selfMap,coachMap,prevMap,prev,focus,canRate,lensCoach,edit})).join("");
   }
 
-  /* ── gaps, once both columns exist ── */
-  if(gaps.length){
+  /* gaps — coaches only, by Ben's call */
+  if(gaps.length&&!edit){
     h+=`<div class="section" style="margin-top:38px"><div class="section-head">
       <h2 class="serif" style="font-size:17px">Blind spots</h2>
       <span class="hint">${gaps.length} skill${gaps.length===1?"":"s"} where self and coach are 3+ apart</span></div>`
       +gaps.sort((a,b)=>Math.abs(selfMap[b.id]-coachMap[b.id])-Math.abs(selfMap[a.id]-coachMap[a.id]))
-        .slice(0,12).map(s=>skRowHtml(s,selfMap[s.id],coachMap[s.id],focus.indexOf(s.id)>=0,editable,lensCoach)).join("")
+        .slice(0,12).map(s=>skRowHtml(s,{self:selfMap[s.id],coach:coachMap[s.id],
+          rank:focus.indexOf(s.id)+1||0,editable:canRate,lensCoach,canFocus:canRate,showGroup:true})).join("")
       +`</div>`;
   }
 
-  const stamp=row.UpdatedAt?new Date(row.UpdatedAt):null;
-  h+=`<div class="hint" style="margin-top:26px;font-family:var(--monof);font-size:9.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-faint)">
-    ${stamp&&!isNaN(stamp)?`Last updated ${stamp.toLocaleDateString(undefined,{month:"short",day:"numeric"})} ${fmtClock(stamp)}${row.UpdatedBy?" · "+esc(row.UpdatedBy):""}`:"Nothing rated yet"}
-    ${skillsLive()?"":" · saved on this device only"}</div>`;
-
-  h+=`</div>`;
+  const stamp=ver&&ver.UpdatedAt?new Date(ver.UpdatedAt):null;
+  h+=`<div class="sk-foot">
+    ${stamp&&!isNaN(stamp)?`Last updated ${stamp.toLocaleDateString(undefined,{month:"short",day:"numeric"})} ${fmtClock(stamp)}${ver.UpdatedBy?" · "+esc(ver.UpdatedBy):""}`:"Nothing rated yet"}
+    ${all.length>1?` · ${all.length} versions kept`:""}${skillsLive()?"":" · saved on this device only"}</div></div>`;
   pane.innerHTML=h;
-  skTabCount();                       // the badge follows every rating, not just the first load
+  skTabCount();
 }
 
-/* ── the coach's team board ────────────────────────────────────────────
-   Not a second copy of the tracker — just enough to answer two questions:
-   who has actually done it, and what is the whole academy worst at. That
-   second answer is what the hub's Topic Bank wants: teach the thing forty
-   people rated a 4, not the thing you taught last year. */
+/* one category: blocks in sheet order, or one flat sorted list otherwise */
+function skCategoryHtml(cat,o){
+  const flat=SK_SORT!=="sheet";
+  const rowOpts=sk=>({self:o.selfMap[sk.id]??null,coach:o.coachMap[sk.id]??null,
+    rank:o.focus.indexOf(sk.id)+1||0,editable:o.canRate,lensCoach:o.lensCoach,
+    canFocus:o.canRate,showGroup:flat,edit:o.edit,
+    prev:o.prevMap?o.prevMap[sk.id]:null,prevLabel:o.prev&&skDay(o.prev.CreatedAt)});
+  const pick=g=>(g.s||[]).map(row=>SKILL_BY_ID[row[0]])
+    .filter(sk=>sk&&(!sk.archived||(o.edit&&SK_SHOW_ARCHIVED)));
+  let h=o.edit?`<div class="sk-cathead"><input class="sk-ren big" value="${esc(cat.n)}"
+      onchange="catRenameCat('${cat.k}',this.value)" aria-label="category name">
+      <button type="button" class="sk-mini" onclick="catAddGroup('${cat.k}')">+ block</button></div>`:"";
+  if(flat&&!o.edit){
+    const rows=skSortRows((cat.g||[]).flatMap(pick),SK_SORT,o.shownMap,o.prevMap,o.selfMap,o.coachMap);
+    return h+`<div class="sk-grp">`+rows.map(sk=>skRowHtml(sk,rowOpts(sk))).join("")+`</div>`;
+  }
+  return h+(cat.g||[]).map(g=>{
+    const rows=pick(g);
+    if(!rows.length&&!o.edit)return "";
+    const ga=skGrpAvg(o.st,cat.k,g.k);
+    const rated=rows.filter(sk=>o.shownMap[sk.id]!=null).length;
+    return `<div class="sk-grp"><div class="sk-ghead">
+        ${o.edit?`<input class="sk-ren" value="${esc(g.n)}" onchange="catRenameGroup('${cat.k}','${g.k}',this.value)" aria-label="block name">`
+                :`<div class="sk-gname">${esc(g.n)}</div>`}
+        <div class="sk-gavg">${o.edit?`<button type="button" class="sk-mini" onclick="catAddSkill('${cat.k}','${g.k}')">+ skill</button>`
+          :`${ga==null?"":"avg "+sk1(ga)+" · "}${rated}/${rows.length} rated`}</div>
+      </div>`
+      +rows.map(sk=>skRowHtml(sk,rowOpts(sk))).join("")
+      +`</div>`;
+  }).join("");
+}
+
+/* the count on the Skillset tab — how much of it they've actually done */
+function skTabCount(){
+  const el=$("sk-tabcount"); if(!el)return;
+  const r=skTarget();
+  if(!r||!SK_LOADED){el.textContent="";return;}
+  const v=viewedVersion(r.id);
+  const n=v?Object.keys(v.Self||{}).length:0;
+  el.textContent=n?n+"/"+SKILL_COUNT:"";
+}
+
+/* ── the coaches' team board ───────────────────────────────────────────
+   Not a second copy of the tracker — just enough to answer three questions:
+   who has actually done it, who is moving, and what the whole academy is
+   worst at. That last one is what the hub's Topic Bank wants. */
 function renderSkillsTeam(){
   const sec=$("skills-team-sec"); if(!sec)return;
   if(MODE==="rep"){sec.classList.add("hidden");return;}
@@ -3061,59 +3436,79 @@ function renderSkillsTeam(){
     loadSkills().then(()=>{if(MODE!=="rep")renderSkillsTeam();});
     return;
   }
-  const camp=currentCampaign();
-  const per=DATA.map(r=>{
-    const row=skRow(r.id,camp);
-    const st=skStats(row.Self||{});
-    return {rep:r,st,focus:(row.Focus||[]).length,updated:row.UpdatedAt};
+  const per=DATA.map(rep=>{
+    const all=repVersions(rep.id);
+    const cur=all.length?all[all.length-1]:null;
+    const was=all.length>1?all[all.length-2]:null;
+    const st=skStats((cur&&cur.Self)||{});
+    const pst=was?skStats(was.Self||{}):null;
+    return {rep,st,cur,versions:all.length,
+      moved:(pst&&pst.avg!=null&&st.avg!=null)?st.avg-pst.avg:null,
+      focus:((cur&&cur.Focus)||[]).slice(0,SK_TOP_FOCUS)};
   });
   const done=per.filter(p=>p.st.n>0);
-  const rated=per.filter(p=>p.st.n>=Math.round(SKILL_COUNT*.6));
+  const deep=per.filter(p=>p.st.n>=Math.round(SKILL_COUNT*.6));
 
   /* academy-wide weak spots: lowest mean among skills at least two people rated */
   const agg={};
-  per.forEach(p=>SKILL_FLAT.forEach(s=>{
-    const v=(skRow(p.rep.id,camp).Self||{})[s.id];
-    if(v==null)return;
-    (agg[s.id]=agg[s.id]||{sum:0,n:0,lo:0}); agg[s.id].sum+=v; agg[s.id].n++; if(v<=4)agg[s.id].lo++;
-  }));
-  const weak=Object.keys(agg).filter(id=>agg[id].n>=2)
+  per.forEach(p=>{
+    const map=(p.cur&&p.cur.Self)||{};
+    SKILL_FLAT.forEach(s=>{
+      const v=map[s.id]; if(v==null)return;
+      (agg[s.id]=agg[s.id]||{sum:0,n:0,lo:0}); agg[s.id].sum+=v; agg[s.id].n++; if(v<=4)agg[s.id].lo++;
+    });
+  });
+  const weak=Object.keys(agg).filter(id=>agg[id].n>=2&&SKILL_BY_ID[id])
     .map(id=>({sk:SKILL_BY_ID[id],avg:agg[id].sum/agg[id].n,n:agg[id].n,lo:agg[id].lo}))
     .sort((a,b)=>a.avg-b.avg).slice(0,6);
+  const teamAvg=done.length?done.reduce((a,p)=>a+p.st.avg,0)/done.length:null;
 
-  const teamAvg=done.length?done.reduce((a,p)=>a+p.st.avg*p.st.n,0)/done.reduce((a,p)=>a+p.st.n,0):null;
+  const sorters={
+    rated:(a,b)=>(b.st.n-a.st.n)||a.rep.name.localeCompare(b.rep.name),
+    score:(a,b)=>((b.st.avg??-9)-(a.st.avg??-9))||a.rep.name.localeCompare(b.rep.name),
+    low:  (a,b)=>((a.st.avg??99)-(b.st.avg??99))||a.rep.name.localeCompare(b.rep.name),
+    moved:(a,b)=>((b.moved??-99)-(a.moved??-99))||a.rep.name.localeCompare(b.rep.name),
+    name: (a,b)=>a.rep.name.localeCompare(b.rep.name)
+  };
 
   let h=`<div class="kpis" style="grid-template-columns:repeat(3,1fr);margin-top:0">
-    <div class="kpi"><div class="lab">Team average</div><div class="val">${sk1(teamAvg)}<small style="font-family:var(--sans);font-size:13px;color:var(--ink-faint)"> / 10</small></div>
-      <div class="meta">across every rating given</div></div>
-    <div class="kpi ${done.length<DATA.length?"alert":""}"><div class="lab">Have started</div><div class="val">${done.length}<small style="font-family:var(--sans);font-size:13px;color:var(--ink-faint)"> / ${DATA.length}</small></div>
-      <div class="meta">${rated.length} have rated most of it</div></div>
+    <div class="kpi"><div class="lab">Team average</div><div class="val">${sk1(teamAvg)}<small class="u"> / 10</small></div>
+      <div class="meta">mean of everyone who has rated</div></div>
+    <div class="kpi ${done.length<DATA.length?"alert":""}"><div class="lab">Have started</div><div class="val">${done.length}<small class="u"> / ${DATA.length}</small></div>
+      <div class="meta">${deep.length} have rated most of it</div></div>
     <div class="kpi"><div class="lab">Skills tracked</div><div class="val">${SKILL_COUNT}</div>
-      <div class="meta">${SKILL_CATS.length} categories · ${esc(camp)}</div></div>
+      <div class="meta">${SKILL_CATS.length} categories${CATALOG_STORED?"":" · from the sheet"}</div></div>
   </div>`;
 
   if(weak.length){
-    h+=`<div class="feed-h eyebrow" style="margin:26px 0 10px">Where the academy is thinnest — call topics pick themselves</div>
+    h+=`<div class="eyebrow" style="margin:26px 0 10px">Where the academy is thinnest — call topics pick themselves</div>
       <div class="sk-bars wide">`+weak.map(w=>`
       <div class="sk-bar">
         <div class="sk-bl" title="${esc(w.sk.catName)} · ${esc(w.sk.grpName)}">${esc(w.sk.n)}</div>
         <div class="sk-btrack"><div class="sk-bfill" style="width:${Math.max(3,w.avg*10)}%;background:${SK_TONE_HEX[skTone(Math.round(w.avg))]}"></div></div>
-        <div class="sk-bv">${sk1(w.avg)}<span class="un"> · ${w.n} rated${w.lo?`, ${w.lo} at 4−`:""}</span></div>
+        <div class="sk-bv">${sk1(w.avg)}<span class="un"> · ${w.n} rated${w.lo?` · ${w.lo} low`:""}</span></div>
       </div>`).join("")+`</div>`;
   }
 
-  h+=`<div class="feed-h eyebrow" style="margin:26px 0 10px">Every mentee — tap to open their board</div><div class="sk-team">`
-    +per.sort((a,b)=>(b.st.n-a.st.n)||a.rep.name.localeCompare(b.rep.name)).map(p=>`
+  h+=`<div class="sk-toolbar" style="margin-top:26px">
+      <div class="eyebrow" style="margin:0">Every mentee — tap to open their board</div>
+      <div class="sk-tools"><select onchange="setTeamSort(this.value)" title="how the mentees are ordered">
+        ${SK_TEAM_SORTS.map(s=>`<option value="${s.k}"${SK_TEAM_SORT===s.k?" selected":""}>${s.n}</option>`).join("")}
+      </select></div>
+    </div><div class="sk-team">`
+    +[...per].sort(sorters[SK_TEAM_SORT]||sorters.rated).map(p=>`
       <div class="sk-tc ${p.st.n?"":"none"}" onclick="openRepSkills('${p.rep.id}')">
         <div class="n">${esc(p.rep.name)}</div>
-        <div class="s">${p.st.n?sk1(p.st.avg):"—"}</div>
-        <div class="m">${p.st.n?`${p.st.n}/${SKILL_COUNT} rated${p.focus?` · ${p.focus} focus`:""}`:"hasn't rated yet"}</div>
+        <div class="s">${p.st.n?sk1(p.st.avg):"—"}${p.moved!=null&&Math.abs(p.moved)>=.05
+          ?`<span class="dd ${p.moved>=0?"up":"down"}">${p.moved>=0?"▲":"▼"}${Math.abs(p.moved).toFixed(1)}</span>`:""}</div>
+        <div class="m">${p.st.n?`${p.st.n}/${SKILL_COUNT} rated${p.versions>1?` · ${p.versions} versions`:""}`:"hasn't rated yet"}</div>
+        ${p.focus.length?`<div class="f">${p.focus.map((id,i)=>`<span>${i+1}. ${esc((SKILL_BY_ID[id]||{}).n||"—")}</span>`).join("")}</div>`:""}
       </div>`).join("")+`</div>`;
 
   if(!skillsLive())
     h+=`<div class="sk-note" style="margin-top:18px"><b>Shared storage isn't switched on yet.</b>
-      Until <span style="font-family:var(--monof);font-size:11px">SNA-Skills-Sync.gs</span> is deployed, every rating
-      stays in the browser that made it — so this board can only ever show your own. Setup is in the README.</div>`;
+      Until <span class="mono">SNA-Skills-Sync.gs</span> is deployed, every rating stays in the browser that made it —
+      so this board can only ever show your own. Setup is in the README.</div>`;
   $("skills-team").innerHTML=h;
 }
 

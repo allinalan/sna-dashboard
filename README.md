@@ -20,7 +20,8 @@ Every mentee page carries two boards, on their own tabs:
 
 137 skills off Alan's skillset sheet, in six categories — Demos, Service Calls,
 Events, General Skills, Biz Gifts, Productivity — each rated **1–10**. That's the
-whole interaction: tap a number.
+whole interaction: tap a number. The catalog isn't hardcoded: coaches add,
+rename and retire skills from the board itself.
 
 It sits on its own tab rather than at the bottom of the performance page on
 purpose. 137 rows would bury the sales numbers reps actually open the page for,
@@ -33,18 +34,30 @@ and a rep who has to scroll past their pace chart to rate themselves won't.
 - **Six bars** — the whole skillset at a glance. Tap one to open that category.
 - **One category at a time.** Nobody rates 137 things in a sitting; they rate
   Demos tonight and Service Calls next week. The pills remember where they are.
-- **Star up to five** as this campaign's focus. Starred skills pin to the top.
+- **Star up to five** as this campaign's focus, **ranked**. They pin to the top
+  with `#1`…`#5`, and the top three are marked as the ones that actually count.
+  Arrows reorder them.
+- **Sort** any category: sheet order, lowest first, highest first, A–Z, or
+  biggest change since the last version. Sorting by anything but sheet order
+  dissolves the blocks — when you ask for "lowest first" you want the weakest
+  skills in the category, not the weakest inside each block — so each row wears
+  its block name instead.
 - **Tap the live number again to clear it** — a rating you're no longer sure of
   is worse than no rating.
 
 Colour is the grade, so a board reads at arm's length:
 
-| | |
-|---|---|
-| **1–3** | learning it |
-| **4–6** | workable |
-| **7–8** | strong |
-| **9–10** | could teach it |
+| | | |
+|---|---|---|
+| **1–3** | Learning it | new or revisiting this skill |
+| **4–6** | Adequate | getting consistent results |
+| **7–8** | Strong | can teach it confidently to the program |
+| **9–10** | Master | almost the level of Ben, Alan, Brandon Brown, Josh Mueller, Christian Hogg |
+
+**The overall number is the average of the six section averages**, not of all 137
+skills. Otherwise General Skills — 44 of the 137 — quietly decides a rep's score
+on its own while Productivity's 8 barely register. Each category carries a
+weight so that can be tilted later; every weight is 1 today.
 
 ### What a coach sees
 
@@ -54,22 +67,41 @@ hub's Mentees roster.
 
 - Their mentee's self ratings, read-only under the **Self rating** lens.
 - **Coach rating** — the coach's own read of the same skill, in its own column.
-  A rep rating themselves and their coach rating them never overwrite each
-  other: only the cells that changed go up the wire, and the script merges them.
+  **Reps never see it.** A rep rating themselves and their coach rating them
+  never overwrite each other: only the cells that changed go up the wire, and
+  the script merges them.
 - **Blind spots** — anywhere self and coach are **3 or more apart**. That list is
   the conversation. A rep who scores themselves a 9 on closing while their coach
   has them at 4 doesn't need more reps, they need to see the tape.
 - A **team board** on the Performance tab: who's actually rated themselves, the
-  academy average, and **where the academy is thinnest** — the six skills with
+  academy average, each mentee's movement since their last version and their top
+  three focus skills, and **where the academy is thinnest** — the six skills with
   the lowest mean across everyone who rated them. Those are next campaign's call
-  topics, chosen from evidence rather than memory.
+  topics, chosen from evidence rather than memory. Sort the mentees by most
+  rated, highest, lowest, most improved or name.
+- **Edit skills** — add a skill to a block, rename anything, retire what you've
+  stopped teaching, add a block or a category, or reset the lot back to the
+  original sheet. Retiring archives rather than deletes, so the ratings already
+  given to a skill survive in the versions that carry them, and renaming keeps
+  a skill's id so its history follows the new name. Reps can't reach any of it.
 
-### Ratings are stamped with the campaign
+### Ratings are versioned, and never reset
 
-A self rating with no history is a mood ring. Every rating is stored against the
-campaign it was given in, so September's numbers stay put when someone rates
-themselves again in January, and the board shows the delta — per skill, per
-category, and overall. Growth is the point; the number on its own isn't.
+A self rating with no history is a mood ring. Each rep's board is a series of
+dated **versions**. A version stays editable for **a week**; the first rating
+after that week closes opens a new one, **carrying every rating forward**. So a
+rep always just rates "now" without thinking about versions, September's board
+is still there in January, and the delta between two versions is the progress —
+per skill, per category and overall.
+
+The rollover is decided by the **script**, not the browser, so forty devices with
+forty slightly wrong clocks can't disagree about which version an edit belongs
+to. The browser proposes the new version's id and the script adopts it, so both
+sides name the same version; if two people roll over at once, the second finds
+the first's version already open and merges into it.
+
+Older versions are read-only — they're the record. Pick one from the row of
+dates to see what a board looked like then.
 
 ### Deep links
 
