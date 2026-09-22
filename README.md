@@ -197,6 +197,3 @@ the calendar and the check-in board). Only rolls that are in count.
 The counting matches the hub: calls they were on, out of the calls that were for
 them, with excused calls left out. Replays never count as being on a call. A call
 belongs to the campaign its Vector week's Friday falls in.
-
-`sna-dashboard.html` is an older standalone copy kept for reference; `index.html`
-is the one that ships.
