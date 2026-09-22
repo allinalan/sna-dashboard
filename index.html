@@ -3011,7 +3011,7 @@ function skSortRows(rows,sort,shownMap,prevMap,selfMap,coachMap){
 function skSet(id,v){
   const r=skTarget(); if(!r)return;
   const coach=(MODE!=="rep"&&SK_LENS==="coach");
-  if(MODE==="rep"&&coach)return;
+  if(!skMayEdit())return;
   const latest=latestVersion(r.id);
   if(SK_VER&&latest&&SK_VER!==latest.VersionID)return;   // looking at history
   const ver=ensureOpenVersion(r.id);
@@ -3026,7 +3026,7 @@ function skSet(id,v){
 /* focus is RANKED — the order in the list is the rank, and the first three
    are the ones that are supposed to matter this campaign */
 function skFocus(id){
-  const r=skTarget(); if(!r)return;
+  const r=skTarget(); if(!r||!skMayEdit())return;
   const latest=latestVersion(r.id);
   if(SK_VER&&latest&&SK_VER!==latest.VersionID)return;
   const ver=ensureOpenVersion(r.id);
@@ -3042,7 +3042,7 @@ function skFocus(id){
   renderSkills();
 }
 function skFocusMove(id,dir){
-  const r=skTarget(); if(!r)return;
+  const r=skTarget(); if(!r||!skMayEdit())return;
   const ver=ensureOpenVersion(r.id);
   const f=ver.Focus||[], i=f.indexOf(id), j=i+dir;
   if(i<0||j<0||j>=f.length)return;
@@ -3051,6 +3051,11 @@ function skFocusMove(id,dir){
   renderSkills();
 }
 function skTarget(){return currentRep();}
+/* Who may write to the board on screen. A rep owns their own column; a coach
+   owns theirs and only theirs. The Self lens is a coach's READ of the rep —
+   the guard lives here as well as in the render so that a stale button, or a
+   call from the console, can't get round it either. */
+function skMayEdit(){return MODE==="rep"?SK_LENS!=="coach":SK_LENS==="coach";}
 
 /* ── the catalog editor (coaches only) ─────────────────────────────────
    Ben wanted to add, rename and retire skills without a code change. Ids are
@@ -3240,14 +3245,14 @@ function renderSkills(){
   /* You can always rate the newest board: with no version yet the first tap
      starts one, and on a closed one it rolls over carrying everything forward.
      Older versions are the record — they stay read-only. */
-  const canRate=isLatest&&!(isRep&&lensCoach);
+  const canRate=isLatest&&(isRep||lensCoach);
   const edit=SK_EDIT&&catCanEdit();
   const selfMap=(ver&&ver.Self)||{}, coachMap=(ver&&ver.Coach)||{}, focus=(ver&&ver.Focus)||[];
   const shownMap=lensCoach?coachMap:selfMap;
   const prevMap=prev?(lensCoach?(prev.Coach||{}):(prev.Self||{})):null;
   const st=skStats(shownMap);
   const prevSt=prevMap?skStats(prevMap):null;
-  if(SK_CAT===null&&st.n===0&&canRate&&!edit)SK_CAT=SKILL_CATS[0]&&SKILL_CATS[0].k;
+  if(SK_CAT===null&&st.n===0&&!edit)SK_CAT=SKILL_CATS[0]&&SKILL_CATS[0].k;
 
   let h=`<div class="section" style="margin-top:22px">
     <div class="section-head">
@@ -3290,6 +3295,10 @@ function renderSkills(){
   else
     h+=`<div class="sk-note shut">Version of <b>${skDay(ver.CreatedAt)}</b> — a past board, kept as the record.
       Read only; pick the newest version to rate.</div>`;
+  if(!isRep&&!lensCoach)
+    h+=`<div class="sk-note shut">This is ${esc(String(r.name||"").split(" ")[0]||"their")}'s own scoring, so it's
+      read-only here — it's theirs to change, not ours. To put <b>your</b> number on these skills, switch to
+      <b>Coach rating</b>; it sits in its own column beside theirs and they never see it.</div>`;
   if(!isRep&&lensCoach)
     h+=`<div class="sk-note">You're editing <b>your</b> read of ${esc(r.name)}${ver?"":", who hasn't rated themselves yet"}. They never see this column.
       Their own number sits beside each skill and anything <b>3 or more apart</b> is flagged — those gaps are the conversation.</div>`;
