@@ -19,9 +19,15 @@
  * SETUP — about three minutes, once:
  *   1. script.google.com  ▸  New project  ▸  paste this whole file over
  *      whatever is there  ▸  name it "SNA Skills Sync".
- *   2. Run  setup()  once. Approve the permission prompt (it's your own script
- *      asking to make a spreadsheet). The Execution log prints the new sheet's
- *      URL — that's where the ratings will live.
+ *   2. SAVE FIRST (disk icon, or Cmd/Ctrl+S). The toolbar's function dropdown
+ *      only lists what is in the SAVED file, so until you save it still says
+ *      "myFunction" and there is no setup to pick — which looks exactly like
+ *      this step is missing. Then pick  setup  in that dropdown  ▸  ▷ Run.
+ *      Google warns "Google hasn't verified this app" — expected for a script
+ *      you wrote yourself this morning. Review permissions ▸ your account ▸
+ *      Advanced (bottom left) ▸ "Go to SNA Skills Sync (unsafe)" ▸ Allow.
+ *      It only ever touches the spreadsheet it creates itself.
+ *      The Execution log then prints the new sheet's URL.
  *   3. Deploy ▸ New deployment ▸ type "Web app"
  *        Execute as:      Me
  *        Who has access:  Anyone
