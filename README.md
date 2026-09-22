@@ -177,5 +177,26 @@ status dot of its own — the worksheet saves on the rep's phone, so the dashboa
 never tell whether it's been done — and its button is outlined, not solid, so it
 never outshouts a check-in or a 1-on-1 that's actually due.
 
+### Group calls
+
+Each mentee sees their own group-call attendance, read from the hub's **Call
+Attendance** rolls (the hub's shared data, the same feed that already brings in
+the calendar and the check-in board). Only rolls that are in count.
+
+- **Your week** gets a **Group calls** row. It shows how many of the calls that
+  were for them they've been on this campaign, and how many replays they still owe.
+  **Your replay ↓** jumps to the make-up in their Assignments.
+- A **Group Calls** section under Assignments lists every call that was for them,
+  plus any they dropped in on. Each shows **On the call**, **Missed** or **Excused**,
+  and, for a missed or excused call, how the replay is going: due, overdue, waiting
+  on a coach, or **Made up ✓**. It follows the campaign picker. Calls that weren't
+  for them and that they weren't on don't appear.
+- Coaches see the same section on **Rep ▸ pick a mentee**, with a link to take the
+  roll on the hub.
+
+The counting matches the hub: calls they were on, out of the calls that were for
+them, with excused calls left out. Replays never count as being on a call. A call
+belongs to the campaign its Vector week's Friday falls in.
+
 `sna-dashboard.html` is an older standalone copy kept for reference; `index.html`
 is the one that ships.
