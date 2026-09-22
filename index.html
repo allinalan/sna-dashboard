@@ -296,6 +296,22 @@
   .pill.late{background:var(--bad-bg);color:var(--bad)}
   .pill.waiting,.pill.revise,.pill.approved{background:var(--good-bg);color:var(--good)}
   .pill.na{background:var(--line-soft);color:var(--ink-faint)}
+  /* group-call attendance — the hub's rolls, read-only here. Same squares as the hub's board. */
+  .gc-sum{font-size:14px;margin-bottom:12px;line-height:1.5}
+  .gc-list{display:grid;gap:6px}
+  .gc-row{display:grid;grid-template-columns:24px minmax(0,1fr) auto;gap:12px;align-items:center;padding:9px 12px;background:var(--card);border:1px solid var(--line);border-radius:10px;font-size:13px}
+  .gc-row.jump{cursor:pointer}
+  .gc-row.jump:hover{border-color:var(--ink-soft)}
+  .gc-sq{width:22px;height:22px;border-radius:6px;display:grid;place-items:center;font-family:var(--monof);font-size:11px;font-weight:600;color:#F4EEDF}
+  .gc-sq.on{background:#2E7D4F}
+  .gc-sq.drop{background:#2E7D4F;box-shadow:0 0 0 2px var(--card),0 0 0 3.5px #2E7D4F}
+  .gc-sq.miss{background:#C0392B}
+  .gc-sq.x{background:#1C1712}
+  .gc-t{font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .gc-d{font-family:var(--monof);font-size:10.5px;color:var(--ink-soft);margin-top:2px}
+  .gc-p{text-align:right}
+  .gc-p .pill{margin:2px 0 2px 6px}
+  @media (max-width:560px){.gc-row .gc-p{grid-column:2/4;text-align:left}.gc-p .pill{margin:2px 6px 2px 0}.gc-t{white-space:normal}}
 
   /* ═══ assignments section ═══ */
   .as-card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px;box-shadow:0 1px 2px rgba(28,23,18,.04)}
@@ -735,7 +751,7 @@
     </div>
 
     <div id="rep-pane-perf">
-    <!-- the rep's week at a glance: check-in · assignments · 1-on-1 (Path/Masters) · next group call -->
+    <!-- the rep's week at a glance: check-in · assignments · 1-on-1 (Path/Masters) · group calls · next group call -->
     <div class="section hidden" id="week-sec" style="margin-top:24px">
       <div id="week-card"></div>
     </div>
@@ -749,6 +765,13 @@
       <div class="camp-pills" id="assign-pills"></div>
       <div id="assign-form"></div>
       <div id="assign-list" style="display:grid;gap:12px;margin-top:14px"></div>
+    </div>
+
+    <!-- group-call attendance: the hub's rolls for this mentee, in the campaign being viewed -->
+    <div class="section hidden" id="gc-sec">
+      <div class="section-head"><h2 class="serif" id="gc-title">Group Calls</h2><span class="hint" id="gc-hint"></span></div>
+      <div class="gc-sum" id="gc-sum"></div>
+      <div class="gc-list" id="gc-list"></div>
     </div>
 
     <!-- coaches: the 1-on-1 in one glance (admin mode only) -->
@@ -1126,7 +1149,7 @@ const SEED = [
 /* ═══════════════ DATA LOAD — one fetch feeds every view ═══════════════ */
 let DATA=[], ROSTER_RAW=[], CALLS_RAW=[], SURVEY_RAW=[], PLANNER_RAW=[];
 let ASSIGN_RAW=[], OVERRIDE_RAW=[], SUB_RAW=[];   // assignments — spec §5
-let HUB_CAL=null;                                 // {calendar,topicTiers,callTime} from the hub, or null
+let HUB_CAL=null;                                 // {calendar,topicTiers,callTime,checkins,attendance} from the hub, or null
 let ASSIGN_CAMPAIGN=null;                         // campaign shown in the Assignments section (defaults to current)
 let HAVE_DATA=false; // a trusted load happened (live fetch, or seed by config)
 let REP_LINKS=CONFIG.REP_LINKS_LIVE; // runtime value of the hub's "Rep dashboard links" toggle; sticky across failed fetches
@@ -2192,12 +2215,13 @@ function campaignWeekNo(){const start=campaignStartDefault(currentCampaign());re
    land within a minute. */
 async function loadHubCalendar(maxAge){
   const ttl=maxAge||10*60000;
-  try{const c=JSON.parse(sessionStorage.getItem("sna_hubcal")||"null");if(c&&Date.now()-c.t<ttl&&c.d&&c.d.checkins){HUB_CAL=c.d;return;}}catch(e){}
+  try{const c=JSON.parse(sessionStorage.getItem("sna_hubcal")||"null");if(c&&Date.now()-c.t<ttl&&c.d&&c.d.checkins&&c.d.attendance){HUB_CAL=c.d;return;}}catch(e){}
   try{
     const j=await (await fetch(CONFIG.HUB_SYNC_URL)).json();
     if(j&&j.ok&&j.data){
       HUB_CAL={calendar:j.data.calendar||[],topicTiers:j.data.topicTiers||{},callTime:String((j.data.meta||{}).callTime||""),
-               checkins:j.data.checkins||{}};   // the Weekly Check-ins board — purple squares are 1-on-1s
+               checkins:j.data.checkins||{},    // the Weekly Check-ins board — purple squares are 1-on-1s
+               attendance:j.data.attendance||{}};   // Call Attendance — one roll per group call, keyed by the call's cid
       try{sessionStorage.setItem("sna_hubcal",JSON.stringify({t:Date.now(),d:HUB_CAL}));}catch(e){}
     }
   }catch(e){console.warn("hub calendar unavailable",e);}
@@ -2244,10 +2268,21 @@ function renderWeekCard(r){
     const btns=[b.btn,(!b.btn||b.btn.url!==CONFIG.CALENDLY_URL)?{lab:"Book your 1-on-1 ↗",url:CONFIG.CALENDLY_URL}:null].filter(Boolean);
     rows.push({dot:cs.status==="done"?"good":cs.status==="booked"?"brass":cs.overdue?"bad":"warn",lab:"Your 1-on-1 · "+monthName(),title:b.title,sub:b.sub,btns});
   }
-  // 4 · next group call from the hub calendar
+  // 4 · group calls so far this campaign, off the hub's rolls — and any replay still to catch up on
+  const gc=groupCallSummary(r,groupCallsFor(r,currentCampaign()));
+  if(gc.calls.length){
+    const next=gc.owed.find(x=>x.replay&&x.replay.state!=="approved"&&x.makeup);
+    rows.push({dot:gc.late?"bad":gc.owed.length?"warn":"good",lab:"Group calls · "+esc(currentCampaign()),
+      title:`On ${gc.on} of ${gc.need} call${gc.need===1?"":"s"}`+(gc.drop?` · +${gc.drop} extra`:""),
+      sub:gc.owed.length
+        ?`${gc.owed.length} replay${gc.owed.length===1?"":"s"} to catch up on: watch it, post your takeaways in the GroupMe, then tell us what you posted.`
+        :gc.on===gc.need?"Every call so far.":"",
+      btns:next?[{lab:"Your replay ↓",js:`assignJump('${esc(next.makeup)}')`}]:[]});
+  }
+  // 5 · next group call from the hub calendar
   const nc=nextGroupCall(r);
   if(nc)rows.push({dot:"brass",lab:"Next group call",title:`${nc.when} · ${nc.topic}`,sub:[nc.presenter?"with "+nc.presenter:"",nc.extra?`${nc.extra} more call${nc.extra>1?"s":""} that week`:""].filter(Boolean).join(" · "),btns:[]});
-  // 5 · Design Your Life — a standing tool, no status: its answers live on the rep's device, never reach us
+  // 6 · Design Your Life — a standing tool, no status: its answers live on the rep's device, never reach us
   rows.push({dot:"brass",lab:"Plan your hours",title:"Does your week fit?",sub:"Budget your hours, your floors and your Power Hour.",btns:[{lab:"Design your week ↗",url:CONFIG.DYL_URL,ghost:true}]});   // ghost: always there, never urgent
   $("week-card").innerHTML=`<div class="wk-card">
     <div class="eyebrow">Your week · ${esc(currentCampaign())} · Week ${campaignWeekNo()}</div>
@@ -2255,6 +2290,75 @@ function renderWeekCard(r){
     ${rows.map(x=>`<div class="wk-row"><span class="wd ${x.dot}"></span><div><div class="wl">${x.lab}</div>${x.html||`<div class="wt">${x.title}</div><div class="ws">${x.sub||""}</div>`}</div>${
       x.btns.length?`<div class="wk-btns">${x.btns.map((b,i)=>b.url?`<a class="form-btn${i||b.ghost?" ghost":""}" href="${b.url}" target="_blank" rel="noopener">${b.lab}</a>`:`<button class="form-btn ghost" onclick="${b.js}">${b.lab}</button>`).join("")}</div>`:""}</div>`).join("")}
   </div>`;
+}
+/* ═══════════════ GROUP-CALL ATTENDANCE (the hub's Call Attendance rolls) ═══════════════
+   The hub keeps one roll per group call, keyed by the call's cid: who the call
+   was for (`expected`), the marks ("on", or "x" for excused), and whether the
+   roll is in (`done`). Once it's in, anyone the call was for who isn't on it
+   has missed it and owes the replay — excused included — and `makeup` is that
+   replay's AssignmentID. A call counts toward the campaign its Vector week
+   (Tue–Mon) does: the one its Friday falls in, the hub's rule. */
+function hubCallCampaign(iso){
+  const [y,m,d]=String(iso).split("-").map(Number);
+  const t=new Date(y,m-1,d); t.setDate(t.getDate()-((t.getDay()+5)%7)+3);   // back to the week's Tuesday, on to its Friday
+  return seasonOf(t)+" "+t.getFullYear();
+}
+function groupCallsFor(r,campaign){
+  const rolls=(HUB_CAL&&HUB_CAL.attendance)||{}, id=String(r.id), out=[];
+  for(const row of (HUB_CAL&&HUB_CAL.calendar)||[]){
+    if(row.status==="off"||row.status==="blocked")continue;
+    const calls=[];
+    if(String(row.topic||"").trim())calls.push({cid:row.cid,date:row.date,topic:row.topic});
+    for(const x of row.extra||[])if(String(x.topic||x.speaker||"").trim())
+      calls.push({cid:x.cid,date:String(x.date||"").trim()||row.date,topic:x.topic||x.speaker});
+    for(const c of calls){
+      const roll=c.cid&&rolls[c.cid];
+      if(!roll||!roll.done||roll.skip||hubCallCampaign(c.date)!==campaign)continue;
+      const isFor=(roll.expected||[]).map(String).includes(id), m=(roll.marks||{})[id]||"";
+      const state=m==="on"?(isFor?"on":"drop"):!isFor?null:m==="x"?"x":"miss";
+      if(!state)continue;                                   // a call that wasn't for them, and they weren't on
+      const a=(state==="miss"||state==="x")&&roll.makeup&&ASSIGN_RAW.find(x=>String(x.AssignmentID)===String(roll.makeup));
+      const s=a?assignState({id:r.id,tier:r.tier},a,OVERRIDE_RAW,SUB_RAW,todayISO()):null;
+      out.push(Object.assign(c,{state,makeup:a?String(a.AssignmentID):"",replay:s&&s.state!=="na"?s:null}));
+    }
+  }
+  return out.sort((a,b)=>String(a.date).localeCompare(String(b.date)));
+}
+/* on the call, out of the calls that were for them — excused ones left out,
+   replays never counted. Every missed or excused call is a replay owed until
+   it's approved. */
+function groupCallSummary(r,calls){
+  const on=calls.filter(c=>c.state==="on").length, miss=calls.filter(c=>c.state==="miss").length;
+  const owed=calls.filter(c=>(c.state==="miss"||c.state==="x")&&!(c.replay&&c.replay.state==="approved"));
+  return {calls,on,need:on+miss,drop:calls.filter(c=>c.state==="drop").length,owed,late:owed.some(c=>c.replay&&c.replay.state==="late")};
+}
+const GC_STATE={on:["on","✓","On the call","approved"],drop:["drop","✓","Dropped in","approved"],miss:["miss","✕","Missed","late"],x:["x","–","Excused","na"]};
+const GC_REPLAY={open:["open","Replay due "],late:["late","Replay overdue"],waiting:["waiting","Replay in · waiting on coach"],revise:["revise","Replay sent back · resubmit"],approved:["approved","Made up ✓"]};
+function renderGroupCalls(r){
+  const sec=$("gc-sec"); if(!sec)return;
+  const gc=groupCallSummary(r,groupCallsFor(r,SELECTED_CAMPAIGN));
+  sec.classList.toggle("hidden",!gc.calls.length);
+  if(!gc.calls.length)return;
+  const rep=MODE==="rep", first=esc(String(r.name).split(" ")[0]);
+  $("gc-title").textContent=(rep?"Your ":"")+"Group Calls · "+SELECTED_CAMPAIGN;
+  $("gc-hint").innerHTML=rep?"every call that was for you · missed one? catch the replay"
+    :`<a href="${CONFIG.HUB_URL}#attend" target="_top" style="text-decoration:none">Take the roll on the hub ↗</a>`;
+  $("gc-sum").innerHTML=(rep?`You've been on <b>${gc.on} of ${gc.need}</b> group call${gc.need===1?"":"s"}`
+                            :`${first} has been on <b>${gc.on} of ${gc.need}</b> group call${gc.need===1?"":"s"}`)
+    +(gc.drop?`, plus ${gc.drop} extra`:"")+"."
+    +(gc.owed.length?` <b style="color:var(--bad)">${gc.owed.length} replay${gc.owed.length===1?"":"s"} to catch up on</b>${rep?": watch it, post your takeaways in the GroupMe, then tell us what you posted.":"."}`
+      :gc.need&&gc.on===gc.need?" Every one so far.":"");
+  $("gc-list").innerHTML=gc.calls.slice().reverse().map(c=>{
+    const [sq,glyph,label,pc]=GC_STATE[c.state], rp=c.replay&&GC_REPLAY[c.replay.state];
+    const jump=rep&&c.makeup&&c.replay&&c.replay.state!=="approved";
+    const [y,m,d]=String(c.date).split("-").map(Number);
+    const when=new Date(y,m-1,d).toLocaleDateString(undefined,{weekday:"short",month:"short",day:"numeric"});
+    return `<div class="gc-row${jump?" jump":""}"${jump?` onclick="assignJump('${esc(c.makeup)}')" title="Open this replay"`:""}>
+      <span class="gc-sq ${sq}">${glyph}</span>
+      <div><div class="gc-t">${esc(c.topic)}</div><div class="gc-d">${esc(when)}</div></div>
+      <div class="gc-p"><span class="pill ${pc}">${label}</span>${rp?`<span class="pill ${rp[0]}">${rp[1]}${c.replay.state==="open"&&c.replay.due?esc(fmtDue(c.replay.due)):""}</span>`:""}</div>
+    </div>`;
+  }).join("");
 }
 function renderAdminCalls(){
   $("calls-month").textContent=monthName();
@@ -2503,7 +2607,7 @@ function renderRep(){
   const r=currentRep(); if(!r)return;
   renderCallPrep(r);
   renderRepContext(r);renderGoalsStrip(r);renderHero(r);renderSummary(r);renderChart();renderChannels(r);renderDiagnostics(r);renderStandards(r);renderNotes(r);
-  renderCallNotes(r);renderRepPlanner(r);renderFallBreakdown(r);renderWeekCard(r);renderAssignments(r);
+  renderCallNotes(r);renderRepPlanner(r);renderFallBreakdown(r);renderWeekCard(r);renderAssignments(r);renderGroupCalls(r);
   // brand-new rep (no check-ins this campaign): collapse the data sections
   // into one starter card so the page leads with what they can DO
   const collapse=MODE==="rep"&&activeWeeks(r)===0;
