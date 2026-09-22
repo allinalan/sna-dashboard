@@ -170,5 +170,12 @@ weekly trend, channel diagnostics, planner, assignments, check-in and call
 notes. It's fed by the **Weekly** check-in form through the Google Sheet named
 in `CONFIG.SHEET_ID`, and refreshes every 60 seconds.
 
+Reps reach the [Design Your Life worksheet](https://allinalan.github.io/sna-design-your-life/)
+(`CONFIG.DYL_URL`) from two places: a **Plan your hours** row at the foot of the
+"Your week" card, and a link beside the Campaign Planner's heading. The row has no
+status dot of its own — the worksheet saves on the rep's phone, so the dashboard can
+never tell whether it's been done — and its button is outlined, not solid, so it
+never outshouts a check-in or a 1-on-1 that's actually due.
+
 `sna-dashboard.html` is an older standalone copy kept for reference; `index.html`
 is the one that ships.

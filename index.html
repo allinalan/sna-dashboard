@@ -825,7 +825,9 @@
     <div class="section" id="rep-planner-sec">
       <div class="section-head">
         <h2 class="serif" id="rp-title">Campaign Planner</h2>
-        <span class="hint" id="plan-saved">type in the grid — saves automatically</span>
+        <!-- #plan-saved is rewritten while saving, so the link sits beside it, not inside -->
+        <span class="hint"><span id="plan-saved">type in the grid — saves automatically</span> ·
+          <a href="https://allinalan.github.io/sna-design-your-life/" target="_blank" rel="noopener" style="color:var(--accent)">do the hours fit? design your week ↗</a></span>
       </div>
       <div id="rep-planner"></div>
     </div>
@@ -929,6 +931,7 @@ const CONFIG = {
   HUB_URL: "https://allinalan.github.io/sna-master-hub/",
   HUB_SYNC_URL: "https://script.google.com/macros/s/AKfycbyw7ngyqNuO9AHQnCeb1paTfoDRWX1sTkJMlhC2zB9BKDuo_O-SF9XWke2e1QiA_Y9A/exec?token=sharpninja", // the hub's calendar feed (token already public in the hub source)
   CALENDLY_URL: "https://calendly.com/sharp-ninja-academy",
+  DYL_URL: "https://allinalan.github.io/sna-design-your-life/",  // Design Your Life worksheet — answers stay on the rep's own device
   SURVEY_FORM_URL: "https://docs.google.com/forms/d/e/1FAIpQLSedU7b3dOX6JQs8fcRJbqB5q3dmbEc9fSoUm-rmpK9484R4cQ/viewform",
   WEBAPP_URL: "https://script.google.com/macros/s/AKfycbyNFDkgEAUT5IDNw4wvCHLQZoe70XxVwgAZmG8bNTmlkY8t0d-wL2eKa53kgke2AOCHPQ/exec",
   CALL_CUTOFF_DAY: 20,          // after this day of month, an unfinished call shows OVERDUE
@@ -2244,11 +2247,13 @@ function renderWeekCard(r){
   // 4 · next group call from the hub calendar
   const nc=nextGroupCall(r);
   if(nc)rows.push({dot:"brass",lab:"Next group call",title:`${nc.when} · ${nc.topic}`,sub:[nc.presenter?"with "+nc.presenter:"",nc.extra?`${nc.extra} more call${nc.extra>1?"s":""} that week`:""].filter(Boolean).join(" · "),btns:[]});
+  // 5 · Design Your Life — a standing tool, no status: its answers live on the rep's device, never reach us
+  rows.push({dot:"brass",lab:"Plan your hours",title:"Does your week fit?",sub:"Budget your hours, your floors and your Power Hour.",btns:[{lab:"Design your week ↗",url:CONFIG.DYL_URL,ghost:true}]});   // ghost: always there, never urgent
   $("week-card").innerHTML=`<div class="wk-card">
     <div class="eyebrow">Your week · ${esc(currentCampaign())} · Week ${campaignWeekNo()}</div>
     <div class="wk-title">${esc(String(r.name).split(" ")[0])}, here's your week</div>
     ${rows.map(x=>`<div class="wk-row"><span class="wd ${x.dot}"></span><div><div class="wl">${x.lab}</div>${x.html||`<div class="wt">${x.title}</div><div class="ws">${x.sub||""}</div>`}</div>${
-      x.btns.length?`<div class="wk-btns">${x.btns.map((b,i)=>b.url?`<a class="form-btn${i?" ghost":""}" href="${b.url}" target="_blank" rel="noopener">${b.lab}</a>`:`<button class="form-btn ghost" onclick="${b.js}">${b.lab}</button>`).join("")}</div>`:""}</div>`).join("")}
+      x.btns.length?`<div class="wk-btns">${x.btns.map((b,i)=>b.url?`<a class="form-btn${i||b.ghost?" ghost":""}" href="${b.url}" target="_blank" rel="noopener">${b.lab}</a>`:`<button class="form-btn ghost" onclick="${b.js}">${b.lab}</button>`).join("")}</div>`:""}</div>`).join("")}
   </div>`;
 }
 function renderAdminCalls(){
