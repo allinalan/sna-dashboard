@@ -3252,7 +3252,7 @@ function renderSkills(){
   let h=`<div class="section" style="margin-top:22px">
     <div class="section-head">
       <h2 class="serif">${isRep?"Your Skillset":esc(r.name)+" — Skillset"}</h2>
-      <span class="hint" id="sk-save">${st.n?`${st.n} of ${SKILL_COUNT} rated`:"rate yourself 1–10"}</span>
+      <span class="hint" id="sk-save">${st.n?`${st.n} of ${SKILL_COUNT} rated`:(isRep?"rate yourself 1–10":lensCoach?"rate them 1–10":"nothing rated yet")}</span>
     </div>`;
 
   /* versions — the history, not a reset */
@@ -3260,7 +3260,7 @@ function renderSkills(){
       const on=ver&&v.VersionID===ver.VersionID;
       return `<button class="camp-pill ${on?"on":""}" onclick="setSkillVersion('${v.VersionID}')">${skDay(v.CreatedAt)}${
         verOpen(v)?`<span class="tag">open</span>`:""}</button>`;
-    }).join(""):`<span class="hint">no versions yet — your first rating starts one</span>`)
+    }).join(""):`<span class="hint">no versions yet — ${isRep?"your first rating starts one":"their first rating starts one"}</span>`)
     +(isRep?"":`<span style="flex:1"></span>`
       +`<button class="camp-pill ${SK_LENS==="self"?"on":""}" onclick="setSkillLens('self')" title="what they scored themselves">Self rating</button>`
       +`<button class="camp-pill ${SK_LENS==="coach"?"on":""}" onclick="setSkillLens('coach')" title="your read — they never see it">Coach rating</button>`)
@@ -3270,10 +3270,17 @@ function renderSkills(){
     h+=`<div class="sk-note"><b>These numbers are only on this device so far.</b>
       The shared copy switches on the moment <span class="mono">SNA-Skills-Sync.gs</span> is deployed and its URL goes
       into <span class="mono">CONFIG.SKILLS_URL</span> — about three minutes, once. Rate away meanwhile; nothing is lost.</div>`;
-  if(!ver)
-    h+=`<div class="sk-note">Nothing rated yet. Your first rating starts a version dated today, <b>open for
-      ${SK_WINDOW_DAYS} days</b>. After that the next rating opens a new one carrying all of these forward — the
-      numbers never reset, so the gap between two versions is the progress.</div>`;
+  if(!ver){
+    if(isRep)
+      h+=`<div class="sk-note">Nothing rated yet. Your first rating starts a version dated today, <b>open for
+        ${SK_WINDOW_DAYS} days</b>. After that the next rating opens a new one carrying all of these forward — the
+        numbers never reset, so the gap between two versions is the progress.</div>`;
+    else if(!lensCoach)
+      h+=`<div class="sk-note shut">${esc(String(r.name||"").split(" ")[0]||"They")} hasn't rated anything yet. Their
+        first rating starts a version dated that day, open for ${SK_WINDOW_DAYS} days, and every version after that
+        carries the previous numbers forward — so you'll be able to read the progress, not just the score.</div>`;
+    /* coach lens with nothing rated: the note just below says it, no need to stack */
+  }
   else if(open&&isLatest)
     h+=`<div class="sk-note">This version is <b>open until ${skDay(ver.ClosesAt)}</b> — everything you tap lands here.
       After that the next rating opens a new one, carrying all of these forward, so nothing ever resets.</div>`;
@@ -3284,7 +3291,7 @@ function renderSkills(){
     h+=`<div class="sk-note shut">Version of <b>${skDay(ver.CreatedAt)}</b> — a past board, kept as the record.
       Read only; pick the newest version to rate.</div>`;
   if(!isRep&&lensCoach)
-    h+=`<div class="sk-note">You're editing <b>your</b> read of ${esc(r.name)}. They never see this column.
+    h+=`<div class="sk-note">You're editing <b>your</b> read of ${esc(r.name)}${ver?"":", who hasn't rated themselves yet"}. They never see this column.
       Their own number sits beside each skill and anything <b>3 or more apart</b> is flagged — those gaps are the conversation.</div>`;
 
   /* four numbers */
