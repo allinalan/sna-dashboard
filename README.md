@@ -119,8 +119,18 @@ a rep and their coaches, deploy the script once:
 1. **script.google.com** ▸ New project ▸ paste
    [`SNA-Skills-Sync.gs`](SNA-Skills-Sync.gs) over whatever is there ▸ name it
    **SNA Skills Sync**.
-2. Run **`setup()`** once and approve the prompt. The Execution log prints the
-   URL of the new **SNA Skills Data** spreadsheet.
+2. **Save first** (disk icon, or Cmd/Ctrl+S), then pick **`setup`** in the
+   toolbar's function dropdown and click **▷ Run**. Saving matters: the dropdown
+   only lists functions from the *saved* file, so before you save it still says
+   `myFunction` and there's no `setup` to choose — which looks exactly like the
+   step is missing.
+
+   Google then warns **"Google hasn't verified this app"** — expected for a
+   script you wrote yourself. *Review permissions* ▸ your account ▸ **Advanced**
+   (bottom left) ▸ **Go to SNA Skills Sync (unsafe)** ▸ **Allow**. It only
+   touches the spreadsheet it creates itself.
+
+   The Execution log prints the URL of the new **SNA Skills Data** spreadsheet.
 3. **Deploy ▸ New deployment ▸ Web app**, *Execute as* **Me**, *Who has access*
    **Anyone** ▸ Deploy ▸ copy the `/exec` URL.
 4. Paste it into `CONFIG.SKILLS_URL` in `index.html` and push.
@@ -134,14 +144,18 @@ New version**, or the web app keeps serving the old code.
 
 ### How it stores things
 
-One row per mentee per campaign:
+Two tabs. **`Skills`** — one row per mentee per version:
 
-| RepID | Campaign | Self | Coach | Focus | UpdatedAt | UpdatedBy |
-|---|---|---|---|---|---|---|
+| RepID | VersionID | CreatedAt | ClosesAt | Campaign | Self | Coach | Focus | UpdatedAt | UpdatedBy |
+|---|---|---|---|---|---|---|---|---|---|
 
-`Self` and `Coach` are JSON maps of `skillId → 1–10`; `Focus` is a list of skill
-ids. Forty reps rating themselves on a Tuesday night is forty rows, not forty
-thousand, and a whole board saves in one write.
+`Self` and `Coach` are JSON maps of `skillId → 1–10`; `Focus` is an ordered list
+of skill ids, where the order is the rank. A whole board saves in one write.
+
+**`Catalog`** — the skill list itself, as a revision-numbered JSON blob split
+across cells so it can grow. The dashboard offers its built-in list the first
+time it finds the tab empty; after that the stored copy wins and the board's
+**Edit skills** controls write to it.
 
 Writes are **patches** — only the skills that changed are sent, and the script
 merges them into what's stored. A `null` clears one. Anything that isn't a whole
