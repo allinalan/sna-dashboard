@@ -592,6 +592,14 @@
   .pane-in{animation:pageIn .38s cubic-bezier(.16,.68,.32,1)}
   @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
 
+  /* first load — a loading card instead of an empty coach board with "Seed data"
+     on it (what a rep used to see for the whole wait). init() takes body.booting off. */
+  #loading{display:none;text-align:center;padding:90px 20px}
+  body.booting #loading{display:block}
+  body.booting #view-team,body.booting #view-rep,body.booting .toggle{display:none}
+  @keyframes bootPulse{0%,100%{opacity:1;transform:none}50%{opacity:.5;transform:scale(.92)}}
+  #loading .mark{animation:bootPulse 1.6s ease-in-out infinite}
+
   @media(max-width:880px){
     .plan-grid{grid-template-columns:1fr 1fr}
     .plan-hero{grid-column:span 2}
@@ -622,7 +630,7 @@
   }
 </style>
 </head>
-<body>
+<body class="booting">
 
 <header>
   <div class="head-inner">
@@ -638,7 +646,7 @@
         <button id="btn-team" class="on" onclick="setView('team')">Team</button>
         <button id="btn-rep" onclick="setView('rep')">Rep</button>
       </div>
-      <div class="status"><span class="dot seed" id="src-dot"></span><span id="src-label">Seed data</span></div>
+      <div class="status"><span class="dot seed" id="src-dot"></span><span id="src-label">Loading&hellip;</span></div>
       <a class="form-btn" href="https://docs.google.com/forms/d/e/1FAIpQLSdIAf_SaV1m2ASTN4YzEBeVxp7o-gkIBXqhCCbO5vmuNh7cTQ/viewform" target="_blank" rel="noopener">Weekly Form ↗</a>
     </div>
   </div>
@@ -894,6 +902,15 @@
 
     <!-- ════ SKILLSET ════ built by renderSkills() ════ -->
     <div id="rep-pane-skills" class="hidden"></div>
+  </div>
+
+  <!-- loading: shown until the first data load lands (body.booting) -->
+  <div id="loading" role="status" aria-live="polite">
+    <div class="mark serif" style="margin:0 auto 18px;width:52px;height:52px;font-size:24px">忍</div>
+    <div class="serif" style="font-size:26px;font-weight:600" id="loading-title">Loading your dashboard&hellip;</div>
+    <div style="font-size:13px;color:var(--ink-soft);margin-top:10px;line-height:1.7" id="loading-sub">
+      Pulling in your latest numbers &mdash; just a few seconds.
+    </div>
   </div>
 
   <!-- lockout: unknown ?rep= id -->
@@ -1162,29 +1179,44 @@ async function loadFlags(){
 }
 async function loadData(){
   if(!CONFIG.USE_LIVE_DATA){DATA=SEED;HAVE_DATA=true;setSource(false);resolveIdentity();return;}
-  await loadFlags();
-  await loadHubCalendar(REP_PARAM?10*60000:50000);   // group-call calendar + Ben's 1-on-1 marks
+  /* All ten requests go out at once. They used to go one after another, so the
+     first paint waited for the SUM of them — ~6 s on wifi, 7–10 s on a phone,
+     most of it the two Apps Script calls (~2 s each, Google's floor). Now it
+     waits for the slowest one. The rules are unchanged: the rep-links flag
+     lands before resolveIdentity reads it, and a load is kept whole or not
+     at all (a failed Weekly no longer leaves a fresh Roster beside it). */
+  const side=Promise.all([
+    loadFlags(),
+    loadHubCalendar(REP_PARAM?10*60000:50000)        // group-call calendar + Ben's 1-on-1 marks
+  ]);                                                // both swallow their own errors, so this never rejects
   try{
     const base=`https://docs.google.com/spreadsheets/d/${CONFIG.SHEET_ID}/gviz/tq?tqx=out:json&headers=1&sheet=`;
     const tab=async(name,optional)=>{ // optional tabs return [] until they exist
       try{return await gviz(base+encodeURIComponent(name));}
       catch(e){if(optional)return [];throw e;}
     };
-    ROSTER_RAW=await tab(CONFIG.ROSTER_TAB);
-    WEEKLY_RAW=await tab(CONFIG.WEEKLY_TAB);
-    CALLS_RAW=await tab(CONFIG.CALLS_TAB,true);
-    SURVEY_RAW=await tab(CONFIG.SURVEY_TAB,true);
-    PLANNER_RAW=await tab(CONFIG.PLANNER_TAB,true);
+    const [,raw]=await Promise.all([side,Promise.all([
+      tab(CONFIG.ROSTER_TAB),
+      tab(CONFIG.WEEKLY_TAB),
+      tab(CONFIG.CALLS_TAB,true),
+      tab(CONFIG.SURVEY_TAB,true),
+      tab(CONFIG.PLANNER_TAB,true),
+      tab(CONFIG.ASSIGN_TAB,true),
+      tab(CONFIG.OVERRIDE_TAB,true),
+      tab(CONFIG.SUBMISSION_TAB,true)
+    ])]);
     const nonEmpty=rows=>rows.filter(o=>Object.values(o).some(v=>v!=null&&String(v).trim()!==""));
-    ASSIGN_RAW=nonEmpty(await tab(CONFIG.ASSIGN_TAB,true));
-    OVERRIDE_RAW=nonEmpty(await tab(CONFIG.OVERRIDE_TAB,true));
-    SUB_RAW=nonEmpty(await tab(CONFIG.SUBMISSION_TAB,true));
+    [ROSTER_RAW,WEEKLY_RAW,CALLS_RAW,SURVEY_RAW,PLANNER_RAW]=raw;
+    ASSIGN_RAW=nonEmpty(raw[5]);
+    OVERRIDE_RAW=nonEmpty(raw[6]);
+    SUB_RAW=nonEmpty(raw[7]);
     applyCampaign();
     HAVE_DATA=true;
     setSource(true);
   }
   catch(e){
     console.warn("Live fetch failed:",e);
+    await side;                                        // a failed tab rejects early; the flag must still land first
     if(HAVE_DATA){setSource("stale");return;}          // blip mid-session: keep last good data as-is
     if(REP_PARAM){setSource("stale");resolveIdentity();return;} // rep with no data yet: connecting screen, never seed
     DATA=SEED;setSource(false);                        // admin with no data yet: seed beats a blank page
@@ -3691,9 +3723,16 @@ function renderAll(){
   fillRepSelect();renderRep();
 }
 async function init(){
-  await loadData();                                   // loadData() also brings the hub feed in, both modes
-  if(MODE==="rep")setView("rep");
-  renderAll();
+  if(!REP_PARAM)$("loading-title").textContent="Loading the team board…";
+  const slow=setTimeout(()=>{$("loading-sub").textContent="Still working on it — a slow connection can take a little longer.";},10000);
+  try{
+    await loadData();                                 // loadData() also brings the hub feed in, both modes
+    if(MODE==="rep")setView("rep");
+    renderAll();
+  }finally{                                           // a render that throws shows what it drew, never an endless loading card
+    clearTimeout(slow);
+    document.body.classList.remove("booting");
+  }
   /* the skillset feed is lazy — but a rep's own row is small and makes the tab
      badge honest from the first paint, so fetch it once in the background. */
   if(MODE==="rep"||MODE==="admin")loadSkills().then(()=>{skTabCount();if(REP_TAB==="skills")renderSkills();});

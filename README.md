@@ -170,6 +170,12 @@ weekly trend, channel diagnostics, planner, assignments, check-in and call
 notes. It's fed by the **Weekly** check-in form through the Google Sheet named
 in `CONFIG.SHEET_ID`, and refreshes every 60 seconds.
 
+Every load asks for all its data **at once**: the eight sheet tabs, the hub feed
+and the rep-links switch. So the first paint waits for the slowest request,
+not the sum of them. That's about 2 s, set by Google's Apps Script. One at a time
+it was about 6 s on wifi and 7–10 s on a phone. Until the data lands, a loading
+card shows, never the empty coach board.
+
 Reps reach the [Design Your Life worksheet](https://allinalan.github.io/sna-design-your-life/)
 (`CONFIG.DYL_URL`) from two places: a **Plan your hours** row at the foot of the
 "Your week" card, and a link beside the Campaign Planner's heading. The row has no
