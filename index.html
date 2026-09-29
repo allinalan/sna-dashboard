@@ -567,6 +567,15 @@
   .rchip.ok{border-color:#B9CFBB;background:var(--good-bg);cursor:default}
   .rchip.ok .dot2{background:var(--good)}
   .prep-note{font-size:12px;line-height:1.55;color:var(--ink);margin-top:2px}
+  .prep-call{margin-top:12px}
+  .prep-head{font-size:12.5px;color:var(--ink-soft);margin:0 0 8px 2px}
+  .prep-call.latest .prep-head{color:var(--ink)}
+  .prep-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+  .prep-list{margin:0;padding-left:18px;font-size:12.5px;line-height:1.5;color:var(--ink)}
+  .prep-list li{margin:0 0 3px}
+  .prep-more{margin-top:10px}
+  .prep-more summary{cursor:pointer;font-size:12px;color:var(--ink-soft)}
+  @media(max-width:880px){.prep-grid{grid-template-columns:1fr}}
 
   /* ── planner v2: assumptions + weekly grid ── */
   .assume{display:grid;grid-template-columns:1.1fr 1.6fr 1.6fr 1fr;gap:10px;margin-bottom:14px}
@@ -784,8 +793,9 @@
 
     <!-- coaches: the 1-on-1 in one glance (admin mode only) -->
     <div class="section hidden" id="prep-sec" style="margin-top:24px">
-      <div class="section-head"><h2 class="serif">Call Prep</h2><span class="hint">this month's call · last action steps · last check-in · pace</span></div>
+      <div class="section-head"><h2 class="serif">Call Prep</h2><span class="hint">this month's call · last call prep · last check-in · pace</span></div>
       <div class="assume" id="prep-cards" style="grid-template-columns:repeat(4,1fr)"></div>
+      <div id="prep-notes"></div>
     </div>
 
     <!-- brand-new reps: one friendly card instead of seven empty sections -->
@@ -843,7 +853,7 @@
     <div class="section rds" id="call-notes-sec">
       <div class="section-head">
         <h2 class="serif">Coaching Call Notes</h2>
-        <span class="hint">takeaways &amp; action steps from the post-call survey · newest first</span>
+        <span class="hint">takeaways &amp; action steps from past call surveys · newest first</span>
       </div>
       <div class="notes" id="call-notes" style="display:grid;gap:10px"></div>
     </div>
@@ -1213,6 +1223,7 @@ async function loadData(){
     applyCampaign();
     HAVE_DATA=true;
     setSource(true);
+    if(!REP_PARAM)loadCallPrep();                     // coach view: the call prep notes (coach key, private sheet)
   }
   catch(e){
     console.warn("Live fetch failed:",e);
@@ -1474,8 +1485,7 @@ function callState(r){
   const surveyed=surveys.length;
   const upcoming=mine.filter(c=>norm(c)==="booked").map(c=>ciParseDate(c.CallDateTime)).filter(Boolean).sort((a,b)=>a-b);
   let status="none";
-  if(completed>=req&&surveyed>=req)status="done";
-  else if(completed>surveyed)status="survey";       // a finished call is missing its survey
+  if(completed>=req)status="done";                  // the post-call survey was retired 2026-09-29: a completed call is done
   else if(upcoming.length||hub.booked.length)status="booked";
   const overdue=status!=="done"&&new Date().getDate()>CONFIG.CALL_CUTOFF_DAY;
   return {req,completed,surveyed,upcoming:upcoming[0]||null,hubWeek:hub.booked[0]||null,status,overdue,surveys};
@@ -1738,10 +1748,8 @@ function renderRadar(){
     const cs=DATA.filter(r=>callsRequired(r)>0).map(r=>({r,c:callState(r)}));
     const od=cs.filter(x=>x.c.overdue).length;
     const nb=cs.filter(x=>x.c.status==="none"&&!x.c.overdue).length;
-    const sp=cs.filter(x=>x.c.status==="survey").length;
     if(od)chips.push({cls:"bad",id:"admin-calls-sec",html:`<b>${od}</b> call${od>1?"s":""} OVERDUE`});
     if(nb)chips.push({cls:"warn",id:"admin-calls-sec",html:`<b>${nb}</b> call${nb>1?"s":""} not booked`});
-    if(sp)chips.push({cls:"warn",id:"admin-calls-sec",html:`<b>${sp}</b> survey${sp>1?"s":""} pending`});
     const t=plannerTeam();
     const behind=t.rows.filter(x=>(x.plan.ahead??0)<-0.5);
     if(behind.length)chips.push({cls:"warn",id:"admin-planner-sec",html:`<b>${behind.length}</b> behind pace: ${behind.slice(0,3).map(x=>x.rep.name.split(" ")[0]).join(", ")}${behind.length>3?"…":""}`});
@@ -2065,8 +2073,7 @@ function openRepPlanner(repId){
 /* ═══════════════ COACHING CALLS (render) ═══════════════ */
 function callCardBits(cs){
   const month=monthName();
-  if(cs.status==="done")return {title:`${month} call${cs.req>1?"s":""} done 🎉`,sub:`${cs.completed}/${cs.req} completed · survey in`,btn:null};
-  if(cs.status==="survey")return {title:"Complete your call survey",sub:`Your ${month} call happened — lock in the takeaways while they're fresh`,btn:CONFIG.SURVEY_FORM_URL?{lab:"Open survey ↗",url:CONFIG.SURVEY_FORM_URL}:null};
+  if(cs.status==="done")return {title:`${month} call${cs.req>1?"s":""} done 🎉`,sub:`${cs.completed}/${cs.req} completed`,btn:null};
   if(cs.status==="booked"&&cs.upcoming)return {title:`Booked for ${cs.upcoming.toLocaleDateString(undefined,{weekday:"long",month:"short",day:"numeric"})}`,sub:fmtCallTime(cs.upcoming)+(cs.req>1?` · ${cs.completed}/${cs.req} this month`:""),btn:null};
   if(cs.status==="booked")return {title:`Booked for the week of ${cs.hubWeek.toLocaleDateString(undefined,{month:"short",day:"numeric"})}`,sub:"On the coaches' check-in board"+(cs.req>1?` · ${cs.completed}/${cs.req} this month`:""),btn:null};
   return {title:`Book your ${month} call`,sub:`${cs.req}/month for your tier · this is your formal 1-on-1, separate from weekly standards`,btn:{lab:"Book on Calendly ↗",url:CONFIG.CALENDLY_URL}};
@@ -2396,7 +2403,7 @@ function renderAdminCalls(){
   $("calls-month").textContent=monthName();
   const hubMarked=DATA.some(r=>callsRequired(r)>0&&(hubOneOnOnes(r,monthKey(new Date())).booked.length||hubOneOnOnes(r,monthKey(new Date())).done));
   if(!CALLS_RAW.length&&!SURVEY_RAW.length&&!hubMarked){
-    $("admin-calls").innerHTML=`<div class="plan-empty">The <b>Calls</b> tab isn't feeding yet — once Calendly + the survey are wired, every mentee's month shows here with overdue flags.</div>`;
+    $("admin-calls").innerHTML=`<div class="plan-empty">The <b>Calls</b> tab isn't feeding yet — once Calendly is wired, every mentee's month shows here with overdue flags.</div>`;
     $("calls-feed").innerHTML="";
     return;
   }
@@ -2406,7 +2413,6 @@ function renderAdminCalls(){
     const od=cs.overdue?` od`:"";
     const lab=(cs.overdue?"OVERDUE · ":"")+(()=>{
       if(cs.status==="done")return cs.req>1?`all ${cs.req} done ✓`:"done ✓";
-      if(cs.status==="survey")return `${cs.completed} done · survey pending`;
       if(cs.status==="booked")return "booked"+(cs.upcoming?` ${cs.upcoming.getMonth()+1}/${cs.upcoming.getDate()}`
         :cs.hubWeek?` · wk of ${cs.hubWeek.getMonth()+1}/${cs.hubWeek.getDate()}`:"");
       return "not booked";
@@ -2584,11 +2590,9 @@ function renderCallNotes(r){
   const mine=SURVEY_RAW.filter(s=>String(s.RepID)===String(r.id))
     .map(s=>({...s,t:ciParseDate(s.Timestamp)})).filter(s=>s.t)
     .sort((a,b)=>b.t-a.t).slice(0,3);
-  if(!mine.length){
-    $("call-notes").innerHTML=`<div class="note"><div class="wk">No call surveys yet</div>`+
-      `<div class="row">After each 1-on-1, the <b>takeaways</b> and <b>action steps</b> from the post-call survey land here — so the next call starts where the last one ended.</div></div>`;
-    return;
-  }
+  // the survey was retired 2026-09-29: this is history for the reps who filled it in; hidden otherwise
+  $("call-notes-sec").classList.toggle("hidden",!mine.length);
+  if(!mine.length){$("call-notes").innerHTML="";return;}
   $("call-notes").innerHTML=mine.map((s,i)=>{
     const mp=String(s.Month||"").split("-");
     const mLab=mp.length===2?new Date(+mp[0],+mp[1]-1,1).toLocaleDateString(undefined,{month:"long",year:"numeric"}):(s.Month||"");
@@ -2614,6 +2618,53 @@ function renderGoalsStrip(r){
   el.classList.remove("hidden");
   el.innerHTML=tiles.map(t=>`<div class="kpi"><div class="lab">${t.lab}</div><div class="val" style="font-size:20px">${t.val}</div><div class="meta">${t.meta}</div></div>`).join("");
 }
+/* ── CALL PREP notes (2026-09-29) ─────────────────────────────────────────
+   After every 1-on-1, call_prep.py on the Mac mini has Claude write the
+   coach's note from the Fireflies transcript and stores it in the PRIVATE
+   contacts sheet (CallPrep tab) through the Apps Script's coach-key action.
+   Read here with the coach key the hub keeps in localStorage (same origin,
+   allinalan.github.io), so only a coach who has entered the key ever sees a
+   note. Reps never do. Replaces the post-call survey, retired the same day. */
+let PREP_RAW=null, PREP_ERR="";
+async function loadCallPrep(){
+  if(REP_PARAM)return;                                   // coach view only
+  const key=localStorage.getItem("sna_coach_key")||"";
+  if(!key){PREP_RAW=null;PREP_ERR="nokey";}
+  else{
+    try{
+      const res=await fetch(CONFIG.WEBAPP_URL,{method:"POST",headers:{"Content-Type":"text/plain;charset=utf-8"},cache:"no-store",
+        body:JSON.stringify({action:"callPrep",key,_t:Date.now()})});
+      const out=await res.json();
+      if(out.ok){PREP_RAW=out.rows||[];PREP_ERR="";}
+      else{PREP_RAW=null;PREP_ERR=out.error||"error";}
+    }catch(e){PREP_RAW=null;PREP_ERR=String(e&&e.message||e);}
+  }
+  const r=currentRep();
+  if(r&&MODE==="admin"&&$("prep-notes"))renderCallPrep(r);
+}
+const prepLines=s=>String(s||"").split("\n").map(x=>x.trim()).filter(Boolean);
+function prepFor(r){
+  return (PREP_RAW||[]).filter(p=>String(p.RepID)===String(r.id))
+    .map(p=>({...p,t:new Date(p.CallAt)})).filter(p=>!isNaN(p.t)).sort((a,b)=>b.t-a.t);
+}
+function prepNoteHtml(p,latest){
+  const li=arr=>arr.length?`<ul class="prep-list">${arr.map(x=>`<li>${esc(x)}</li>`).join("")}</ul>`:`<div class="prep-note">—</div>`;
+  const when=p.t.toLocaleDateString(undefined,{weekday:"short",month:"short",day:"numeric",year:"numeric"});
+  const conf=p.Confidence&&p.Confidence!=="high"?` · <span style="color:var(--warn)">${esc(p.Confidence)} confidence${p.ReviewNote?": "+esc(p.ReviewNote):""}</span>`:"";
+  return `<div class="prep-call${latest?" latest":""}">
+    <div class="prep-head"><b>${when}</b> · with ${esc(p.Coach||"?")}${+p.DurationMin?` · ${Math.round(+p.DurationMin)} min`:""}${conf}${p.URL?` · <a href="${esc(p.URL)}" target="_blank" rel="noopener">recording ↗</a>`:""}</div>
+    <div class="prep-grid">
+      <div class="ag"><div class="ah">What we covered</div>${li(prepLines(p.Covered))}</div>
+      <div class="ag"><div class="ah">Where their head is at</div><div class="prep-note">${esc(p.Head||"—")}</div>${prepLines(p.Numbers).length?`<div class="ah" style="margin-top:10px">Numbers</div>${li(prepLines(p.Numbers))}`:""}</div>
+      <div class="ag"><div class="ah">They committed to</div>${li(prepLines(p.Commitments))}</div>
+      <div class="ag"><div class="ah">Raise next call</div>${li(prepLines(p.Followups))}</div>
+    </div></div>`;
+}
+function prepNotesHtml(preps){
+  if(!preps.length)return "";
+  const more=preps.slice(1,6);
+  return prepNoteHtml(preps[0],true)+(more.length?`<details class="prep-more"><summary>${more.length} earlier call${more.length>1?"s":""}</summary>${more.map(p=>prepNoteHtml(p,false)).join("")}</details>`:"");
+}
 /* coach call-prep: the 1-on-1 in one glance (admin deep-dive only) */
 function renderCallPrep(r){
   const sec=$("prep-sec"); if(!sec)return;
@@ -2622,18 +2673,22 @@ function renderCallPrep(r){
   const cs=callState(r);
   const sv=SURVEY_RAW.filter(x=>String(x.RepID)===String(r.id))
     .map(x=>({...x,t:ciParseDate(x.Timestamp)})).filter(x=>x.t).sort((a,b)=>b.t-a.t)[0];
+  const preps=prepFor(r), latest=preps[0];
   const note=(r.notes||[])[0];
   const p=plannerFor(r), pc=pace(p);
   const callTxt=cs.status==="na"?"The Dojo · no 1-on-1s":cs.status==="booked"&&cs.upcoming
     ?`Booked ${cs.upcoming.toLocaleDateString(undefined,{weekday:"short",month:"short",day:"numeric"})} · ${fmtCallTime(cs.upcoming)}`
-    :cs.status==="done"?"Done + surveyed ✓"
-    :cs.status==="survey"?`${cs.completed} done · survey pending`
+    :cs.status==="done"?"Done ✓"
     :"Not booked — nudge them";
+  const lastTxt=latest?`<b>${latest.t.toLocaleDateString(undefined,{month:"short",day:"numeric"})}</b> with ${esc(latest.Coach||"?")} · call prep below`
+    :sv?`<b>survey ${sv.t.toLocaleDateString(undefined,{month:"short",day:"numeric"})}:</b> ${esc(sv.ActionSteps||"—")}`
+    :PREP_ERR==="nokey"?"enter the coach key on the hub's Mentees tab to see call prep":PREP_RAW?"no call prep yet":"loading call prep…";
   $("prep-cards").innerHTML=`
     <div class="ag"><div class="ah">This month's call</div><div class="prep-note"><b>${callTxt}</b></div></div>
-    <div class="ag"><div class="ah">Last call — action steps</div><div class="prep-note">${sv?esc(sv.ActionSteps||"—"):"no survey yet"}</div></div>
+    <div class="ag"><div class="ah">Last call</div><div class="prep-note">${lastTxt}</div></div>
     <div class="ag"><div class="ah">Last check-in</div><div class="prep-note">${note?[note.win&&"<b>Win:</b> "+esc(note.win),note.obs&&"<b>Obstacle:</b> "+esc(note.obs),note.commit&&"<b>Commit:</b> "+esc(note.commit)].filter(Boolean).join("<br>")||"—":"no check-ins yet"}</div></div>
     <div class="ag"><div class="ah">Pace</div><div class="prep-note"><b style="color:${(p.ahead??0)>=0?'var(--good)':'var(--bad)'}">${pc.word}</b>${p.planShort!=null&&p.planShort>0.5?`<br><span style="color:var(--ink-soft)">plan short ${money(p.planShort)}</span>`:""}</div></div>`;
+  $("prep-notes").innerHTML=prepNotesHtml(preps);
 }
 function renderRep(){
   const r=currentRep(); if(!r)return;
