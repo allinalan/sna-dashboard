@@ -361,8 +361,8 @@
   .ptable tbody tr:last-child td{border-bottom:none}
   .ptable td .up{color:var(--good);font-weight:600}
   .ptable td .down{color:var(--bad);font-weight:600}
-  .ptable .rowbtn{font-family:var(--monof);font-size:10px;letter-spacing:.05em;text-transform:uppercase;border:1px solid var(--line-strong);background:none;border-radius:7px;padding:3px 9px;cursor:pointer;color:var(--ink-soft);transition:border-color .15s,color .15s}
-  .ptable .rowbtn:hover{border-color:var(--accent);color:var(--accent)}
+  .ptable .rowbtn,.sk-tools .rowbtn{font-family:var(--monof);font-size:10px;letter-spacing:.05em;text-transform:uppercase;border:1px solid var(--line-strong);background:none;border-radius:7px;padding:3px 9px;cursor:pointer;color:var(--ink-soft);transition:border-color .15s,color .15s}
+  .ptable .rowbtn:hover,.sk-tools .rowbtn:hover{border-color:var(--accent);color:var(--accent)}
   .camp-pills{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 14px}
   .camp-pill{font-family:var(--monof);font-size:10px;letter-spacing:.04em;border:1px solid var(--line-strong);background:var(--card);
     border-radius:999px;padding:4px 12px;cursor:pointer;color:var(--ink-soft);transition:border-color .15s,color .15s}
@@ -445,16 +445,81 @@
   .sk-scale.ro button:hover{border-color:var(--line);color:var(--ink-faint)}
   .sk-scale.coach button.on{box-shadow:inset 0 0 0 2px var(--card),inset 0 0 0 3px currentColor}
 
-  .sk-legend{display:flex;gap:16px;flex-wrap:wrap;font-family:var(--monof);font-size:9.5px;
-    letter-spacing:.06em;text-transform:uppercase;color:var(--ink-faint);margin:14px 0 2px}
-  .sk-legend span{display:flex;align-items:center;gap:6px}
-  .sk-legend i{width:10px;height:10px;border-radius:3px;display:block}
+  /* The key: what a 1–10 means. It was one 9.5px line and nobody could rate
+     against it, so now it is four cards you can read from across the table —
+     the range, what that level is called, and what it looks like (Alan,
+     2026-10-06). The how-to folds away under it once a rep has started. */
+  .sk-key{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:16px 0 0}
+  .sk-kc{background:var(--card);border:1px solid var(--line);border-top:4px solid var(--band,var(--line-strong));
+    border-radius:10px;padding:12px 14px 13px}
+  .sk-kc .r{font-family:var(--serif);font-size:23px;font-weight:600;letter-spacing:-.01em;line-height:1;color:var(--band,var(--ink))}
+  .sk-kc .n{font-size:14px;font-weight:600;letter-spacing:-.005em;line-height:1.3;margin-top:7px}
+  .sk-kc .d{font-size:13px;line-height:1.5;color:var(--ink-soft);margin-top:4px}
+  .sk-howto{margin:10px 0 0;background:var(--card);border:1px solid var(--line);border-radius:10px}
+  .sk-howto-t{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;
+    font-family:var(--sans);font-size:14px;font-weight:600;color:var(--ink);background:none;border:none;
+    padding:11px 14px;cursor:pointer;text-align:left}
+  .sk-howto-t .chev{font-family:var(--monof);font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;
+    color:var(--ink-faint);font-weight:400;white-space:nowrap}
+  .sk-howto-t:hover .chev{color:var(--accent)}
+  .sk-howto ol{margin:0;padding:0 18px 14px 36px;font-size:13.5px;line-height:1.6;color:var(--ink-soft)}
+  .sk-howto li{margin-top:5px;padding-left:2px}
+  .sk-howto li::marker{font-family:var(--monof);font-size:11px;color:var(--accent);font-weight:600}
+  /* what a section is, in a line, so "Selling Ultimates" means something to a
+     rep in their first month */
+  .sk-gdesc{font-size:13px;line-height:1.55;color:var(--ink-soft);margin:7px 0 5px;max-width:78ch}
+  .sk-starhint{font-family:var(--monof);font-size:9.5px;letter-spacing:.06em;text-transform:uppercase;
+    color:var(--ink-faint);text-align:right;margin:9px 2px 0}
+  .sk-desc{display:block;width:100%;max-width:760px;margin:8px 0 6px;font-family:var(--sans);font-size:13px;
+    line-height:1.5;padding:7px 10px;border:1px solid var(--line-strong);border-radius:7px;
+    background:var(--card-raised);color:var(--ink);resize:vertical;min-height:58px}
+  .sk-desc:focus{outline:none;border-color:var(--accent)}
+  /* the level a rating sits in, said in words beside the skill */
+  .sk-lvl{font-family:var(--monof);font-size:9px;letter-spacing:.06em;text-transform:uppercase;
+    border:1px solid currentColor;border-radius:5px;padding:1px 6px;white-space:nowrap}
+  .sk-lvl.lo{color:#A33512} .sk-lvl.mid{color:#7F6408} .sk-lvl.hi{color:#3D6B4F} .sk-lvl.top{color:#1C1712}
 
   .sk-note{font-size:12.5px;color:var(--ink-soft);background:var(--card);border:1px solid var(--line);
     border-left:3px solid var(--brass);border-radius:10px;padding:13px 16px;line-height:1.65;margin:16px 0 0}
   .sk-note b{color:var(--ink)}
-  .sk-save{font-family:var(--monof);font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-faint)}
-  .sk-save.ok{color:var(--good)} .sk-save.err{color:var(--bad)}
+  .sk-note .sk-mini{margin-left:6px;vertical-align:1px}
+  .sk-note.fix{border-left-color:var(--accent);background:var(--accent-soft);color:var(--accent-ink)}
+  .sk-note.fix b{color:var(--accent-ink)}
+
+  /* ═══ the Save bar ═══
+     Ratings used to save themselves behind a 9.5px "saved ✓" in the heading,
+     which had scrolled out of sight by the second skill, so nobody knew
+     whether a board was kept (Alan, 2026-10-06). Now there is a Save button
+     pinned to the bottom of the screen for as long as the skillset is up, and
+     it only says Saved once the sheet has answered with the same numbers. */
+  .sk-savebar{position:fixed;left:0;right:0;bottom:0;z-index:40;background:var(--shell);color:var(--shell-text);
+    border-top:1px solid rgba(142,121,66,.5);box-shadow:0 -12px 26px -16px rgba(18,13,7,.6);
+    padding:10px 26px calc(10px + env(safe-area-inset-bottom))}
+  .sk-savebar .in{max-width:1088px;margin:0 auto;display:flex;align-items:center;gap:10px}
+  .sk-savebar .msg{flex:1;min-width:0;font-size:14px;line-height:1.35}
+  .sk-savebar .msg b{font-weight:600}
+  .sk-savebar .msg small{display:block;font-family:var(--monof);font-size:9.5px;letter-spacing:.07em;
+    text-transform:uppercase;color:var(--shell-mut);margin-top:2px}
+  .sk-savebar button{font-family:var(--monof);font-size:11.5px;font-weight:600;letter-spacing:.09em;
+    text-transform:uppercase;border-radius:9px;padding:0 22px;min-height:42px;cursor:pointer;white-space:nowrap;
+    border:1px solid var(--accent);background:var(--accent);color:#FFF9F1;transition:background .15s,border-color .15s}
+  .sk-savebar button:hover{background:var(--accent-deep);border-color:var(--accent-deep)}
+  .sk-savebar button.ghost{background:transparent;border-color:rgba(244,238,223,.35);color:var(--shell-text)}
+  .sk-savebar button.ghost:hover{border-color:var(--shell-text);background:transparent}
+  .sk-savebar button:disabled{background:transparent;border-color:rgba(244,238,223,.22);color:var(--shell-dim);cursor:default}
+  .sk-savebar.dirty{border-top:2px solid var(--accent)}
+  .sk-savebar.ok .msg b{color:#BFDCC4}
+  .sk-savebar.err{border-top:2px solid #E0704A}
+  .sk-savebar.err .msg b{color:#F3B9A2}
+  body.sk-bar-on{padding-bottom:160px}
+  /* Inside the hub the page is one tall frame that never scrolls, so "fixed"
+     would pin the bar to the foot of 137 skills. There it floats instead, and
+     skBarPlace() keeps it at the bottom of what the hub is showing. If the
+     hub's scroll can't be read it sits above the board, in the flow. */
+  body.embed .sk-savebar{position:absolute;bottom:auto;left:26px;right:26px;border:1px solid rgba(142,121,66,.5);
+    border-radius:12px;padding:10px 16px;box-shadow:0 14px 30px -14px rgba(18,13,7,.6)}
+  body.embed .sk-savebar.inflow{position:static;margin:18px 0 0}
+  body.embed.sk-bar-on{padding-bottom:96px}
 
   /* coach's team board */
   .sk-team{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px}
@@ -468,6 +533,7 @@
 
   @media(max-width:860px){
     .sk-top{grid-template-columns:repeat(2,1fr)}
+    .sk-key{grid-template-columns:repeat(2,1fr)}
     .sk-bar{grid-template-columns:104px 1fr 108px;gap:9px}
     .sk-bars.wide .sk-bar{grid-template-columns:130px 1fr 150px}
   }
@@ -478,6 +544,17 @@
     .sk-scale button{width:100%;max-width:34px;height:31px}
     .sk-bar,.sk-bars.wide .sk-bar{grid-template-columns:1fr;gap:4px}
     .sk-bv{text-align:left}
+    /* the key on a phone: one card per line, the range beside the words */
+    .sk-key{grid-template-columns:1fr;gap:7px}
+    .sk-kc{display:grid;grid-template-columns:54px 1fr;column-gap:10px;border-top:1px solid var(--line);
+      border-left:4px solid var(--band,var(--line-strong));padding:10px 12px}
+    .sk-kc .r{grid-row:1 / span 2;font-size:20px;align-self:center}
+    .sk-kc .n{margin-top:0}
+    .sk-kc .d{margin-top:2px}
+    .sk-savebar{padding-left:14px;padding-right:14px}
+    .sk-savebar button{padding:0 16px}
+    .sk-savebar .msg{font-size:13.5px}
+    body.embed .sk-savebar{left:14px;right:14px}
   }
 
   /* ═══ skillset: versions, ranked focus, sorting, the catalog editor ═══ */
@@ -492,6 +569,7 @@
     flex-wrap:wrap;margin:32px 0 6px}
   .sk-tools{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
   .sk-tools select{font-size:11px;padding:6px 28px 6px 11px}
+  .sk-tools .rowbtn{padding:6px 11px}
   .rowbtn.on{border-color:var(--accent);color:var(--accent);background:var(--accent-soft)}
   .camp-pill.add{border-style:dashed;color:var(--ink-faint)}
 
@@ -912,6 +990,8 @@
 
     <!-- ════ SKILLSET ════ built by renderSkills() ════ -->
     <div id="rep-pane-skills" class="hidden"></div>
+    <!-- the Save bar — filled by skBar(), moved to <body> on first use so nothing above it can clip it -->
+    <div id="sk-savebar" class="sk-savebar hidden" role="status" aria-live="polite"></div>
   </div>
 
   <!-- loading: shown until the first data load lands (body.booting) -->
@@ -1593,11 +1673,18 @@ function plannerTeam(){
 const repLink=id=>location.origin+location.pathname+"?rep="+encodeURIComponent(id);
 
 function setView(v){
+  /* leaving a mentee's skillset for the team board: a correction is asked
+     about, ratings still waiting are sent */
+  if(v!=="rep"&&REP_TAB==="skills"&&!$("view-rep").classList.contains("hidden")){
+    if(!skLeaveFix())return;
+    skSave();
+  }
   $("view-team").classList.toggle("hidden",v!=="team");
   $("view-rep").classList.toggle("hidden",v!=="rep");
   $("btn-team").classList.toggle("on",v==="team");
   $("btn-rep").classList.toggle("on",v==="rep");
   paneIn($("view-"+v));
+  skBar();
 }
 /* replay the entrance on the pane being shown — view switches only, never on data refreshes */
 function paneIn(el){
@@ -2723,6 +2810,13 @@ function renderRep(){
    two versions is the progress. Rollover is decided by the SERVER, so forty
    browsers with forty slightly wrong clocks can't disagree about it.
 
+   ── Save, and correcting a version (Alan, 2026-10-06) ───────────────────
+   Ratings go up when Save is pressed, on a bar pinned to the bottom of the
+   screen, and it says Saved only once the sheet has answered with the same
+   numbers. Leaving the page sends anything still waiting. A CLOSED version
+   can be corrected in place (Edit, change, Save or Cancel): it wears
+   "edited <date>" afterwards, and it needs storage script API 2.
+
    The CATALOG is stored too, not hardcoded: coaches add, rename and retire
    skills from the board itself. SKILL_SEED below is only the first-run
    default — the stored copy wins the moment there is one. Retiring a skill
@@ -2944,13 +3038,53 @@ const SK_MAX_FOCUS=5;      // Ben: five, ranked, with the top 3 the ones that ma
 const SK_TOP_FOCUS=3;
 const SK_WINDOW_DAYS=7;    // a version stays editable for a week
 
-/* the bands, in Ben's words */
+/* The bands, in Alan's words (2026-10-06; before that they were Ben's
+   "Learning it / Adequate / Strong / Master"). n is the name on the key, s the
+   short form a rated row wears, d what that level looks like. */
 const SK_BANDS=[
-  {lo:1,hi:3, k:"lo",  n:"Learning it",  d:"new or revisiting this skill",        hex:"#A33512"},
-  {lo:4,hi:6, k:"mid", n:"Adequate",     d:"getting consistent results",          hex:"#96760A"},
-  {lo:7,hi:8, k:"hi",  n:"Strong",       d:"can teach it confidently to the program", hex:"#3D6B4F"},
-  {lo:9,hi:10,k:"top", n:"Master",       d:"almost the level of Ben, Alan, Brandon Brown, Josh Mueller, Christian Hogg", hex:"#1C1712"}
+  {lo:1,hi:3, k:"lo",  n:"New Rep / New to You",s:"New",      d:"Still memorizing it. Not getting results with it yet.",hex:"#A33512"},
+  {lo:4,hi:6, k:"mid", n:"Varsity / Adequate",  s:"Varsity",  d:"Getting results. Probably your second year using this skill.",hex:"#96760A"},
+  {lo:7,hi:8, k:"hi",  n:"CSP Level",           s:"CSP Level",d:"You're a pro at this. You can do it at the level of someone who sells $300k+ a year.",hex:"#3D6B4F"},
+  {lo:9,hi:10,k:"top", n:"Elite CSP",           s:"Elite CSP",d:"You could give a national-level talk on this topic.",hex:"#1C1712"}
 ];
+/* How to use it: the lines under the key. The last one is only true once the
+   storage script can correct a version in place, so it only shows then. */
+const SK_HOWTO_STEPS=[
+  "Open a category and rate each skill 1–10 using the key. Rate where you are today, not where you want to be.",
+  "Tap your number again to clear it.",
+  "Star up to five skills to focus on this campaign and put them in order. The top three come first.",
+  "Press Save. Your board is kept by date, so you and your coach can see what moved."
+];
+const SK_HOWTO_FIX="Scored something wrong? Open the earlier date, press Edit, fix it, Save.";
+
+/* What each section means, so a rep knows what they are rating (Alan approved
+   this wording 2026-10-06). Keyed category/section, for the sections off his
+   sheet. A coach rewrites one from Edit skills; that line is stored on the
+   section in the catalog (g.d) and wins. "" there means a coach cleared it on
+   purpose, so nothing shows. */
+const SK_GROUP_DESC={
+  "demos/selling-ultimates":"Presenting the Ultimate Set as the first option in a demo: creating the need, building value, positioning the price and closing on it.",
+  "demos/handling-objections":"Answering a customer who hesitates in a demo (wouldn't use it, too much money, spouse, think about it, all or nothing) and keeping the sale moving.",
+  "demos/dropping-down-sets":"Stepping down from the Ultimate one set at a time (Signature, Homemaker, Galley, down to a 5-piece) so you land on the biggest set that fits.",
+  "service-calls/selling-ultimate-upgrades":"Upgrading an existing customer to the Ultimate on a service call: creating the need, the upgrade preframe, stacking value and closing.",
+  "service-calls/handling-objections":"The objections existing customers give on a service call, including \"I don't want a block.\"",
+  "service-calls/dropping-down-upgrades":"Stepping down the upgrade options one at a time so the customer still adds on at the level that fits.",
+  "events/selling-ultimates":"Selling the Ultimate Set at a booth to someone who just walked up: qualifying, the power intro, value, price and set positioning, closing.",
+  "events/selling-ultimate-upgrades":"Bringing current Cutco owners to the booth and upgrading them: gaining permission, describing the upgrade, stacking value, closing.",
+  "events/handling-objections":"Booth objections: the first and second \"I need to think about it,\" the spouse stall, price, all or nothing.",
+  "general-skills/referrals":"Asking for recommendations and getting them: your approach, social proof, hypertargeting and the common push-backs.",
+  "general-skills/upserving":"Moving a customer up from what they first picked: sets to packages, pieces to an upgrade, one or two pieces to a 5-piece.",
+  "general-skills/gifts":"Selling Cutco as gifts: asking how many they need, and moving from a first set toward the dream set.",
+  "general-skills/cookware":"Presenting and closing cookware: the intro, value, price, how it cooks, set positioning and the common objections.",
+  "general-skills/flatware":"Presenting and closing flatware, including \"too light\" and \"don't love the pattern.\"",
+  "general-skills/accesory-package":"Presenting and closing the accessory package, and dropping down when the full package doesn't fit.",
+  "general-skills/famous-let-go":"Ending the appointment well when they don't buy everything today: setting expectations for next time and building their wishlist.",
+  "biz-gifts/asking-everyone-what-you-do":"Pitching Cutco as business gifts: gaining permission, the 60-second pitch, questions, closing, stepping down to a smaller option or a pilot, and following up for the second order.",
+  "biz-gifts/real-estate":"Selling closing gifts to real estate agents and teams: building value, booking team meetings, setting follow-ups.",
+  "productivity/scheduling":"Running your week: priority planning, morning and night routines, weekly reflection, screen time, accountability."
+};
+const skGrpDescDefault=(ck,gk)=>SK_GROUP_DESC[ck+"/"+gk]||"";
+const skGrpDesc=(cat,g)=>g.d!=null?String(g.d):skGrpDescDefault(cat.k,g.k);
 const skBand=v=>v==null?null:SK_BANDS.find(b=>v>=b.lo&&v<=b.hi)||null;
 const skTone=v=>{const b=skBand(v);return b?b.k:"";};
 const SK_TONE_HEX={}; SK_BANDS.forEach(b=>SK_TONE_HEX[b.k]=b.hex);
@@ -2965,7 +3099,21 @@ let SK_SORT="sheet";
 let SK_TEAM_SORT="rated";
 let SK_EDIT=false;         // coaches: the catalog editor
 let SK_SHOW_ARCHIVED=false;
-let SK_PENDING=null, SK_TIMER=null;
+/* ── saving ──
+   SK_PEND  what has been tapped and not sent yet: one patch per mentee.
+   SK_FIX   the closed version being corrected in place, with a copy of how it
+            was so Cancel can put it back. null when nobody is correcting one.
+   SK_API   what the deployed storage script can do (API in the .gs). 0 until
+            a feed load says otherwise. */
+let SK_PEND={};
+let SK_FIX=null;
+let SK_API=0;
+let SK_INFLIGHT=0, SK_CHAIN=Promise.resolve();
+let SK_SAVE={state:"idle",at:0,note:""};   // idle · saved · mismatch. A failure lives on its patch (p.failed).
+let SK_TOAST=null, SK_TOAST_T=null;
+let SK_VIEW={repId:"",canRate:false};      // what renderSkills last drew, for the Save bar
+let SK_HOWTO=null;         // the how-to: null = open until something is rated, else what they chose
+try{const h=localStorage.getItem("sna_skills_howto");if(h==="1"||h==="0")SK_HOWTO=(h==="1");}catch(e){}
 let REP_TAB="perf";
 
 const skLocalKey=repId=>"sna_skills::"+repId;
@@ -2977,6 +3125,9 @@ const skDay=d=>{const x=new Date(d);return isNaN(x)?"":x.toLocaleDateString(unde
 const repVersions=repId=>SK_VERSIONS.filter(v=>String(v.RepID)===String(repId))
   .sort((a,b)=>new Date(a.CreatedAt)-new Date(b.CreatedAt));
 const verOpen=v=>!!v&&Date.now()<new Date(v.ClosesAt).getTime();
+/* corrected after it closed: the script stamps UpdatedAt on every write, and an
+   ordinary rating can only land while its version is open */
+const verEdited=v=>!!(v&&v.UpdatedAt&&v.ClosesAt&&new Date(v.UpdatedAt).getTime()>new Date(v.ClosesAt).getTime());
 function latestVersion(repId){const a=repVersions(repId);return a.length?a[a.length-1]:null;}
 /* the one on screen: whatever the picker says, else the newest */
 function viewedVersion(repId){
@@ -3017,6 +3168,9 @@ function ensureOpenVersion(repId){
 async function loadSkills(force){
   const scope=(MODE==="rep"&&ME)?String(ME.id):"*";
   if(!force&&SK_LOADED&&SK_SCOPE===scope&&Date.now()-SK_FETCHED_AT<60000)return;
+  /* never pull a fresh copy over work that hasn't been sent: the old numbers
+     would come back on screen under a bar still saying "3 changes not saved" */
+  if(SK_LOADED&&SK_SCOPE===scope&&(skDirty()||SK_FIX||SK_INFLIGHT))return;
   if(SK_LOADING)return SK_LOADING;
   SK_LOADING=(async()=>{
     if(!skillsLive()){ skLoadLocal(scope); }
@@ -3026,6 +3180,7 @@ async function loadSkills(force){
           +(scope==="*"?"":"&rep="+encodeURIComponent(scope));
         const j=await (await fetch(u)).json();
         if(!j||!j.ok)throw new Error((j&&j.error)||"bad reply");
+        SK_API=+j.api||1;                     // a script from before 2026-10-06 sends none
         SK_VERSIONS=(j.versions||[]).map(normVersion);
         applyCatalog(j.catalog,j.catalogRev);
         /* first run anywhere: hand the built-in list up so there's something
@@ -3033,6 +3188,7 @@ async function loadSkills(force){
         if(!CATALOG_STORED)skSeedCatalog();
       }catch(e){
         console.warn("skills feed unavailable — falling back to this device",e);
+        SK_API=0;
         skLoadLocal(scope);
       }
     }
@@ -3087,54 +3243,315 @@ function skWriteLocalCatalog(){
 }
 
 /* ── write ─────────────────────────────────────────────────────────────
+   Nothing goes up until Save is pressed (Alan, 2026-10-06), with one net
+   under it: leaving the page, the Skillset tab, or a mentee's board sends
+   whatever is waiting, so a rep who rates forty skills on a phone and closes
+   the tab loses none of them. The one thing the net never sends is a
+   correction to a closed version: history is only rewritten by someone
+   pressing Save on it.
+
    Only the cells that CHANGED go up, and the script merges them into the
-   open version. A rep and their coach on the same board therefore can't
-   wipe each other — the only collision left is one person twice. */
+   version. A rep and their coach on the same board therefore can't wipe each
+   other. The only collision left is one person twice.
+
+   "Saved" is said only when the script has answered with the row as it read
+   it back from the sheet AND those numbers match what was sent. A send that
+   fails goes back in the queue, so Try again really does try again. */
+const skPendOf=repId=>SK_PEND[String(repId)]||null;
+const skPendCount=repId=>{const p=skPendOf(repId);
+  return p?Object.keys(p.self).length+Object.keys(p.coach).length+(p.focus?1:0):0;};
+const skDirty=()=>Object.keys(SK_PEND).length>0;
+const skFixing=repId=>!!SK_FIX&&SK_FIX.repId===String(repId);
+const skBy=()=>MODE==="rep"?(ME&&ME.name)||"rep":"coach";
+const skSnap=v=>({Self:Object.assign({},v.Self),Coach:Object.assign({},v.Coach),Focus:(v.Focus||[]).slice()});
 function skQueue(repId,patch){
-  if(!SK_PENDING||SK_PENDING.repId!==repId)SK_PENDING={repId,self:{},coach:{},focus:null};
-  if(patch.self)Object.assign(SK_PENDING.self,patch.self);
-  if(patch.coach)Object.assign(SK_PENDING.coach,patch.coach);
-  if(patch.focus)SK_PENDING.focus=patch.focus.slice();
-  if(patch.newVersionId)SK_PENDING.newVersionId=patch.newVersionId;
-  skSay("saving…","");
-  clearTimeout(SK_TIMER);
-  SK_TIMER=setTimeout(skSave,900);
+  const id=String(repId);
+  const p=SK_PEND[id]||(SK_PEND[id]={repId:id,self:{},coach:{},focus:null});
+  if(patch.self)Object.assign(p.self,patch.self);
+  if(patch.coach)Object.assign(p.coach,patch.coach);
+  if(patch.focus)p.focus=patch.focus.slice();
+  if(patch.newVersionId)p.newVersionId=patch.newVersionId;
+  if(patch.versionId)p.versionId=patch.versionId;
+  SK_SAVE={state:"idle",at:0,note:""};
+  skBar();
 }
-function skSay(t,cls){const el=$("sk-save");if(el){el.className="sk-save "+(cls||"");el.textContent=t;}}
-async function skSave(){
-  SK_TIMER=null;
-  const p=SK_PENDING; SK_PENDING=null;
-  if(!p)return;
+/* a line on the Save bar for a few seconds: the editor's "Renamed ✓", the
+   focus cap. It used to be written into the heading, where nobody rating
+   their fortieth skill could see it. */
+function skSay(t,cls){
+  SK_TOAST={t,cls:cls||""};
+  clearTimeout(SK_TOAST_T);
+  SK_TOAST_T=setTimeout(()=>{SK_TOAST=null;skBar();},cls==="err"?6000:3200);
+  skBar();
+}
+function skApplyPatch(ver,p){
+  const put=(bag,patch)=>{for(const k in (patch||{})){if(patch[k]==null)delete bag[k];else bag[k]=patch[k];}};
+  put(ver.Self=ver.Self||{},p.self);
+  put(ver.Coach=ver.Coach||{},p.coach);
+  if(p.focus)ver.Focus=p.focus.slice();
+}
+/* does the row the sheet handed back hold what was sent? */
+function skConfirmed(p,v){
+  const same=(patch,bag)=>Object.keys(patch||{}).every(k=>patch[k]==null?bag[k]==null:bag[k]===patch[k]);
+  return same(p.self,v.Self||{})&&same(p.coach,v.Coach||{})
+    &&(!p.focus||JSON.stringify(p.focus)===JSON.stringify(v.Focus||[]));
+}
+/* a send that failed goes back in the queue, under anything tapped since */
+function skRestore(p,why){
+  /* an ordinary save must never be re-sent as part of a correction */
+  if(!p.versionId&&skFixing(p.repId))skFixDrop();
+  const cur=SK_PEND[p.repId];
+  if(cur){
+    cur.self=Object.assign({},p.self,cur.self);
+    cur.coach=Object.assign({},p.coach,cur.coach);
+    if(!cur.focus)cur.focus=p.focus;
+    if(!cur.newVersionId)cur.newVersionId=p.newVersionId;
+    if(!cur.versionId)cur.versionId=p.versionId;
+  } else SK_PEND[p.repId]=p;
+  SK_PEND[p.repId].failed=why||"error";
+}
+/* the Save button, and Try again */
+function skSaveNow(){
+  Object.keys(SK_PEND).forEach(id=>{delete SK_PEND[id].failed;});
+  return skSave();
+}
+/* opts.leaving  the page is going away: send now, outside the queue, and keep
+                 the request alive past the unload
+   opts.auto     a background flush of a board that was walked away from: one
+                 that already failed is left for the bar to ask about
+   opts.repId    just that mentee */
+function skSave(opts){
+  opts=opts||{};
+  return Promise.all(Object.keys(SK_PEND)
+    .filter(id=>!opts.repId||String(opts.repId)===id)
+    .map(id=>skSaveOne(id,opts)));
+}
+function skSaveOne(id,opts){
+  const p=SK_PEND[id];
+  if(!p)return Promise.resolve(false);
+  if(p.versionId&&(opts.leaving||opts.auto))return Promise.resolve(false);   // history is only rewritten on purpose
+  if(p.failed&&opts.auto)return Promise.resolve(false);
+  delete SK_PEND[id]; delete p.failed;
+  if(!skillsLive()){
+    const v=repVersions(p.repId).find(x=>x.VersionID===(p.versionId||p.newVersionId))||latestVersion(p.repId);
+    if(v){v.UpdatedAt=new Date().toISOString();v.UpdatedBy=skBy();}
+    skWriteLocal(p.repId);
+    if(p.versionId&&skFixing(p.repId))SK_FIX=null;
+    SK_SAVE={state:"saved",at:Date.now(),note:"device"};
+    renderSkills(); skBar();
+    return Promise.resolve(true);
+  }
   skWriteLocal(p.repId);
-  if(!skillsLive()){skSay("saved on this device","ok");return;}
+  SK_INFLIGHT++; skBar();
+  const run=()=>skSend(p,opts)
+    .catch(e=>{console.warn("skill save failed",e);skRestore(p,"error");return false;})
+    .then(ok=>{SK_INFLIGHT--;renderSkills();skBar();return ok;});
+  if(opts.leaving)return run();
+  return (SK_CHAIN=SK_CHAIN.then(run,run));     // one at a time, so an older answer can't land on top of a newer one
+}
+async function skSend(p,opts){
   const body={token:CONFIG.SKILLS_TOKEN,action:"saveSkills",repId:p.repId,
     self:p.self,coach:p.coach,focus:p.focus,campaign:currentCampaign(),
-    windowDays:SK_WINDOW_DAYS,newVersionId:p.newVersionId||null,
-    by:(MODE==="rep"?(ME&&ME.name)||"rep":"coach")};
+    windowDays:SK_WINDOW_DAYS,newVersionId:p.newVersionId||null,by:skBy()};
+  if(p.versionId)body.versionId=p.versionId;
   let j=null;
   for(let attempt=1;attempt<=2&&!j;attempt++){
-    try{j=await fetch(CONFIG.SKILLS_URL,{method:"POST",body:JSON.stringify(body)}).then(r=>r.json());}
+    try{j=await fetch(CONFIG.SKILLS_URL,{method:"POST",body:JSON.stringify(body),keepalive:!!opts.leaving}).then(r=>r.json());}
     catch(e){if(attempt===2)j={ok:false,error:"network"};}
   }
-  if(!j||!j.ok){skSay(j&&j.error==="network"?"⚠ offline — kept on this device":"⚠ not saved","err");return;}
+  if(!j||!j.ok){skRestore(p,(j&&j.error)||"error");return false;}
+  if(!j.version){skRestore(p,"no answer from the sheet");return false;}
   /* the server has the last word on which version an edit belongs to —
      it may have merged into one another device opened first */
-  if(j.version){
-    const v=normVersion(j.version);
-    const i=SK_VERSIONS.findIndex(x=>String(x.RepID)===String(v.RepID)&&x.VersionID===v.VersionID);
-    if(i>=0)SK_VERSIONS[i]=v; else SK_VERSIONS.push(v);
-    /* our proposal wasn't taken (someone else's version was already open):
-       drop the local placeholder rather than leave a version nobody has */
-    if(p.newVersionId&&p.newVersionId!==v.VersionID)
-      SK_VERSIONS=SK_VERSIONS.filter(x=>!(String(x.RepID)===String(v.RepID)&&x.VersionID===p.newVersionId&&x._local));
-    delete v._local;
-    if(SK_VER&&!repVersions(v.RepID).some(x=>x.VersionID===SK_VER))SK_VER=v.VersionID;
-    skWriteLocal(v.RepID);
-  }
+  const v=normVersion(j.version);
+  const asSaved=skSnap(v);
+  /* a correction must come back as the version it was aimed at. A storage
+     script from before API 2 ignores versionId and writes into the OPEN
+     version. The Edit button doesn't exist until the script says 2, and this
+     is the second lock on the same door. */
+  const wrongPlace=!!p.versionId&&v.VersionID!==p.versionId;
+  const i=SK_VERSIONS.findIndex(x=>String(x.RepID)===String(v.RepID)&&x.VersionID===v.VersionID);
+  if(i>=0)SK_VERSIONS[i]=v; else SK_VERSIONS.push(v);
+  /* our proposal wasn't taken (someone else's version was already open):
+     drop the local placeholder rather than leave a version nobody has */
+  if(p.newVersionId&&p.newVersionId!==v.VersionID)
+    SK_VERSIONS=SK_VERSIONS.filter(x=>!(String(x.RepID)===String(v.RepID)&&x.VersionID===p.newVersionId&&x._local));
+  /* anything tapped while this was in the air is still waiting: keep it on screen */
+  const more=skPendOf(v.RepID);
+  if(more&&(more.versionId?more.versionId===v.VersionID:!p.versionId))skApplyPatch(v,more);
+  if(SK_VER&&!repVersions(v.RepID).some(x=>x.VersionID===SK_VER))SK_VER=v.VersionID;
+  skWriteLocal(v.RepID);
   SK_FETCHED_AT=Date.now();
-  skSay("saved ✓","ok");
+  if(p.versionId&&skFixing(p.repId)&&SK_FIX.versionId===p.versionId){
+    if(wrongPlace)skFixDrop();                      // put the board back as it was: nothing was corrected
+    else if(more&&more.versionId)SK_FIX.snap=asSaved;   // still correcting: Cancel now goes back to what was just saved
+    else SK_FIX=null;
+  }
+  SK_SAVE=(wrongPlace||!skConfirmed(p,v))
+    ?{state:"mismatch",at:Date.now(),note:wrongPlace?"it was not saved to the version you were correcting":""}
+    :{state:"saved",at:Date.now(),note:""};
+  return true;
+}
+
+/* ── correcting a closed version (Alan, 2026-10-06) ─────────────────────
+   Past boards used to be read-only: "they're the record" (Ben, 2026-09-21).
+   Alan's call is that a record with a wrong number in it is worse than one
+   that was fixed, so a closed version can be corrected in place, by the rep
+   in their own column and by a coach in theirs. It is a deliberate act:
+   Edit, change, then Save or Cancel. Nothing here is sent by the
+   leave-the-page net, a corrected version wears "edited <date>", and later
+   versions keep the numbers they carried forward at the time.
+
+   It needs storage script API 2. Against an older copy the very same save
+   would be written into the OPEN version, so until the feed says 2 the
+   button is not there. */
+const skFixOk=()=>!skillsLive()||SK_API>=2;
+function skFixStart(){
+  const r=skTarget(); if(!r||!skMayEdit()||!skFixOk())return;
+  const ver=viewedVersion(r.id);
+  if(!ver||verOpen(ver)||ver._local)return;
+  if(SK_INFLIGHT){skSay("Still saving. Try again in a moment.","");return;}
+  if(skPendOf(r.id)){
+    /* ratings waiting on the current board go up first: one kind of unsaved work at a time */
+    skSaveNow().then(()=>{
+      if(skPendOf(r.id))skSay("Save your current changes first","err"); else skFixStart();
+    });
+    return;
+  }
+  SK_FIX={repId:String(r.id),versionId:ver.VersionID,snap:skSnap(ver)};
+  SK_VER=ver.VersionID;
+  SK_SAVE={state:"idle",at:0,note:""};
   renderSkills();
 }
+/* put the version back the way it was and forget the correction (no repaint) */
+function skFixDrop(){
+  if(!SK_FIX)return;
+  const ver=repVersions(SK_FIX.repId).find(v=>v.VersionID===SK_FIX.versionId);
+  if(ver){ver.Self=SK_FIX.snap.Self;ver.Coach=SK_FIX.snap.Coach;ver.Focus=SK_FIX.snap.Focus;}
+  const p=SK_PEND[SK_FIX.repId];
+  if(p&&p.versionId)delete SK_PEND[SK_FIX.repId];
+  SK_FIX=null;
+}
+function skFixCancel(){skFixDrop();renderSkills();}
+/* stepping away from a correction: unsaved changes are asked about, never carried along */
+function skLeaveFix(){
+  if(!SK_FIX)return true;
+  if(skPendCount(SK_FIX.repId)&&!confirm("Discard the changes you haven't saved to this version?"))return false;
+  skFixDrop();
+  return true;
+}
+/* The board on screen changed hands (a coach picked another mentee). A
+   correction in progress is dropped, and ratings waiting on the board being
+   left are sent: before there was a Save button they would have saved
+   themselves a second after the tap. */
+function skOnBoard(r){
+  const id=String(r.id), was=SK_VIEW.repId;
+  SK_VIEW.repId=id;
+  if(!was||was===id)return;
+  if(SK_FIX&&SK_FIX.repId!==id)skFixDrop();
+  SK_SAVE={state:"idle",at:0,note:""};
+  Object.keys(SK_PEND).filter(x=>x!==id).forEach(x=>skSaveOne(x,{auto:true}));
+}
+
+/* ── the Save bar ──────────────────────────────────────────────────────
+   One line of what is and isn't saved, and the button. It is up whenever the
+   board on screen can be rated, and whenever there is something to say. */
+const skOnScreen=()=>REP_TAB==="skills"&&!$("view-rep").classList.contains("hidden");
+function skBar(){
+  const bar=$("sk-savebar"); if(!bar)return;
+  if(!SK_BAR_FLOW&&bar.parentNode!==document.body)document.body.appendChild(bar);
+  const away=MODE==="locked"||MODE==="offline"||MODE==="gated"||MODE==="pending";
+  const r=(!away&&skOnScreen())?skTarget():null;
+  const failed=Object.keys(SK_PEND).map(id=>SK_PEND[id]).filter(p=>p.failed);
+  const n=r?skPendCount(r.id):0;
+  const fixing=!!r&&skFixing(r.id);
+  /* ...and it stays up after a save, so a correction to a past version (a
+     board that can't otherwise be rated) still gets its "Saved ✓" */
+  const show=!!r&&(SK_VIEW.canRate||fixing||n>0||failed.length>0||SK_INFLIGHT>0||!!SK_TOAST||SK_SAVE.state!=="idle");
+  bar.classList.toggle("hidden",!show);
+  document.body.classList.toggle("sk-bar-on",show);
+  if(!show){bar.innerHTML="";return;}
+  const ver=viewedVersion(r.id);
+  const btn=(label,off,ghost,fn)=>`<button type="button"${ghost?' class="ghost"':""} onclick="${fn||"skSaveNow()"}"${off?" disabled":""}>${label}</button>`;
+  const cancel=fixing?btn("Cancel",SK_INFLIGHT>0,true,"skFixCancel()"):"";
+  const plural=k=>k===1?"":"s";
+  let cls="",msg="",sub="",btns="";
+  if(SK_INFLIGHT>0){
+    msg="<b>Saving…</b>"; sub="waiting for the sheet"; btns=cancel+btn("Saving…",true);
+  } else if(failed.length){
+    const why=failed[0].failed;
+    cls="err"; msg="<b>⚠ Not saved</b>";
+    sub=why==="network"?"couldn't reach the sheet · your changes are still here"
+      :why==="version not found"?"that version isn't in the sheet any more · reload the page"
+      :esc(why)+" · your changes are still here";
+    btns=cancel+btn("Try again");
+  } else if(fixing){
+    cls=n?"dirty":"";
+    msg=`Correcting the <b>${ver?skDay(ver.CreatedAt):""}</b> version`;
+    sub=n?`${n} change${plural(n)} not saved yet`:"no changes yet · tap a number";
+    btns=cancel+btn("Save changes",!n);
+  } else if(n){
+    cls="dirty"; msg=`<b>${n} change${plural(n)}</b> not saved yet`;
+    sub=skillsLive()?"saves on its own if you leave this page":"kept on this device only";
+    btns=btn("Save");
+  } else if(SK_SAVE.state==="saved"){
+    cls="ok"; msg=`<b>Saved ✓</b> ${fmtClock(new Date(SK_SAVE.at))}`;
+    sub=SK_SAVE.note==="device"?"on this device only":"the sheet has it";
+    btns=btn("Saved",true);
+  } else if(SK_SAVE.state==="mismatch"){
+    cls="err"; msg="<b>⚠ Check the board</b>";
+    sub=esc(SK_SAVE.note||"the sheet's copy doesn't match what you tapped");
+    btns=btn("Save",true);
+  } else {
+    const at=ver&&ver.UpdatedAt?new Date(ver.UpdatedAt):null;
+    msg="No changes to save";
+    sub=at&&!isNaN(at)?`last saved ${skDay(at)} ${fmtClock(at)}`:"tap a number to start";
+    btns=btn("Save",true);
+  }
+  if(SK_TOAST){msg=`<b>${esc(SK_TOAST.t)}</b>`; sub=""; if(SK_TOAST.cls==="err")cls="err"; else if(SK_TOAST.cls==="ok"&&!cls)cls="ok";}
+  bar.className="sk-savebar"+(cls?" "+cls:"")+(SK_BAR_FLOW?" inflow":"");
+  bar.innerHTML=`<div class="in"><div class="msg">${msg}${sub?`<small>${sub}</small>`:""}</div>${btns}</div>`;
+  skBarPlace();
+}
+/* Where the bar goes. On a rep's own page it is fixed to the bottom of the
+   screen and this does nothing. Inside the hub (?embed=1) the page is a frame
+   as tall as its content, so the bottom of the screen is the HUB's: read from
+   where the frame sits in the hub's window, which works because the hub and
+   this page are served from the same origin. If that can't be read (the local
+   dev pair runs on two ports) the bar sits in the flow above the board. */
+let SK_BAR_HOOKED=false, SK_BAR_FLOW=false;
+function skBarPlace(){
+  const bar=$("sk-savebar"); if(!bar||!EMBED||bar.classList.contains("hidden"))return;
+  const pane=$("rep-pane-skills");
+  let edge=null;
+  if(!SK_BAR_FLOW){
+    try{
+      const fe=window.frameElement;
+      if(fe){
+        edge=parent.innerHeight-fe.getBoundingClientRect().top;     // the hub's bottom edge, in this page's coordinates
+        if(!SK_BAR_HOOKED){
+          SK_BAR_HOOKED=true;
+          parent.addEventListener("scroll",skBarPlace,{passive:true,capture:true});
+          parent.addEventListener("resize",skBarPlace,{passive:true});
+          parent.addEventListener("hashchange",()=>{skSave({leaving:true});});   // another hub tab: the same as leaving
+        }
+      }
+    }catch(e){edge=null;}
+  }
+  if(edge==null||!pane){
+    if(!SK_BAR_FLOW&&pane){SK_BAR_FLOW=true;bar.classList.add("inflow");bar.style.top="";pane.parentNode.insertBefore(bar,pane);}
+    return;
+  }
+  const box=pane.getBoundingClientRect(), h=bar.offsetHeight;
+  bar.style.top=Math.round(Math.max(box.top+8,Math.min(edge-h-14,box.bottom-h))+window.scrollY)+"px";
+}
+/* the net under the Save button: anything still waiting goes up as the page
+   goes away. A correction to a closed version is never sent this way, so an
+   unsaved one gets the browser's own "leave this page?" instead. */
+document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="hidden")skSave({leaving:true});});
+window.addEventListener("pagehide",()=>{skSave({leaving:true});});
+window.addEventListener("beforeunload",e=>{if(SK_FIX&&skPendCount(SK_FIX.repId)){e.preventDefault();e.returnValue="";}});
+window.addEventListener("resize",()=>{skBarPlace();});
 
 /* ── stats ─────────────────────────────────────────────────────────────
    Ben: the overall is the average of the SECTION averages, not of every
@@ -3204,46 +3621,55 @@ function skSortRows(rows,sort,shownMap,prevMap,selfMap,coachMap){
 }
 
 /* ── editing a rating ── */
+/* the version a tap lands in: the one being corrected, else the open one (or a
+   fresh one carrying everything forward). null = looking at history. */
+function skWriteVersion(repId){
+  if(skFixing(repId))return repVersions(repId).find(v=>v.VersionID===SK_FIX.versionId)||null;
+  const latest=latestVersion(repId);
+  if(SK_VER&&latest&&SK_VER!==latest.VersionID)return null;
+  const ver=ensureOpenVersion(repId);
+  SK_VER=ver.VersionID;
+  return ver;
+}
+/* say where a patch is going: into the version being corrected, or into a
+   version this browser has only proposed so far */
+function skAim(ver,patch){
+  if(skFixing(ver.RepID))patch.versionId=ver.VersionID;
+  else if(ver._local)patch.newVersionId=ver.VersionID;
+  return patch;
+}
 function skSet(id,v){
   const r=skTarget(); if(!r)return;
   const coach=(MODE!=="rep"&&SK_LENS==="coach");
   if(!skMayEdit())return;
-  const latest=latestVersion(r.id);
-  if(SK_VER&&latest&&SK_VER!==latest.VersionID)return;   // looking at history
-  const ver=ensureOpenVersion(r.id);
+  const ver=skWriteVersion(r.id); if(!ver)return;
   const bag=coach?(ver.Coach=ver.Coach||{}):(ver.Self=ver.Self||{});
   if(bag[id]===v)delete bag[id]; else bag[id]=v;     // tapping the live number clears it
-  SK_VER=ver.VersionID;
-  const patch=coach?{coach:{[id]:bag[id]??null}}:{self:{[id]:bag[id]??null}};
-  if(ver._local)patch.newVersionId=ver.VersionID;
-  skQueue(r.id,patch);
+  skQueue(r.id,skAim(ver,coach?{coach:{[id]:bag[id]??null}}:{self:{[id]:bag[id]??null}}));
   renderSkills();
 }
 /* focus is RANKED — the order in the list is the rank, and the first three
    are the ones that are supposed to matter this campaign */
 function skFocus(id){
   const r=skTarget(); if(!r||!skMayEdit())return;
-  const latest=latestVersion(r.id);
-  if(SK_VER&&latest&&SK_VER!==latest.VersionID)return;
-  const ver=ensureOpenVersion(r.id);
+  const ver=skWriteVersion(r.id); if(!ver)return;
   const f=(ver.Focus=Array.isArray(ver.Focus)?ver.Focus:[]);
   const i=f.indexOf(id);
   if(i>=0)f.splice(i,1);
   else{
-    if(f.length>=SK_MAX_FOCUS){skSay(`focus tops out at ${SK_MAX_FOCUS} — drop one first`,"err");return;}
+    if(f.length>=SK_MAX_FOCUS){skSay(`Focus tops out at ${SK_MAX_FOCUS}. Drop one first.`,"err");return;}
     f.push(id);
   }
-  SK_VER=ver.VersionID;
-  skQueue(r.id,ver._local?{focus:f,newVersionId:ver.VersionID}:{focus:f});
+  skQueue(r.id,skAim(ver,{focus:f}));
   renderSkills();
 }
 function skFocusMove(id,dir){
   const r=skTarget(); if(!r||!skMayEdit())return;
-  const ver=ensureOpenVersion(r.id);
+  const ver=skWriteVersion(r.id); if(!ver)return;
   const f=ver.Focus||[], i=f.indexOf(id), j=i+dir;
   if(i<0||j<0||j>=f.length)return;
   f.splice(j,0,f.splice(i,1)[0]);
-  skQueue(r.id,ver._local?{focus:f,newVersionId:ver.VersionID}:{focus:f});
+  skQueue(r.id,skAim(ver,{focus:f}));
   renderSkills();
 }
 function skTarget(){return currentRep();}
@@ -3320,6 +3746,17 @@ function catRenameGroup(catKey,grpKey,name){
   name=String(name||"").trim(); if(!name||name===g.n)return;
   g.n=name; catSave("Renamed");
 }
+/* What a section means. The built-in wording is the default; a coach's own
+   line is stored on the section and wins, and emptying the box means "show
+   nothing here", not "go back to the default". */
+function catDescGroup(catKey,grpKey,text){
+  if(!catCanEdit())return;
+  const {c,g}=catFind(catKey,grpKey); if(!c||!g)return;
+  text=String(text||"").replace(/\s+/g," ").trim().slice(0,400);
+  if(text===skGrpDesc(c,g))return;
+  if(text===skGrpDescDefault(catKey,grpKey))delete g.d; else g.d=text;
+  catSave("Description saved");
+}
 function catAddGroup(catKey){
   if(!catCanEdit())return;
   const name=prompt("New block in this category:"); if(!name||!name.trim())return;
@@ -3350,7 +3787,12 @@ function catReset(){
 
 /* ── tabs ── */
 function setRepTab(t){
-  REP_TAB=t==="skills"?"skills":"perf";
+  const next=t==="skills"?"skills":"perf";
+  if(REP_TAB==="skills"&&next!=="skills"){
+    if(!skLeaveFix())return;
+    skSave();                 // walking away from the board is leaving it
+  }
+  REP_TAB=next;
   $("rep-pane-perf").classList.toggle("hidden",REP_TAB!=="perf");
   $("rep-pane-skills").classList.toggle("hidden",REP_TAB!=="skills");
   document.querySelectorAll("#rep-tabs button").forEach(b=>b.classList.toggle("on",b.dataset.tab===REP_TAB));
@@ -3360,6 +3802,7 @@ function setRepTab(t){
     loadSkills().then(()=>{if(REP_TAB==="skills")renderSkills();});
   } else paneIn($("rep-pane-perf"));
   try{history.replaceState(null,"",skShareUrl(null,REP_TAB));}catch(e){}
+  skBar();
 }
 function skShareUrl(repId,tab){
   const u=new URL(location.href);
@@ -3372,12 +3815,17 @@ function openRepSkills(repId){
   setRepTab("skills");
   const el=$("rep-pane-skills"); if(el)el.scrollIntoView({behavior:"smooth",block:"start"});
 }
-function setSkillVersion(v){if(v===SK_VER)return;SK_VER=v||null;renderSkills();}
+function setSkillVersion(v){if(v===SK_VER||!skLeaveFix())return;SK_VER=v||null;renderSkills();}
 function setSkillCat(k){SK_CAT=(SK_CAT===k?null:k);renderSkills();}
-function setSkillLens(l){SK_LENS=l;renderSkills();}
+function setSkillLens(l){if(l===SK_LENS||!skLeaveFix())return;SK_LENS=l;renderSkills();}
 function setSkillSort(s){SK_SORT=s;renderSkills();}
 function setTeamSort(s){SK_TEAM_SORT=s;renderSkillsTeam();}
-function toggleSkillEdit(){SK_EDIT=!SK_EDIT;if(!SK_EDIT)SK_SHOW_ARCHIVED=false;renderSkills();}
+function toggleSkillEdit(){if(!SK_EDIT&&!skLeaveFix())return;SK_EDIT=!SK_EDIT;if(!SK_EDIT)SK_SHOW_ARCHIVED=false;renderSkills();}
+function toggleSkHowto(on){
+  SK_HOWTO=!!on;
+  try{localStorage.setItem("sna_skills_howto",SK_HOWTO?"1":"0");}catch(e){}
+  renderSkills();
+}
 function toggleArchived(){SK_SHOW_ARCHIVED=!SK_SHOW_ARCHIVED;renderSkills();}
 
 /* ── the 1–10 ruler ── */
@@ -3399,6 +3847,7 @@ function skRowHtml(sk,o){
   const d=(o.prev!=null&&shown!=null)?shown-o.prev:null;
   const chips=[
     o.rank?`<span class="sk-rank${o.rank<=SK_TOP_FOCUS?" top":""}">#${o.rank}</span>`:"",
+    shown!=null&&skBand(shown)?`<span class="sk-lvl ${skTone(shown)}">${shown} · ${esc(skBand(shown).s)}</span>`:"",
     other!=null?`<span class="sk-coachv">${otherLab} <b>${other}</b></span>`:"",
     gap?`<span class="sk-gap" title="self and coach are ${gap} apart">gap ${gap}</span>`:"",
     d!=null&&d!==0?`<span class="sk-d ${d>0?"up":"down"}" title="vs ${esc(o.prevLabel||"last version")}">${d>0?"▲":"▼"}${Math.abs(d)}</span>`:""
@@ -3428,7 +3877,12 @@ function renderSkills(){
   const pane=$("rep-pane-skills"); if(!pane)return;
   if(REP_TAB!=="skills")return;
   const r=skTarget();
-  if(!r){pane.innerHTML=`<div class="plan-empty" style="margin-top:26px">Pick a mentee to see their skillset.</div>`;return;}
+  if(!r){
+    pane.innerHTML=`<div class="plan-empty" style="margin-top:26px">Pick a mentee to see their skillset.</div>`;
+    SK_VIEW={repId:"",canRate:false}; skBar();
+    return;
+  }
+  skOnBoard(r);
 
   const isRep=MODE==="rep";
   const all=repVersions(r.id);
@@ -3441,7 +3895,11 @@ function renderSkills(){
   /* You can always rate the newest board: with no version yet the first tap
      starts one, and on a closed one it rolls over carrying everything forward.
      Older versions are the record — they stay read-only. */
-  const canRate=isLatest&&(isRep||lensCoach);
+  /* ...unless one is being corrected: then that version, and only that one,
+     takes the taps. */
+  const fixing=skFixing(r.id)&&!!ver&&ver.VersionID===SK_FIX.versionId;
+  const canRate=(isRep||lensCoach)&&(fixing||isLatest);
+  const canFix=!fixing&&!!ver&&!ver._local&&!open&&(isRep||lensCoach)&&skFixOk();
   const edit=SK_EDIT&&catCanEdit();
   const selfMap=(ver&&ver.Self)||{}, coachMap=(ver&&ver.Coach)||{}, focus=(ver&&ver.Focus)||[];
   const shownMap=lensCoach?coachMap:selfMap;
@@ -3453,14 +3911,14 @@ function renderSkills(){
   let h=`<div class="section" style="margin-top:22px">
     <div class="section-head">
       <h2 class="serif">${isRep?"Your Skillset":esc(r.name)+" — Skillset"}</h2>
-      <span class="hint" id="sk-save">${st.n?`${st.n} of ${SKILL_COUNT} rated`:(isRep?"rate yourself 1–10":lensCoach?"rate them 1–10":"nothing rated yet")}</span>
+      <span class="hint">${st.n?`${st.n} of ${SKILL_COUNT} rated`:(isRep?"rate yourself 1–10":lensCoach?"rate them 1–10":"nothing rated yet")}</span>
     </div>`;
 
   /* versions — the history, not a reset */
   h+=`<div class="camp-pills">`+(all.length?all.map(v=>{
       const on=ver&&v.VersionID===ver.VersionID;
       return `<button class="camp-pill ${on?"on":""}" onclick="setSkillVersion('${v.VersionID}')">${skDay(v.CreatedAt)}${
-        verOpen(v)?`<span class="tag">open</span>`:""}</button>`;
+        verOpen(v)?`<span class="tag">open</span>`:verEdited(v)?`<span class="tag">edited ${skDay(v.UpdatedAt)}</span>`:""}</button>`;
     }).join(""):`<span class="hint">no versions yet — ${isRep?"your first rating starts one":"their first rating starts one"}</span>`)
     +(isRep?"":`<span style="flex:1"></span>`
       +`<button class="camp-pill ${SK_LENS==="self"?"on":""}" onclick="setSkillLens('self')" title="what they scored themselves">Self rating</button>`
@@ -3471,9 +3929,10 @@ function renderSkills(){
     h+=`<div class="sk-note"><b>These numbers are only on this device so far.</b>
       The shared copy switches on the moment <span class="mono">SNA-Skills-Sync.gs</span> is deployed and its URL goes
       into <span class="mono">CONFIG.SKILLS_URL</span> — about three minutes, once. Rate away meanwhile; nothing is lost.</div>`;
+  const fixBtn=`<button type="button" class="sk-mini" onclick="skFixStart()">Edit this version</button>`;
   if(!ver){
     if(isRep)
-      h+=`<div class="sk-note">Nothing rated yet. Your first rating starts a version dated today, <b>open for
+      h+=`<div class="sk-note">Nothing rated yet. Your first save starts a version dated today, <b>open for
         ${SK_WINDOW_DAYS} days</b>. After that the next rating opens a new one carrying all of these forward — the
         numbers never reset, so the gap between two versions is the progress.</div>`;
     else if(!lensCoach)
@@ -3482,15 +3941,20 @@ function renderSkills(){
         carries the previous numbers forward — so you'll be able to read the progress, not just the score.</div>`;
     /* coach lens with nothing rated: the note just below says it, no need to stack */
   }
+  else if(fixing)
+    h+=`<div class="sk-note fix"><b>You're correcting the version of ${skDay(ver.CreatedAt)}.</b> Changes fix that board
+      as it was; later versions keep the numbers they carried forward. Nothing is saved until you press
+      <b>Save changes</b>.</div>`;
   else if(open&&isLatest)
-    h+=`<div class="sk-note">This version is <b>open until ${skDay(ver.ClosesAt)}</b> — everything you tap lands here.
+    h+=`<div class="sk-note">This version is <b>open until ${skDay(ver.ClosesAt)}</b> — everything you save lands here.
       After that the next rating opens a new one, carrying all of these forward, so nothing ever resets.</div>`;
   else if(isLatest)
     h+=`<div class="sk-note shut">Version of <b>${skDay(ver.CreatedAt)}</b>, closed ${skDay(ver.ClosesAt)}.
-      Rate anything and a fresh version opens with these numbers carried into it.</div>`;
+      Rate anything and a fresh version opens with these numbers carried into it.${
+      canFix?` Scored something wrong back then? ${fixBtn}`:""}</div>`;
   else
     h+=`<div class="sk-note shut">Version of <b>${skDay(ver.CreatedAt)}</b> — a past board, kept as the record.
-      Read only; pick the newest version to rate.</div>`;
+      ${canFix?`Scored something wrong? ${fixBtn}`:"Read only; pick the newest version to rate."}</div>`;
   if(!isRep&&!lensCoach)
     h+=`<div class="sk-note shut">This is ${esc(String(r.name||"").split(" ")[0]||"their")}'s own scoring, so it's
       read-only here — it's theirs to change, not ours. To put <b>your</b> number on these skills, switch to
@@ -3562,14 +4026,12 @@ function renderSkills(){
     </div>
   </div>`;
 
+  if(!edit)h+=skKeyHtml({isRep,rated:st.n,canRate});
   if(SK_CAT===null&&!edit){
     h+=`<div class="plan-empty" style="margin-top:14px">${
       st.n?`Tap a category above — or a bar — to rate those skills.`
         :`Tap a category above to start. There's no prize for a 10: the honest number is the one that makes the next call better.`}</div>`;
   } else {
-    h+=`<div class="sk-legend">`+SK_BANDS.map(b=>
-        `<span title="${esc(b.d)}"><i style="background:${b.hex}"></i>${b.lo}–${b.hi} ${b.n}</span>`).join("")
-      +(canRate?`<span style="margin-left:auto">☆ star up to ${SK_MAX_FOCUS}, ranked</span>`:"")+`</div>`;
     const cats=SK_CAT===null?SKILL_CATS:SKILL_CATS.filter(c=>c.k===SK_CAT);
     h+=cats.map(cat=>skCategoryHtml(cat,{st,shownMap,selfMap,coachMap,prevMap,prev,focus,canRate,lensCoach,edit})).join("");
   }
@@ -3591,6 +4053,24 @@ function renderSkills(){
     ${all.length>1?` · ${all.length} versions kept`:""}${skillsLive()?"":" · saved on this device only"}</div></div>`;
   pane.innerHTML=h;
   skTabCount();
+  SK_VIEW={repId:String(r.id),canRate};
+  skBar();
+}
+
+/* the key — what a 1–10 means — and under it how to use the board */
+function skKeyHtml(o){
+  const open=SK_HOWTO==null?(o.isRep&&!o.rated):SK_HOWTO;
+  const steps=SK_HOWTO_STEPS.concat(skFixOk()?[SK_HOWTO_FIX]:[]);
+  return `<div class="sk-key">`+SK_BANDS.map(b=>
+      `<div class="sk-kc" style="--band:${b.hex}"><div class="r">${b.lo}–${b.hi}</div>
+        <div class="n">${esc(b.n)}</div><div class="d">${esc(b.d)}</div></div>`).join("")
+    +`</div>
+    <div class="sk-howto">
+      <button type="button" class="sk-howto-t" onclick="toggleSkHowto(${open?0:1})" aria-expanded="${open}">
+        <span>How to use the skillset tracker</span><span class="chev">${open?"hide ▴":"show ▾"}</span></button>
+      ${open?`<ol>${steps.map(t=>`<li>${esc(t)}</li>`).join("")}</ol>`:""}
+    </div>`
+    +(o.canRate&&!open?`<div class="sk-starhint">☆ star up to ${SK_MAX_FOCUS} to focus on, ranked</div>`:"");
 }
 
 /* one category: blocks in sheet order, or one flat sorted list otherwise */
@@ -3620,6 +4100,10 @@ function skCategoryHtml(cat,o){
         <div class="sk-gavg">${o.edit?`<button type="button" class="sk-mini" onclick="catAddSkill('${cat.k}','${g.k}')">+ skill</button>`
           :`${ga==null?"":"avg "+sk1(ga)+" · "}${rated}/${rows.length} rated`}</div>
       </div>`
+      +(o.edit?`<textarea class="sk-desc" rows="2" aria-label="what this section means"
+          placeholder="What this section means, in a line. Reps see it under the heading."
+          onchange="catDescGroup('${cat.k}','${g.k}',this.value)">${esc(skGrpDesc(cat,g))}</textarea>`
+        :(skGrpDesc(cat,g)?`<p class="sk-gdesc">${esc(skGrpDesc(cat,g))}</p>`:""))
       +rows.map(sk=>skRowHtml(sk,rowOpts(sk))).join("")
       +`</div>`;
   }).join("");
@@ -3764,6 +4248,7 @@ function dataStamp(){
 function renderAll(){
   LAST_PAINT=dataStamp();
   applyMode();
+  skBar();                    // a page that just locked or went offline has no board to save
   if(MODE==="locked"||MODE==="offline"||MODE==="gated")return;
   if(MODE==="rep"){
     renderRep();

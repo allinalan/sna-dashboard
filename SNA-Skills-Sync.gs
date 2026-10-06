@@ -36,12 +36,29 @@
  *      Until you do, the tracker still works — it just keeps each rating in
  *      the browser that made it, and says so on the page.
  *
+ * A VERSION CAN BE CORRECTED IN PLACE (Alan, 2026-10-06). A save that names a
+ * versionId is merged into that version, open or closed, and never opens a new
+ * one. That is how a rep fixes a number they got wrong last month without
+ * inventing a version for it. The row's UpdatedAt then falls after its
+ * ClosesAt, which is what the board reads as "edited".
+ *
+ * EVERY SAVE IS READ BACK. After the write the row is fetched from the sheet
+ * again and THAT is what the page gets, so "Saved" on the board means the
+ * sheet holds it, not that the script meant to write it.
+ *
  * If you ever change this file, you must Deploy ▸ Manage deployments ▸ edit ▸
  * New version, or the web app keeps serving the old code.
  */
 
 // Must match CONFIG.SKILLS_TOKEN in the dashboard's index.html.
 var TOKEN = 'sharpninja';
+
+// What this deployment can do, sent with every reply so the page never offers
+// something the deployed copy would get wrong. 2 = saveSkills takes versionId
+// (correct a version in place) and answers with the row as read back. A copy
+// from before 2026-10-06 sends no api at all, and the page hides the Edit
+// button until it sees a 2.
+var API = 2;
 
 var PROP_SHEET = 'SKILLS_SHEET_ID';
 var TAB = 'Skills';
@@ -121,7 +138,7 @@ function doGet(e) {
       return !want || String(r.RepID).toLowerCase() === want;
     });
     var cat = readCatalog_();
-    return json_({ ok: true, versions: rows, catalog: cat.catalog, catalogRev: cat.rev });
+    return json_({ ok: true, api: API, versions: rows, catalog: cat.catalog, catalogRev: cat.rev });
   } catch (err) {
     return json_({ ok: false, error: String(err) });
   }
@@ -147,7 +164,12 @@ function doPost(e) {
 }
 
 /* { token, action:'saveSkills', repId, self:{id:1..10|null}, coach:{…},
-     focus:[id] | null, campaign, windowDays, by }
+     focus:[id] | null, campaign, windowDays, by, versionId? }
+
+   versionId, when present, names the version to correct IN PLACE. It must be
+   one of this mentee's, or the save is refused: a wrong id never falls through
+   to the open version, because a correction that lands on the wrong board is
+   worse than one that doesn't land.
 
    self/coach are PATCHES, not replacements: only the skills that changed come
    up the wire and they are merged into whatever the open version holds. A rep
@@ -167,12 +189,19 @@ function saveSkills_(body) {
   var now = new Date();
   var last = all.length ? all[all.length - 1] : null;
   var isOpen = last && now.getTime() < new Date(last.ClosesAt).getTime();
-  var ver, rowAt;
+  var target = String(body.versionId || '').trim();
+  var ver, rowAt, opened = false;
 
-  if (isOpen) {
+  if (target) {
+    ver = null;
+    for (var i = 0; i < all.length; i++) if (all[i].VersionID === target) ver = all[i];
+    rowAt = ver ? findRow_(sh, repId, target) : 0;
+    if (!ver || !rowAt) return json_({ ok: false, api: API, error: 'version not found' });
+  } else if (isOpen) {
     ver = last;
     rowAt = findRow_(sh, repId, ver.VersionID);
   } else {
+    opened = true;
     // a new dated version, carrying every rating forward — nothing resets
     ver = {
       RepID: repId,
@@ -206,7 +235,13 @@ function saveSkills_(body) {
   sh.getRange(at, 1, 1, HEAD.length).setValues([row]);
   SpreadsheetApp.flush();
 
-  return json_({ ok: true, version: ver, opened: !isOpen, rated: Object.keys(ver.Self).length });
+  // what the sheet holds now, not what we meant to write
+  var back = rowToVersion_(sh.getRange(at, 1, 1, HEAD.length).getValues()[0]);
+  if (!back || back.RepID !== ver.RepID || back.VersionID !== ver.VersionID)
+    return json_({ ok: false, api: API, error: 'the sheet did not keep the save' });
+
+  return json_({ ok: true, api: API, version: back, opened: opened, edited: !!target,
+                 rated: Object.keys(back.Self).length });
 }
 
 /* { token, action:'saveCatalog', catalog, baseRev, by }
@@ -245,16 +280,20 @@ function readAll_() {
   var vals = sh.getRange(2, 1, last - 1, HEAD.length).getValues();
   var out = [];
   for (var i = 0; i < vals.length; i++) {
-    var r = vals[i];
-    if (!String(r[0] || '').trim() || !String(r[1] || '').trim()) continue;
-    out.push({
-      RepID: String(r[0]), VersionID: String(r[1]),
-      CreatedAt: iso_(r[2]), ClosesAt: iso_(r[3]), Campaign: String(r[4] || ''),
-      Self: parseMap_(r[5]), Coach: parseMap_(r[6]), Focus: parseList_(r[7]),
-      UpdatedAt: iso_(r[8]), UpdatedBy: String(r[9] || '')
-    });
+    var v = rowToVersion_(vals[i]);
+    if (v) out.push(v);
   }
   return out;
+}
+/* one sheet row -> one version, or null for a row with no rep or no version id */
+function rowToVersion_(r) {
+  if (!String(r[0] || '').trim() || !String(r[1] || '').trim()) return null;
+  return {
+    RepID: String(r[0]), VersionID: String(r[1]),
+    CreatedAt: iso_(r[2]), ClosesAt: iso_(r[3]), Campaign: String(r[4] || ''),
+    Self: parseMap_(r[5]), Coach: parseMap_(r[6]), Focus: parseList_(r[7]),
+    UpdatedAt: iso_(r[8]), UpdatedBy: String(r[9] || '')
+  };
 }
 function findRow_(sh, repId, versionId) {
   var last = sh.getLastRow();
