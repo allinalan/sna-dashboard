@@ -1484,6 +1484,14 @@ const centralZone=d=>{
   return day>=new Date(y,2,firstSundayOf(y,2)+7)&&day<new Date(y,10,firstSundayOf(y,10))?"CDT":"CST";
 };
 const fmtCallTime=d=>{const face=fmtClock(d);return face?face+" "+centralZone(d):"";};
+/* Group-call times come from the hub, which stores them as Central 24-hour
+   "HH:MM". Printed as stored, a 1 o'clock call read "13:00" on every rep's page.
+   Same rule as the hub's fmtTime: a canonical time gets the 12-hour face and the
+   zone of the call's own night; anything else stays as whoever wrote it. */
+const fmtHubTime=(v,day)=>{
+  const raw=String(v==null?"":v).trim(), m=/^(\d{2}):(\d{2})$/.exec(raw);
+  return m&&+m[1]<24&&+m[2]<60?fmtCallTime(new Date(day.getFullYear(),day.getMonth(),day.getDate(),+m[1],+m[2])):raw;
+};
 const sum=a=>a.filter(x=>x!=null).reduce((p,c)=>p+c,0);
 const activeWeeks=r=>r.sales.filter(x=>x!=null).length;
 const totalSales=r=>sum(r.sales);
@@ -2362,7 +2370,7 @@ function nextGroupCall(r){
     .sort((a,b)=>String(a.date).localeCompare(String(b.date)))[0];
   if(!row)return null;
   const p=row.date.split("-"), d=new Date(+p[0],+p[1]-1,+p[2]);
-  const time=String(row.time||HUB_CAL.callTime||"").trim();
+  const time=fmtHubTime(row.time||HUB_CAL.callTime,d);
   return {when:d.toLocaleDateString(undefined,{weekday:"short",month:"short",day:"numeric"})+(time?" · "+esc(time):""),topic:esc(row.topic),presenter:esc(row.presenter||""),extra:(row.extra||[]).length};
 }
 
