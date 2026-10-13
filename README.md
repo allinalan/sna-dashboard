@@ -282,11 +282,10 @@ never outshouts a check-in or a 1-on-1 that's actually due.
 against what their program owes: The Path 1, The Masters 2, The Dojo none (so the
 Dojo isn't on the card). A call comes from one of two places:
 
-- the **Calls** tab of the sheet, which Alan's Calendly feeds (booked, completed), and
+- the **Calls** tab of the sheet, which Alan's Calendly feeds (booked, completed,
+  cancelled), and
 - a **purple square** on the hub's Weekly Check-ins board, which is how a 1-on-1 on
-  Ben's calendar gets in. A square on a week that's still running reads as booked;
-  once that week's Monday has passed it reads as completed. The week belongs to the
-  month its Friday falls in. A coach sees a new square within a minute.
+  Ben's calendar gets in. A coach sees a new square within a minute.
 
 Each row reads **not booked**, **booked**, or **done ✓**, and a Masters mentee who is
 partway reads **1 of 2 done · next not booked** (or **next booked**) with an amber
@@ -294,20 +293,39 @@ dot. Before 2026-10-13 that case fell through to plain "not booked", which looke
 if the purple square had never arrived. The mentee's own **Your 1-on-1** row and the
 coach's call prep say the same thing.
 
-**A month is a Vector month**, the same four-week blocks as the hub's check-in board,
-not a calendar month. A call on 9/30 is an October call, because 9/29–10/5 is October
-week 1 (Alan, 2026-10-13). The card doesn't fully follow that yet:
+**A month is a Vector month**, the same blocks as the hub's check-in board, not a
+calendar month: weeks run Tue–Mon, each month of a campaign is four weeks, and the
+last month takes what is left. Fall 2026 is Sep · Wk 1–4, Oct · Wk 5–8 (9/29–10/26),
+Nov · Wk 9–12, Dec · Wk 13–17. A call on 9/30 is an October call (Alan, 2026-10-13).
+The card's heading says which weeks and dates it is counting.
 
-- A purple square is filed by the month its week's Friday falls in. That matches the
-  Vector month for every week of Fall 2026 except Wk 9 (10/27) and Wk 13 (11/24).
-- A Calendly call is filed by the **Month** column of the Calls tab, which is the
-  calendar month, so a 9/30 call is credited to September.
-- The card itself turns over on the 1st, and "overdue" starts after the 20th, both
-  by the calendar.
-- The two sources are added together, not matched up: a call that is in Calendly
-  **and** marked purple on the board counts twice.
+- **A call is filed by the week it happened in.** For a Calendly call that is the
+  week of its **CallDateTime**; the Calls tab's **Month** column is the calendar
+  month and is only used for a row that has no date. For a purple square it is the
+  week the square is on.
+- **A purple square in the same Tue–Mon week as a Calendly call is that call**, a
+  coach marking Alan's call on the board, and is not counted again. (Six of the
+  thirteen squares on the board on 2026-10-13 were exactly that.) Two Calendly calls
+  in one week are still two.
+- **A square alone in its week** is a call on Ben's calendar: booked while the week
+  is running, completed once its Monday has passed. A cancelled Calendly row is not
+  a call, so a square beside only a cancelled row counts by itself.
+- **A square beside a call Calendly still has as booked** shows the Calendly date
+  while the week runs; once the week is over the square stands as proof the call
+  happened, and it reads completed.
+- **The card turns over on the Tuesday a Vector month starts** (10/27 for November),
+  not on the 1st.
+- **OVERDUE** starts the day the month's last week does (10/20 for October, 12/22 for
+  December's five weeks) for anyone not done. Before 2026-10-13 it was the 20th of
+  the calendar month.
+
+The month rule is a copy of the hub's (`campaignMonths` and `MONTH_SPLIT` in
+`sna-master-hub/index.html`); if the Vector calendar ever changes there, change
+`CALL_MONTH_SPLIT` here too. Both were checked against each other for
+every day from 2026 through 2031 when this was written.
 
 ```
+node tests/call-count.test.js     # which calls count, in which month, and when it's overdue
 node tests/call-words.test.js     # the words on the card, for every state
 ```
 

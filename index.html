@@ -773,7 +773,7 @@
     <div class="section" id="admin-calls-sec">
       <div class="section-head">
         <h2 class="serif">Coaching Calls — <span id="calls-month"></span></h2>
-        <span class="hint">Path 1/mo · Masters 2/mo · formal 1-on-1s, separate from the weekly standard</span>
+        <span class="hint"><span id="calls-span"></span>Path 1/mo · Masters 2/mo · formal 1-on-1s, separate from the weekly standard</span>
       </div>
       <div id="admin-calls"></div>
       <div class="feed-h eyebrow" style="margin:22px 0 10px">Recent takeaways &amp; action steps</div>
@@ -1068,7 +1068,6 @@ const CONFIG = {
   DYL_URL: "https://allinalan.github.io/sna-design-your-life/",  // Design Your Life worksheet — answers stay on the rep's own device
   SURVEY_FORM_URL: "https://docs.google.com/forms/d/e/1FAIpQLSedU7b3dOX6JQs8fcRJbqB5q3dmbEc9fSoUm-rmpK9484R4cQ/viewform",
   WEBAPP_URL: "https://script.google.com/macros/s/AKfycbyNFDkgEAUT5IDNw4wvCHLQZoe70XxVwgAZmG8bNTmlkY8t0d-wL2eKa53kgke2AOCHPQ/exec",
-  CALL_CUTOFF_DAY: 20,          // after this day of month, an unfinished call shows OVERDUE
   REFRESH_MS: 60000,
   /* Skillset tracker storage — its own Apps Script, its own spreadsheet, so a
      rep rating themselves can never touch the performance sheet. Paste the
@@ -1530,10 +1529,9 @@ function teamStats(){
     salesPerMentee:n?totSales/n:null, apptsPerMentee:n?totAppt/n:null};
 }
 
-/* ── coaching calls (current month) — Path 1/mo · Masters 2/mo ──
+/* ── coaching calls (this Vector month) — Path 1/mo · Masters 2/mo ──
    This formal 1-on-1 is separate from the weekly "coaching interaction" standard. */
 const monthKey=d=>d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0");
-const monthName=()=>new Date().toLocaleDateString(undefined,{month:"long"});
 /* Dojo 0 · Path 1 · Masters 2 formal 1-on-1s per month */
 const callsRequired=r=>{const k=tierRank(r.tier);return k===1?0:k===3?2:1;};
 /* Sheets sometimes stores "2026-07" as a real date — accept either form */
@@ -1542,45 +1540,103 @@ function monthNorm(v){
   if(d&&String(v).match(/^Date\(|GMT|\//))return monthKey(d);
   return String(v||"").trim();
 }
+/*CALL_COUNT_BEGIN*/
+/* A month here is a VECTOR month, the same blocks as the hub's Weekly Check-ins
+   board (campaignMonths and MONTH_SPLIT in the hub's index.html — this is a copy
+   of that rule, so change the two together). Weeks run Tue–Mon and belong to
+   the campaign their Friday falls in; each month of a campaign is four weeks
+   and the last one takes what is left. Fall 2026 is Sep · Wk 1–4, Oct · Wk 5–8
+   (9/29–10/26), Nov · Wk 9–12, Dec · Wk 13–17, so a call on 9/30 is an October
+   call (Alan, 2026-10-13). */
+const CALL_SEASON_MONTHS={Spring:["January","February","March","April"],Summer:["May","June","July","August"],Fall:["September","October","November","December"]};
+const CALL_MONTH_SPLIT={17:[4,4,4,5],18:[4,4,4,6]};
+const callDay=(d,n)=>new Date(d.getFullYear(),d.getMonth(),d.getDate()+(n||0));   // local midnight, n days on — never UTC-shifted
+const callWeekOf=d=>callDay(d,-((d.getDay()+5)%7));                               // the Tuesday that opens d's week
+function callWeekCampaign(tue){const f=callDay(tue,3),m=f.getMonth();return (m<=3?"Spring":m<=7?"Summer":"Fall")+" "+f.getFullYear();}
+/* the Vector month day d falls in: its name, its week numbers (from–to), its
+   weeks' Tuesdays, and calKey — the "2026-10" the Calls tab's Month column
+   would call it, for the rows that carry nothing better */
+function vectorMonthOf(d){
+  const tue=callWeekOf(d), camp=callWeekCampaign(tue), [season,year]=camp.split(" ");
+  let first=tue; while(callWeekCampaign(callDay(first,-7))===camp)first=callDay(first,-7);
+  const weeks=[]; for(let w=first;callWeekCampaign(w)===camp;w=callDay(w,7))weeks.push(w);
+  const names=CALL_SEASON_MONTHS[season], split=CALL_MONTH_SPLIT[weeks.length]||[4,4,4,weeks.length-12];
+  const at=weeks.findIndex(w=>+w===+tue);
+  for(let m=0,from=0;m<names.length;m++){
+    const n=m===names.length-1?weeks.length-from:Math.max(0,split[m]);
+    if(at<from+n)return {campaign:camp,name:names[m],calKey:year+"-"+String({Spring:1,Summer:5,Fall:9}[season]+m).padStart(2,"0"),
+                         from:from+1,to:from+n,weeks:weeks.slice(from,from+n)};
+    from+=n;
+  }
+}
+/* One mentee's 1-on-1s for one Vector month. calls: their Calls rows as
+   {status, when (CallDateTime as a Date, or null), month (the Month column)};
+   squares: the Tuesdays they have a purple square on. A call is filed by the
+   week it happened in, so the Month column only places a row that has no date.
+   A purple square in the same Tue–Mon week as a Calendly call IS that call — a
+   coach marking Alan's call on the board — so it adds nothing, except to vouch
+   for a call Calendly still has as "booked" once that week is over. A square
+   alone in its week (or beside only a cancelled row) is a call on Ben's
+   calendar: booked while the week runs, completed once its Monday has passed.
+   Returns {completed, upcoming:[when…], hubBooked:[tuesday…]}. */
+function callTally(calls,squares,month,today){
+  const key=d=>d.getFullYear()+"-"+d.getMonth()+"-"+d.getDate();
+  const wk=new Map(month.weeks.map(w=>[key(w),{tue:w,done:0,booked:[],sq:false}]));
+  let completed=0;
+  for(const c of calls){
+    const s=String(c.status||"").trim().toLowerCase(), done=s==="completed"||s==="survey_done";
+    if(!done&&s!=="booked")continue;                          // cancelled, or anything else, is not a call
+    if(!c.when){if(done&&c.month===month.calKey)completed++;continue;}
+    const w=wk.get(key(callWeekOf(c.when)));
+    if(w){if(done)w.done++;else w.booked.push(c.when);}
+  }
+  for(const t of squares){const w=wk.get(key(callWeekOf(t)));if(w)w.sq=true;}
+  const upcoming=[],hubBooked=[],t0=callDay(today);
+  for(const w of wk.values()){
+    const over=callDay(w.tue,7)<=t0;                          // the week's Monday has passed
+    w.booked.sort((a,b)=>a-b);
+    if(w.sq&&!w.done&&!w.booked.length){if(over)completed++;else hubBooked.push(w.tue);continue;}
+    if(w.sq&&over&&!w.done){w.done=1;w.booked.shift();}       // the coach's square says the booked call happened
+    completed+=w.done;
+    upcoming.push(...w.booked);
+  }
+  return {completed,upcoming,hubBooked};
+}
 /* Ben's 1-on-1s book on HIS calendar, so they never reach the Calls tab (that
-   feed is Alan's Calendly). The hub's Weekly Check-ins board is where Ben records
-   them: a purple square ("one" = 1-1 call) on a week of this month counts here.
-   Weeks are Tue–Mon and belong to the month their Friday falls in — the hub's
-   own rule. A mark on a week still running reads as booked; once the week has
-   ended it reads as completed, so it flows into the survey step like any other
-   call and never trips a false OVERDUE. Returns {booked:[tueDate], done:n}. */
-function hubOneOnOnes(r,mk){
-  const marks=[];
+   feed is Alan's Calendly). The hub's Weekly Check-ins board is where a coach
+   records them: a purple square ("one" = 1-1 call) on the week it happened.
+   Returns the Tuesdays of this mentee's purple squares, every campaign. */
+function hubSquares(r){
+  const out=[];
   for(const camp of Object.values((HUB_CAL&&HUB_CAL.checkins)||{})){
     for(const [tue,state] of Object.entries((camp||{})[String(r.id)]||{})){
       if(state!=="one")continue;
       const [y,m,d]=String(tue).split("-").map(Number);
-      if(!y||!m||!d)continue;
-      const t=new Date(y,m-1,d), fri=new Date(y,m-1,d+3);      // local dates — never UTC-shifted
-      if(monthKey(fri)===mk)marks.push(t);
+      if(y&&m&&d)out.push(new Date(y,m-1,d));                 // local dates — never UTC-shifted
     }
   }
-  marks.sort((a,b)=>a-b);
-  const today=new Date();today.setHours(0,0,0,0);
-  const over=t=>new Date(t.getFullYear(),t.getMonth(),t.getDate()+7)<=today;   // the week's Monday has passed
-  return {booked:marks.filter(t=>!over(t)),done:marks.filter(over).length};
+  return out;
 }
-function callState(r){
-  const mk=monthKey(new Date());
-  const mine=CALLS_RAW.filter(c=>String(c.RepID)===String(r.id)&&monthNorm(c.Month)===mk);
-  const surveys=SURVEY_RAW.filter(s=>String(s.RepID)===String(r.id)&&monthNorm(s.Month)===mk);
+/* now: the clock, for the tests — the page never passes it */
+function callState(r,now){
   const req=callsRequired(r);
   if(req===0)return {req:0,completed:0,surveyed:0,upcoming:null,hubWeek:null,status:"na",overdue:false,surveys:[]}; // The Dojo: no 1-on-1s
-  const norm=c=>String(c.Status||"").trim().toLowerCase();
-  const hub=hubOneOnOnes(r,mk);
-  const completed=mine.filter(c=>norm(c)==="completed"||norm(c)==="survey_done").length+hub.done;
-  const surveyed=surveys.length;
-  const upcoming=mine.filter(c=>norm(c)==="booked").map(c=>ciParseDate(c.CallDateTime)).filter(Boolean).sort((a,b)=>a-b);
+  const today=now||new Date(), month=vectorMonthOf(today), id=String(r.id);
+  const mine=CALLS_RAW.filter(c=>String(c.RepID)===id).map(c=>({status:c.Status,when:ciParseDate(c.CallDateTime),month:monthNorm(c.Month)}));
+  const surveys=SURVEY_RAW.filter(s=>String(s.RepID)===id&&monthNorm(s.Month)===month.calKey);
+  const t=callTally(mine,hubSquares(r),month,today);
   let status="none";
-  if(completed>=req)status="done";                  // the post-call survey was retired 2026-09-29: a completed call is done
-  else if(upcoming.length||hub.booked.length)status="booked";
-  const overdue=status!=="done"&&new Date().getDate()>CONFIG.CALL_CUTOFF_DAY;
-  return {req,completed,surveyed,upcoming:upcoming[0]||null,hubWeek:hub.booked[0]||null,status,overdue,surveys};
+  if(t.completed>=req)status="done";                // the post-call survey was retired 2026-09-29: a completed call is done
+  else if(t.upcoming.length||t.hubBooked.length)status="booked";
+  const overdue=status!=="done"&&callDay(today)>=month.weeks[month.weeks.length-1];   // the month's last week has started
+  return {req,completed:t.completed,surveyed:surveys.length,upcoming:t.upcoming[0]||null,hubWeek:t.hubBooked[0]||null,status,overdue,surveys};
+}
+/*CALL_COUNT_END*/
+/* "October" on the card, and what that covers: "Wk 5–8 · 9/29–10/26" */
+const monthName=()=>vectorMonthOf(new Date()).name;
+function monthSpan(){
+  const m=vectorMonthOf(new Date()), md=d=>(d.getMonth()+1)+"/"+d.getDate();
+  return `Wk ${m.from}–${m.to} · ${md(m.weeks[0])}–${md(callDay(m.weeks[m.weeks.length-1],6))}`;
 }
 /*CALL_WORDS_BEGIN*/
 /* The Masters owe two 1-on-1s a month, so one down is a state of its own. It
@@ -2519,14 +2575,14 @@ function renderGroupCalls(r){
 }
 function renderAdminCalls(){
   $("calls-month").textContent=monthName();
-  const hubMarked=DATA.some(r=>callsRequired(r)>0&&(hubOneOnOnes(r,monthKey(new Date())).booked.length||hubOneOnOnes(r,monthKey(new Date())).done));
-  if(!CALLS_RAW.length&&!SURVEY_RAW.length&&!hubMarked){
+  $("calls-span").textContent=monthSpan()+" · ";
+  const rows=DATA.filter(r=>callsRequired(r)>0).map(r=>({r,cs:callState(r)}));
+  if(!CALLS_RAW.length&&!SURVEY_RAW.length&&!rows.some(({cs})=>cs.completed||cs.hubWeek)){     // nothing from Calendly, no purple square this month
     $("admin-calls").innerHTML=`<div class="plan-empty">The <b>Calls</b> tab isn't feeding yet — once Calendly is wired, every mentee's month shows here with overdue flags.</div>`;
     $("calls-feed").innerHTML="";
     return;
   }
-  const rows=DATA.filter(r=>callsRequired(r)>0).map(r=>({r,cs:callState(r)}))
-    .sort((a,b)=>(a.cs.status==="done"?1:0)-(b.cs.status==="done"?1:0)||a.r.name.localeCompare(b.r.name));
+  rows.sort((a,b)=>(a.cs.status==="done"?1:0)-(b.cs.status==="done"?1:0)||a.r.name.localeCompare(b.r.name));
   $("admin-calls").innerHTML=`<div class="calls-grid">`+rows.map(({r,cs})=>{
     const b=callRowBits(cs);
     return `<div class="call-row ${b.cls}"><span class="st"></span>${r.name}`+
