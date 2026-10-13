@@ -276,6 +276,41 @@ status dot of its own — the worksheet saves on the rep's phone, so the dashboa
 never tell whether it's been done — and its button is outlined, not solid, so it
 never outshouts a check-in or a 1-on-1 that's actually due.
 
+### Coaching calls
+
+**Coaching Calls — [month]** counts each mentee's formal 1-on-1s for the month
+against what their program owes: The Path 1, The Masters 2, The Dojo none (so the
+Dojo isn't on the card). A call comes from one of two places:
+
+- the **Calls** tab of the sheet, which Alan's Calendly feeds (booked, completed), and
+- a **purple square** on the hub's Weekly Check-ins board, which is how a 1-on-1 on
+  Ben's calendar gets in. A square on a week that's still running reads as booked;
+  once that week's Monday has passed it reads as completed. The week belongs to the
+  month its Friday falls in. A coach sees a new square within a minute.
+
+Each row reads **not booked**, **booked**, or **done ✓**, and a Masters mentee who is
+partway reads **1 of 2 done · next not booked** (or **next booked**) with an amber
+dot. Before 2026-10-13 that case fell through to plain "not booked", which looked as
+if the purple square had never arrived. The mentee's own **Your 1-on-1** row and the
+coach's call prep say the same thing.
+
+**A month is a Vector month**, the same four-week blocks as the hub's check-in board,
+not a calendar month. A call on 9/30 is an October call, because 9/29–10/5 is October
+week 1 (Alan, 2026-10-13). The card doesn't fully follow that yet:
+
+- A purple square is filed by the month its week's Friday falls in. That matches the
+  Vector month for every week of Fall 2026 except Wk 9 (10/27) and Wk 13 (11/24).
+- A Calendly call is filed by the **Month** column of the Calls tab, which is the
+  calendar month, so a 9/30 call is credited to September.
+- The card itself turns over on the 1st, and "overdue" starts after the 20th, both
+  by the calendar.
+- The two sources are added together, not matched up: a call that is in Calendly
+  **and** marked purple on the board counts twice.
+
+```
+node tests/call-words.test.js     # the words on the card, for every state
+```
+
 ### Group calls
 
 Each mentee sees their own group-call attendance, read from the hub's **Call
