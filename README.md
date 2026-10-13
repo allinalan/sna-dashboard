@@ -276,6 +276,32 @@ status dot of its own — the worksheet saves on the rep's phone, so the dashboa
 never tell whether it's been done — and its button is outlined, not solid, so it
 never outshouts a check-in or a 1-on-1 that's actually due.
 
+### Coaching calls
+
+**Coaching Calls — [month]** counts each mentee's formal 1-on-1s for the calendar
+month against what their program owes: The Path 1, The Masters 2, The Dojo none (so
+the Dojo isn't on the card). A call comes from one of two places:
+
+- the **Calls** tab of the sheet, which Alan's Calendly feeds (booked, completed), and
+- a **purple square** on the hub's Weekly Check-ins board, which is how a 1-on-1 on
+  Ben's calendar gets in. A square on a week that's still running reads as booked;
+  once that week's Monday has passed it reads as completed. The week belongs to the
+  month its Friday falls in. A coach sees a new square within a minute.
+
+Each row reads **not booked**, **booked**, or **done ✓**, and a Masters mentee who is
+partway reads **1 of 2 done · next not booked** (or **next booked**) with an amber
+dot. Before 2026-10-13 that case fell through to plain "not booked", which looked as
+if the purple square had never arrived. The mentee's own **Your 1-on-1** row and the
+coach's call prep say the same thing.
+
+The two sources are added together, not matched up: a call that is in Calendly **and**
+marked purple on the board counts twice, and a square on a week that straddles two
+months counts for the month its Friday is in even if the call was the month before.
+
+```
+node tests/call-words.test.js     # the words on the card, for every state
+```
+
 ### Group calls
 
 Each mentee sees their own group-call attendance, read from the hub's **Call
