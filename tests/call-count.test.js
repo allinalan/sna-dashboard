@@ -112,7 +112,7 @@ const cases = [
   }],
 
   ["OVERDUE starts the day the month's last week does, and never on a finished month", () => {
-    const none = page(), done = page([call("r42", "completed", at(10, 8, 9))]), booked = page([call("r42", "booked", at(10, 22, 9))]);
+    const none = page(), done = page([call("r42", "completed", at(10, 8, 9))]);
     assert.strictEqual(none.callState(PATH, at(10, 19)).overdue, false);             // Monday of Wk 7
     assert.strictEqual(none.callState(PATH, at(10, 20)).overdue, true);              // Tuesday, Wk 8 of 5-8
     assert.strictEqual(none.callState(PATH, at(10, 21)).overdue, true);              // the 21st was the old calendar cutoff
@@ -120,8 +120,30 @@ const cases = [
     assert.strictEqual(none.callState(PATH, at(12, 21)).overdue, false);             // December has five weeks…
     assert.strictEqual(none.callState(PATH, at(12, 22)).overdue, true);              // …so it's Wk 17 that flags
     assert.strictEqual(done.callState(PATH, at(10, 22)).overdue, false);
-    assert.strictEqual(booked.callState(PATH, at(10, 20)).overdue, true);            // booked isn't done, as before
     assert.strictEqual(done.callState({id:"r42", tier:"Masters"}, at(10, 22)).overdue, true);   // 1 of 2 in the last week
+  }],
+
+  ["a call still booked ahead holds OVERDUE off, through its own day and no longer", () => {
+    const pg = page([call("r42", "booked", at(10, 22, 16, 30))]);
+    assert.strictEqual(pg.callState(PATH, at(10, 20)).overdue, false);               // last week, but the call is Thursday
+    assert.strictEqual(pg.callState(PATH, at(10, 22, 9)).overdue, false);            // the morning of the call
+    assert.strictEqual(pg.callState(PATH, at(10, 22, 23)).overdue, false);           // that night, before Calendly's poll has marked it
+    assert.deepStrictEqual([pg.callState(PATH, at(10, 23)).status, pg.callState(PATH, at(10, 23)).overdue], ["booked", true]);   // still "booked" the day after: never confirmed
+    const romeo = page([call("r27", "booked", at(10, 20, 13))]);                     // Romeo, 2026-10-20: read OVERDUE on the day of his call
+    assert.strictEqual(romeo.callState({id:"r27", tier:"Path"}, at(10, 20)).overdue, false);
+  }],
+
+  ["a purple square on the month's last week holds OVERDUE off too, while that week runs", () => {
+    const pg = page([], fall({r42: {"2026-10-20": "one"}}));
+    assert.deepStrictEqual([pg.callState(PATH, at(10, 20)).status, pg.callState(PATH, at(10, 20)).overdue], ["booked", false]);
+    assert.deepStrictEqual([pg.callState(PATH, at(10, 26)).status, pg.callState(PATH, at(10, 26)).overdue], ["booked", false]);
+  }],
+
+  ["The Masters: one done and the next booked isn't overdue; one done and nothing booked is", () => {
+    const next = page([call("r02", "completed", at(10, 7, 9)), call("r02", "booked", at(10, 23, 9))]);
+    assert.strictEqual(next.callState(MASTERS, at(10, 20)).overdue, false);
+    assert.strictEqual(page([call("r02", "completed", at(10, 7, 9))]).callState(MASTERS, at(10, 20)).overdue, true);
+    assert.strictEqual(page([call("r02", "booked", at(10, 23, 9))]).callState(MASTERS, at(10, 20)).overdue, false);   // none done, one booked: quiet until that call is in
   }],
 
   ["a Calls row with no date is filed by its Month column, and can't be matched to a square", () => {

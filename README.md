@@ -316,8 +316,14 @@ The card's heading says which weeks and dates it is counting.
 - **The card turns over on the Tuesday a Vector month starts** (10/27 for November),
   not on the 1st.
 - **OVERDUE** starts the day the month's last week does (10/20 for October, 12/22 for
-  December's five weeks) for anyone not done. Before 2026-10-13 it was the 20th of
-  the calendar month.
+  December's five weeks) for anyone who isn't done **and has no call still ahead of
+  them**. Before 2026-10-13 it was the 20th of the calendar month.
+- **A booked call isn't overdue** (Alan, 2026-10-13). A Calendly booking holds the
+  flag off through the day of the call, and a purple square does while its week is
+  running. Calendly's hourly poll marks a call completed within two hours of its
+  slot, so a call still "booked" the morning after was never confirmed (a hand-added
+  row, or one Calendly no longer knows about) and reads **OVERDUE · booked 10/22**.
+  A Masters mentee with none done and one booked stays quiet until that call is in.
 
 The month rule is a copy of the hub's (`campaignMonths` and `MONTH_SPLIT` in
 `sna-master-hub/index.html`); if the Vector calendar ever changes there, change

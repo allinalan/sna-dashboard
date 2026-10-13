@@ -1628,7 +1628,13 @@ function callState(r,now){
   let status="none";
   if(t.completed>=req)status="done";                // the post-call survey was retired 2026-09-29: a completed call is done
   else if(t.upcoming.length||t.hubBooked.length)status="booked";
-  const overdue=status!=="done"&&callDay(today)>=month.weeks[month.weeks.length-1];   // the month's last week has started
+  /* OVERDUE: the month's last week has started, they aren't done, and no call
+     is still ahead of them. A booked call holds the flag off through its own
+     day (Alan, 2026-10-13: a booked call isn't overdue). Calendly's hourly poll
+     marks a call completed within two hours of its slot, so one still "booked"
+     the morning after never got confirmed, and the flag comes back. */
+  const ahead=t.hubBooked.length>0||t.upcoming.some(d=>d>=callDay(today));
+  const overdue=status!=="done"&&!ahead&&callDay(today)>=month.weeks[month.weeks.length-1];
   return {req,completed:t.completed,surveyed:surveys.length,upcoming:t.upcoming[0]||null,hubWeek:t.hubBooked[0]||null,status,overdue,surveys};
 }
 /*CALL_COUNT_END*/
