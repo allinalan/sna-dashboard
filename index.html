@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Sharp Ninja Academy — Mentee Dashboard</title>
 <meta name="description" content="Sharp Ninja Academy mentee performance — weekly check-ins, standards, and sales by channel. Live coach dashboard.">
+<meta name="theme-color" content="#0E0B08" media="(prefers-color-scheme: dark)">
 <meta name="theme-color" content="#191410">
 <meta property="og:title" content="Sharp Ninja Academy — Mentee Dashboard">
 <meta property="og:description" content="Weekly check-ins, standards, and sales by channel — live coach view.">
@@ -12,185 +13,349 @@
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23AE3B15'/%3E%3Ctext x='32' y='44' font-size='34' text-anchor='middle' font-family='Hiragino Mincho ProN,Yu Mincho,serif' fill='%23F3EFE6'%3E忍%3C/text%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..700&family=Hanken+Grotesk:wght@400;500;600;700&family=Spline+Sans+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..700&family=Hanken+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   /* ═════════════════════════════════════════════════════════════════════
-     SNA MENTEE DASHBOARD — "Program Book" design system, shared with the
-     Master Hub. Dark lacquer masthead over warm paper; vermilion seal;
-     brass details. Fraunces (display) · Hanken Grotesk (text) ·
-     Spline Sans Mono (numbers, labels).
+     SNA MENTEE DASHBOARD — the Master Hub's "Program Book" design system.
+     The tokens, type scale, buttons, segmented controls, tables, motion and
+     dark mode below are the hub's (sna-master-hub/index.html, top of its
+     stylesheet), so the hub's Performance tab, which embeds this page with
+     ?embed=1, reads as one app in light and in dark. Change a token there,
+     change it here.
+     Fraunces for titles · Hanken Grotesk for everything else (its figures
+     are tabular, so numbers line up without a monospace). One type scale:
+     11 · 12 · 13 · 14 · 16 · 18 · 22 · 28 · 40px, nothing below 11px.
+     All caps (+.06em) only on tiny section labels. Weight carries
+     hierarchy: --ink-faint is for placeholders and decoration, never for
+     text you read (secondary text is --ink-soft).
      ═════════════════════════════════════════════════════════════════════ */
   :root{
-    --paper:#F3EFE6; --paper-deep:#EAE4D6;
-    --card:#FBF8F1; --card-raised:#FFFDF6;
-    --ink:#1C1712; --ink-soft:#5E5645; --ink-faint:#958C79;
-    --line:#DCD5C3; --line-soft:#E8E2D2; --line-strong:#C9C0AA;
-    --accent:#AE3B15; --accent-deep:#8F2F0F; --accent-soft:#F1DFD2; --accent-ink:#7C2C0E;
-    --brass:#8E7942;
-    --good:#3D6B4F; --good-bg:#DFE9DC;
-    --warn:#96760A; --warn-bg:#F2E7C6;
-    --bad:#A33512;  --bad-bg:#F0D9CC;
-    --shell:#191410; --shell-hi:#221C15;
-    --shell-text:#F4EEDF; --shell-mut:#9A907C; --shell-dim:#7C7360;
+    color-scheme:light dark;
+    --radius:12px;
     --serif:"Fraunces",Georgia,serif;
     --sans:"Hanken Grotesk",-apple-system,"Helvetica Neue",sans-serif;
-    --monof:"Spline Sans Mono",ui-monospace,SFMono-Regular,monospace;
+    --monof:var(--sans);           /* was Spline Sans Mono: Hanken's tabular figures do the aligning now */
+    --hair:1px;                    /* a separator: one device pixel on a retina screen (below) */
+    /* motion: colour fades on --ease-out, sheets on the iOS sheet curve, anything that
+       moves under your hand on a real spring. The bouncy one is for checkmarks only. */
+    --ease-out:cubic-bezier(.2,.8,.2,1);
+    --ease-sheet:cubic-bezier(.32,.72,0,1);
+    --spring:linear(0,.074,.232,.411,.577,.714,.819,.895,.946,.978,.997,1.007,1.01,1.011,1.01,1.008,1.006,1.004,1.003,1.002,1);
+    --spring-bouncy:linear(0,.075,.249,.458,.659,.827,.952,1.034,1.078,1.094,1.091,1.076,1.057,1.037,1.02,1.007,.998,.993,.991,.991,.992,.994,.996,.998,1);
+    --spring-dur:440ms;
   }
+  @media (min-resolution:2dppx){:root{--hair:.5px}}
+  /* ── colour ── every colour on the page is one of these (the hub's set); component
+     rules never carry a hex of their own. Dark (below) only swaps the base colours;
+     the derived ones are mixed from --ink and --accent and follow. */
+  :root{
+    --paper:#F3EFE6; --paper-deep:#EAE4D6; --paper-top:#F8F5EE;
+    --card:#FFFDF8; --card-raised:#FFFEFB;
+    --ink:#1C1712; --ink-soft:#5E5645; --ink-faint:#736A57; --ink-strong:#000;
+    --line:#DCD5C3; --line-soft:#E8E2D2; --line-strong:#C9C0AA;
+    --accent:#AE3B15; --accent-deep:#8F2F0F; --accent-soft:#F1DFD2; --accent-ink:#7C2C0E;
+    --on-accent:#FFF9F1;           /* text on an --accent (or --bad, --good, --warn) fill */
+    --brass:#8E7942; --brass-soft:#EFE7D2;
+    --good:#3D6B4F; --good-bg:#DFE9DC;
+    --warn:#96760A; --warn-bg:#F2E7C6; --warn-ink:#6E5606;
+    --bad:#B42318;  --bad-bg:#F5DFDA;  /* errors and overdue only — the brand red is --accent */
+    --tier3:#5B57A8;
+    --selection:#EAD9C4;
+    /* the masthead (and the Save bar) are the dark cover in both themes */
+    --shell:#191410; --shell-hi:#221C15;
+    --shell-text:#F4EEDF; --shell-mut:#9A907C; --shell-dim:#988E78; --shell-btn:#EDE6D6;
+    --shell-line:rgba(244,238,223,.1); --shell-edge:rgba(244,238,223,.16);
+    --shell-fill:rgba(244,238,223,.10); --shell-fill-hover:rgba(244,238,223,.17);
+    --seal:#AE3B15; --seal-ink:#F6EFE2;
+    --dot-ok:#6FA080; --dot-edited:#D9A62E;
+    /* marks: the solid squares on the boards, the same colours as the hub's boards
+       in both themes (green = on / met, red = missed, black = not needed) */
+    --mark-call:#2E7D4F; --mark-1on1:#7A3FA8; --mark-text:#2C6BB5; --mark-missed:#C0392B;
+    --mark-off:#1C1712; --mark-off-ring:transparent; --mark-none:#5E5645;
+    --mark-open:#DDAA00; --mark-open-ink:#3A2C00; --mark-brass:#8E7942;
+    --on-mark:#F4EEDF;
+    /* derived */
+    --fill:color-mix(in oklab,var(--ink) 6%,transparent);          /* grey buttons, fields, segmented tracks, bar tracks */
+    --fill-hover:color-mix(in oklab,var(--ink) 10%,transparent);
+    --fill-strong:color-mix(in oklab,var(--ink) 16%,transparent);
+    --hover:color-mix(in oklab,var(--ink) 7%,transparent);         /* a row in a list you're pointing at */
+    --band:color-mix(in oklab,var(--ink) 3.5%,transparent);        /* alternate rows on the heatmap */
+    --ring:color-mix(in oklab,var(--ink) 30%,transparent);
+    --focus-ring:color-mix(in oklab,var(--accent) 14%,transparent);
+    --accent-tint:color-mix(in oklab,var(--accent) 7%,transparent); /* this week's row, the latest note */
+    --accent-line:color-mix(in oklab,var(--accent) 22%,transparent);
+    /* elevation — three steps, nothing else casts a shadow */
+    --elev-1:0 0 0 var(--hair) rgba(28,23,18,.06),0 1px 2px rgba(28,23,18,.05);
+    --elev-2:0 0 0 var(--hair) rgba(28,23,18,.10),0 4px 12px rgba(28,23,18,.08),0 16px 40px rgba(28,23,18,.14);
+    --elev-3:0 0 0 var(--hair) rgba(28,23,18,.12),0 24px 64px rgba(28,23,18,.28);
+  }
+  /* dark: the hub's set, so the frame follows the same system setting as the hub
+     around it. Screen only, so the page never prints dark. */
+  @media screen and (prefers-color-scheme:dark){
+    :root{
+      --paper:#15110D; --paper-deep:#1B1612; --paper-top:#18130F;
+      --card:#211B15; --card-raised:#2A231C;
+      --ink:#F2EBDD; --ink-soft:#BFB4A0; --ink-faint:#988E7A; --ink-strong:#FFFFFF;
+      --line:rgba(242,235,221,.13); --line-soft:rgba(242,235,221,.07); --line-strong:rgba(242,235,221,.22);
+      --accent:#E8734A; --accent-deep:#F08A66; --accent-soft:rgba(232,115,74,.15); --accent-ink:#F29C7B;
+      --on-accent:#1B110B;
+      --brass:#CDB57E; --brass-soft:rgba(205,181,126,.14);
+      --good:#74C08E; --good-bg:rgba(116,192,142,.15);
+      --warn:#E2B54C; --warn-bg:rgba(226,181,76,.15); --warn-ink:#E9C46A;
+      --bad:#F2735F;  --bad-bg:rgba(242,115,95,.15);
+      --tier3:#A9A5EA;
+      --selection:rgba(232,115,74,.32);
+      --shell:#0E0B08; --shell-hi:#16120E;
+      --mark-off:#050403; --mark-off-ring:rgba(242,235,221,.24);
+      --focus-ring:color-mix(in oklab,var(--accent) 28%,transparent);
+      --elev-1:0 0 0 var(--hair) rgba(242,235,221,.07),0 1px 2px rgba(0,0,0,.3);
+      --elev-2:0 0 0 var(--hair) rgba(242,235,221,.10),0 4px 12px rgba(0,0,0,.3),0 16px 40px rgba(0,0,0,.4);
+      --elev-3:0 0 0 var(--hair) rgba(242,235,221,.12),0 24px 64px rgba(0,0,0,.55);
+    }
+  }
+  @media print{:root{color-scheme:light}}
   *{box-sizing:border-box;margin:0;padding:0}
   html{-webkit-text-size-adjust:100%}
-  body{background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:14px;line-height:1.5;
+  body{background:linear-gradient(180deg,var(--paper-top) 0,var(--paper) 560px) no-repeat,var(--paper);color:var(--ink);
+    font-family:var(--sans);font-size:14px;line-height:1.5;
     -webkit-font-smoothing:antialiased;-webkit-tap-highlight-color:transparent;padding:0 0 90px}
-  .mono{font-family:var(--monof)}
-  ::selection{background:#EAD9C4}
-  a{color:var(--accent)}
+  .mono{font-family:var(--monof);font-variant-numeric:tabular-nums}
+  ::selection{background:var(--selection)}
+  a{color:var(--accent);text-underline-offset:2px}
   :focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:4px}
-  .wrap{max-width:1140px;margin:0 auto;padding:0 26px}
+  .wrap{max-width:1220px;margin:0 auto;padding:0 28px}
   .serif{font-family:var(--serif)}
-  .eyebrow{font-family:var(--monof);font-size:10px;letter-spacing:.24em;text-transform:uppercase;
-    color:var(--ink-soft);font-weight:500;display:flex;align-items:center;gap:9px}
-  .eyebrow::before{content:"";width:20px;height:2px;background:var(--accent);flex:none}
+  .eyebrow{font-family:var(--sans);font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;
+    color:var(--ink-soft);display:flex;align-items:center;gap:9px}
+  /* (the page used to wear a film-grain overlay and an accent dash before each eyebrow; the hub dropped both) */
 
-  /* film grain over everything */
-  body::after{content:"";position:fixed;inset:0;z-index:200;pointer-events:none;opacity:.05;
-    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='220' height='220' filter='url(%23n)'/%3E%3C/svg%3E")}
-
-  /* ═══ masthead — the dark cover ═══ */
-  header{background:linear-gradient(180deg,var(--shell-hi),var(--shell));color:var(--shell-text);
-    position:sticky;top:0;z-index:30;border-bottom:1px solid rgba(142,121,66,.4);
-    box-shadow:0 12px 26px -18px rgba(18,13,7,.55)}
-  .head-inner{display:flex;align-items:center;justify-content:space-between;padding:13px 26px;max-width:1140px;margin:0 auto;flex-wrap:wrap;gap:12px}
-  .brand{display:flex;align-items:center;gap:13px}
-  .mark{width:40px;height:40px;background:var(--accent);color:#F6EFE2;border-radius:10px;flex:none;
-    display:grid;place-items:center;font-family:"Hiragino Mincho ProN","Yu Mincho",serif;font-size:20px;line-height:1;font-weight:400;
+  /* ═══ masthead — the dark cover ═══
+     a material, not a slab: the page scrolls under it, blurred, and a hairline marks the edge */
+  header{background:color-mix(in oklab,var(--shell) 94%,transparent);color:var(--shell-text);
+    -webkit-backdrop-filter:saturate(1.6) blur(20px);backdrop-filter:saturate(1.6) blur(20px);
+    position:sticky;top:0;z-index:30;border-bottom:var(--hair) solid var(--shell-edge)}
+  .head-inner{display:flex;align-items:center;justify-content:space-between;padding:16px 28px 15px;max-width:1220px;margin:0 auto;flex-wrap:wrap;gap:14px}
+  .brand{display:flex;align-items:center;gap:14px}
+  .mark{width:41px;height:41px;background:var(--seal);color:var(--seal-ink);border-radius:10px;flex:none;
+    display:grid;place-items:center;font-family:"Hiragino Mincho ProN","Yu Mincho",serif;font-size:21px;line-height:1;font-weight:400;
     box-shadow:inset 0 1px 0 rgba(255,255,255,.14),0 2px 8px rgba(0,0,0,.4)}
-  .brand h1{font-family:var(--serif);font-size:19px;font-weight:540;letter-spacing:.005em;line-height:1.1;color:var(--shell-text)}
-  .brand .sub{font-family:var(--monof);font-size:8.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--shell-mut);margin-top:4px}
-  .head-right{display:flex;align-items:center;gap:11px;flex-wrap:wrap;margin-left:auto}
-  .status{font-family:var(--monof);font-size:10.5px;color:var(--shell-mut);display:flex;align-items:center;gap:7px}
-  .dot{width:7px;height:7px;border-radius:50%;background:#6FA080;flex:none;box-shadow:0 0 6px rgba(111,160,128,.5)}
-  .dot.seed{background:#D9A62E;box-shadow:0 0 6px rgba(217,166,46,.5)}
-  .toggle{display:flex;gap:2px;border:1px solid rgba(244,238,223,.24);border-radius:9px;background:rgba(244,238,223,.06);padding:3px}
-  .toggle button{font-family:var(--monof);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;
-    padding:6px 14px;border:none;background:none;border-radius:6px;cursor:pointer;color:var(--shell-mut);
-    transition:background .15s,color .15s}
-  .toggle button:hover{color:var(--shell-text)}
-  .toggle button.on{background:var(--paper);color:var(--ink);font-weight:500}
-  .form-btn{font-family:var(--monof);font-size:10.5px;font-weight:500;letter-spacing:.09em;text-transform:uppercase;
-    text-decoration:none;color:#FFF9F1;background:var(--accent);border:1px solid var(--accent);border-radius:8px;
-    padding:8px 15px;transition:background .15s,border-color .15s}
-  .form-btn:hover{background:var(--accent-deep);border-color:var(--accent-deep);opacity:1}
+  .brand h1{font-family:var(--serif);font-size:18px;font-weight:600;letter-spacing:-.011em;line-height:1.1;color:var(--shell-text)}
+  .brand .sub{font-size:12px;font-weight:500;color:var(--shell-mut);margin-top:3px}
+  .head-right{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin-left:auto}
+  .status{font-family:var(--sans);font-size:12px;color:var(--shell-mut);display:flex;align-items:center;gap:7px;margin-right:4px}
+  .dot{width:7px;height:7px;border-radius:50%;background:var(--dot-ok);flex:none}
+  .dot.seed{background:var(--dot-edited)}
+
+  /* ═══ buttons ═══ filled, not outlined: grey for most, ink for the one thing the
+     view is for (.primary, at most one), plain tinted text for the quiet ones
+     (.ghost). Sentence case, 13px semibold. .form-btn is this page's name for .btn. */
+  .form-btn{display:inline-block;font-family:var(--sans);font-size:13px;line-height:18px;font-weight:600;letter-spacing:0;
+    padding:9px 16px;border:0;background:var(--fill);color:var(--ink);text-align:center;
+    border-radius:10px;cursor:pointer;white-space:nowrap;text-decoration:none}
+  .form-btn:hover{background:var(--fill-hover);color:var(--ink)}
+  .form-btn.primary{background:var(--ink);color:var(--paper)}
+  .form-btn.primary:hover{background:var(--ink-strong);color:var(--paper)}
+  .form-btn.ghost{background:none;color:var(--accent);padding-left:10px;padding-right:10px}
+  .form-btn.ghost:hover{background:var(--accent-soft);color:var(--accent-ink)}
+  .form-btn[disabled]{opacity:.45;cursor:not-allowed}
+  button.form-btn{cursor:pointer}
+  header .form-btn{color:var(--shell-btn);background:var(--shell-fill)}
+  header .form-btn:hover{background:var(--shell-fill-hover);color:var(--shell-text)}
+  /* small grey buttons in rows and toolbars */
+  .rowbtn,.sk-mini{font-family:var(--sans);font-size:12px;line-height:16px;font-weight:600;letter-spacing:0;
+    padding:7px 12px;border:0;border-radius:8px;background:var(--fill);color:var(--ink);cursor:pointer;white-space:nowrap}
+  .rowbtn:hover,.sk-mini:hover{background:var(--fill-hover)}
+  .rowbtn.on{background:var(--accent);color:var(--on-accent)}
+  .rowbtn.on:hover{background:var(--accent-deep);color:var(--on-accent)}
+  .sk-mini.danger{color:var(--bad)}
+  .sk-mini.danger:hover{background:var(--bad-bg);color:var(--bad)}
+
+  /* ═══ segmented controls ═══ a recessed track, the chosen segment a raised card in it.
+     Team/Rep (on the cover, and in the hub's frame), campaigns, versions, categories. */
+  .toggle,.camp-pills{display:flex;gap:2px;border:0;border-radius:10px;background:var(--fill);padding:2px;width:max-content;max-width:100%}
+  .toggle button,.camp-pill{font-family:var(--sans);font-size:13px;line-height:18px;font-weight:500;letter-spacing:0;padding:6px 13px;border:none;background:none;
+    border-radius:8px;cursor:pointer;color:var(--ink-soft);white-space:nowrap}
+  .toggle button:hover,.camp-pill:hover{color:var(--ink)}
+  .toggle button.on,.camp-pill.on{background:var(--card-raised);color:var(--ink);font-weight:600;
+    box-shadow:0 1px 3px rgba(28,23,18,.12),0 0 0 var(--hair) rgba(28,23,18,.08)}
+  .camp-pill .tag{font-size:12px;font-weight:500;color:var(--ink-soft);margin-left:6px}
+  .camp-pill.add{color:var(--accent)}
+  .camp-pills{flex-wrap:wrap;margin:0 0 14px}
+  .camp-pills:empty{display:none}
+  /* a mentee's versions on the left, whose rating (coaches) on the right */
+  .sk-verrow{display:flex;justify-content:space-between;align-items:center;gap:10px 16px;flex-wrap:wrap;margin:0 0 14px}
+  .sk-verrow .camp-pills{margin:0}
+  /* on the dark cover the track is the cover's own fill */
+  header .toggle{background:var(--shell-fill)}
+  header .toggle button{color:var(--shell-mut)}
+  header .toggle button:hover{color:var(--shell-text)}
+  header .toggle button.on{background:var(--shell-btn);color:var(--shell);box-shadow:none}
+
+  /* ═══ fields ═══ */
+  select{font-family:var(--sans);font-size:13px;line-height:18px;font-weight:500;letter-spacing:0;padding:7px 30px 7px 12px;
+    border:1px solid transparent;border-radius:10px;color:var(--ink);cursor:pointer;-webkit-appearance:none;appearance:none;
+    background-color:var(--fill);
+    background-image:linear-gradient(45deg,transparent 50%,var(--ink-soft) 50%),linear-gradient(135deg,var(--ink-soft) 50%,transparent 50%);
+    background-position:calc(100% - 16px) 52%,calc(100% - 11px) 52%;background-size:5px 5px;background-repeat:no-repeat;
+    transition:background-color .2s var(--ease-out),border-color .2s var(--ease-out),box-shadow .2s var(--ease-out)}
+  select:hover{background-color:var(--fill-hover)}
+  select:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--focus-ring)}
+  select option{background:var(--card-raised);color:var(--ink)}
+  /* every typed field: a filled well that lights up when it has the focus */
+  .as-form select,.as-form input[type=url],.as-form textarea,.ag input,.pw-in,.sk-ren,.sk-desc{
+    font-family:var(--sans);font-size:14px;line-height:18px;border:1px solid transparent;border-radius:10px;
+    background-color:var(--fill);color:var(--ink);
+    transition:background-color .2s var(--ease-out),border-color .2s var(--ease-out),box-shadow .2s var(--ease-out)}
+  :is(.as-form select,.as-form input[type=url],.as-form textarea,.ag input,.pw-in,.sk-ren,.sk-desc):focus{
+    outline:none;background-color:var(--card-raised);border-color:var(--accent);box-shadow:0 0 0 3px var(--focus-ring)}
+  :is(.as-form input,.as-form textarea,.ag input,.pw-in,.sk-ren,.sk-desc)::placeholder{color:var(--ink-faint)}
 
   /* ═══ page title ═══ */
-  .period{padding:36px 0 6px}
-  .period .big{font-family:var(--serif);font-size:clamp(30px,4.6vw,42px);font-weight:540;letter-spacing:-.018em;line-height:1.02;margin-top:10px}
-  .period .frame{font-family:var(--monof);font-size:11px;color:var(--ink-soft);margin-top:9px;letter-spacing:.03em}
+  .period{padding:44px 0 6px}
+  .period .big{font-family:var(--serif);font-size:clamp(32px,4vw,40px);font-weight:500;letter-spacing:-.024em;line-height:1.08;margin-top:8px}
+  .period .frame{font-size:13px;color:var(--ink-soft);margin-top:10px}
   .period .frame b{color:var(--accent);font-weight:600}
 
   /* ═══ stat groups — annual-report rules, not boxes ═══ */
-  .kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:14px 24px;margin-top:26px}
-  .kpi{border-top:2px solid var(--ink);padding:11px 0 2px;background:none}
-  .kpi .lab{font-family:var(--monof);font-size:9.5px;letter-spacing:.15em;text-transform:uppercase;color:var(--ink-soft)}
-  .kpi .val{font-family:var(--serif);font-size:29px;font-weight:520;letter-spacing:-.02em;margin-top:8px;line-height:1}
-  .kpi .meta{font-size:11px;color:var(--ink-faint);margin-top:6px}
+  .kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:14px 24px;margin-top:28px}
+  .kpi,.mini,.bucket{border-top:2px solid var(--ink);padding:11px 0 2px;background:none;min-width:0}
+  .kpi .lab,.mini .lab,.bucket .lab{font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-soft)}
+  .kpi .val,.mini .val,.bucket .val{font-family:var(--sans);font-size:28px;font-weight:600;letter-spacing:-.019em;margin-top:8px;line-height:1;font-variant-numeric:tabular-nums}
+  .bucket .val{font-size:22px;letter-spacing:-.015em}
+  .kpi .meta,.mini .meta,.bucket .meta{font-size:12px;color:var(--ink-soft);margin-top:6px}
   .kpi.alert{border-top-color:var(--accent)}
   .kpi.alert .val{color:var(--accent)}
+  .mini .val.muted,.bucket .val.muted{color:var(--ink-faint)}
+  .mini .meta.await,.bucket .meta.await{color:var(--warn-ink)}
+  .kpi .val .up,.ptable td .up{color:var(--good);font-weight:600}
+  .kpi .val .down,.ptable td .down{color:var(--bad);font-weight:600}
 
   .section{margin-top:46px}
-  .section-head{display:flex;align-items:baseline;justify-content:space-between;border-bottom:2px solid var(--ink);padding-bottom:10px;margin-bottom:18px;gap:12px;flex-wrap:wrap}
-  .section-head h2{font-family:var(--serif);font-size:21px;font-weight:560;letter-spacing:-.012em}
-  .section-head .hint{font-family:var(--monof);font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-faint)}
-  select{font-family:var(--monof);font-size:11.5px;padding:7px 30px 7px 12px;border:1px solid var(--line-strong);border-radius:8px;background:var(--card) url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'><path d='M1 1l4 4 4-4' stroke='%235E5645' stroke-width='1.4' fill='none'/></svg>") no-repeat right 11px center;color:var(--ink);cursor:pointer;-webkit-appearance:none;appearance:none;transition:border-color .15s}
+  .section-head{display:flex;align-items:baseline;justify-content:space-between;border-bottom:2px solid var(--ink);padding-bottom:11px;margin-bottom:18px;gap:8px 16px;flex-wrap:wrap}
+  .section-head h2{font-family:var(--serif);font-size:22px;font-weight:600;letter-spacing:-.015em}
+  .hint{font-size:12px;color:var(--ink-soft);letter-spacing:0}
+  .section-head .hint{margin-left:auto}
+  .section-head select{margin-left:auto}
+  .section-head .hint+select{margin-left:0}
 
-  /* ═══ leaderboard ═══ */
-  .lb{background:var(--card);border:1px solid var(--line);border-radius:12px;overflow:hidden;box-shadow:0 1px 2px rgba(28,23,18,.04)}
-  .lb-row{display:grid;grid-template-columns:34px 1fr 110px 92px;align-items:center;gap:10px;padding:12px 18px;border-bottom:1px solid var(--line-soft)}
+  /* ═══ cards: surfaces separate from the paper by fill — no outline, no shadow ═══ */
+  .lb,.heat-scroll,.chart-card,.note,.call-card,.wk-card,.as-card,.as-form,.ag,.sk-bars,.sk-kc,.sk-howto,.sk-note,.sk-tc,
+  .ci-item,.call-row,.gc-row,.ctable,.ptable{background:var(--card);border:0;box-shadow:none}
+
+  /* ═══ tables (the hub's table.grid) ═══ */
+  .lb{border-radius:var(--radius);overflow:hidden}
+  .lb-row{display:grid;grid-template-columns:34px 1fr 110px 92px;align-items:center;gap:10px;padding:11px 18px;border-bottom:var(--hair) solid var(--line)}
   .lb-row:last-child{border-bottom:none}
-  .lb-row.h{font-family:var(--monof);font-size:9.5px;letter-spacing:.15em;text-transform:uppercase;color:var(--ink-soft);padding:12px 18px 9px;border-bottom:1.5px solid rgba(28,23,18,.65)}
-  .lb-rank{font-family:var(--serif);font-weight:560;font-size:15px;color:var(--ink-faint)}
+  .lb-row.h{font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-soft);padding:13px 18px 9px;border-bottom:1px solid var(--line-strong)}
+  .lb-rank{font-size:13px;font-weight:600;color:var(--ink-soft);font-variant-numeric:tabular-nums}
   .lb-rank.top{color:var(--accent)}
-  .lb-name{font-size:13px;font-weight:500}
-  .lb-name .tag{font-family:var(--monof);font-size:9px;letter-spacing:.05em;color:var(--ink-soft);margin-left:7px;border:1px solid var(--line);border-radius:5px;padding:1px 5px}
-  .lb-bar-wrap{height:6px;background:var(--line-soft);border-radius:99px;overflow:hidden}
+  .lb-name{font-size:14px;font-weight:500;min-width:0}
+  .lb-name .tag{font-size:11px;font-weight:600;color:var(--ink-soft);background:var(--fill);border-radius:999px;padding:1px 8px;margin-left:8px;white-space:nowrap}
+  .lb-bar-wrap{height:6px;background:var(--fill);border-radius:99px;overflow:hidden}
   .lb-bar{height:100%;background:var(--accent);border-radius:99px}
-  .lb-val{font-family:var(--monof);font-size:12px;font-weight:600;text-align:right;font-variant-numeric:tabular-nums}
+  .lb-val{font-size:13px;font-weight:600;text-align:right;font-variant-numeric:tabular-nums}
+  .lb-row:not(.h){transition:background .12s}
+  .lb-row:not(.h):hover{background:var(--paper-deep)}
 
-  /* check-ins */
-  .ci-lead{font-size:12.5px;color:var(--ink-soft);margin-bottom:14px}
+  .heat-scroll{overflow-x:auto;border-radius:var(--radius)}
+  .ctable,.ptable{width:100%;border-collapse:collapse;border-radius:var(--radius);overflow:hidden}
+  .heat-scroll>.ctable{border-radius:0}
+  :is(.ctable,.ptable) th{font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-soft);
+    text-align:right;padding:13px 16px 9px;border-bottom:1px solid var(--line-strong);white-space:nowrap}
+  :is(.ctable,.ptable) th:first-child,.ptable td:first-child{text-align:left}
+  :is(.ctable,.ptable) td{font-size:13px;text-align:right;padding:11px 16px;border-bottom:var(--hair) solid var(--line);font-variant-numeric:tabular-nums}
+  :is(.ctable,.ptable) tbody tr:last-child td{border-bottom:none}
+  :is(.ctable,.ptable) tbody tr{transition:background .12s}
+  :is(.ctable,.ptable) tbody tr:hover{background:var(--paper-deep)}
+  .ctable td.cn{text-align:left;color:var(--ink)}
+  .ctable td.cn .evt{font-size:11px;font-weight:600;color:var(--accent-ink);background:var(--accent-soft);border-radius:999px;padding:1px 7px;margin-left:6px}
+  .ctable tfoot td{font-weight:600;border-top:1px solid var(--line-strong);border-bottom:none}
+  .ctable tfoot td.cn{color:var(--ink)}
+  .aw{color:var(--warn-ink);font-size:12px}
+  .ptable td{padding:10px 14px}
+  .ptable th{padding:13px 14px 9px}
+  .ptable tr.wk-now td{background:var(--accent-tint)}
+
+  /* ═══ check-ins (coach) ═══ */
+  .ci-lead{font-size:13px;color:var(--ink-soft);margin-bottom:14px}
   .ci-lead b{color:var(--ink)}
   .ci-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:8px}
-  .ci-item{display:flex;align-items:center;gap:9px;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 13px;font-size:12.5px;font-weight:500}
+  .ci-item{display:flex;align-items:center;gap:9px;border-radius:10px;padding:10px 13px;font-size:13px;font-weight:500}
   .ci-item .st{width:8px;height:8px;border-radius:50%;flex:none}
   .ci-item.in .st{background:var(--good)}
   .ci-item.out .st{background:var(--bad)}
-  .ci-item.out{background:var(--bad-bg);border-color:#DFBEAC}
-  .ci-item .lab2{margin-left:auto;font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;font-weight:600;flex:none}
+  .ci-item.out{background:var(--bad-bg)}
+  .ci-item .lab2{margin-left:auto;font-size:12px;font-weight:600;flex:none}
   .ci-item.in .lab2{color:var(--good)}
   .ci-item.out .lab2{color:var(--bad)}
   .ci-main{display:flex;flex-direction:column;gap:4px;min-width:0}
   .ci-hist{display:flex;align-items:center;gap:3px}
-  .ci-hist i{width:7px;height:7px;border-radius:2px;display:block}
-  .ci-hist i.y{background:var(--good)}
-  .ci-hist i.n{background:var(--bad);opacity:.4}
-  .ci-hist i.na{background:var(--line)}
-  .ci-hist span{font-family:var(--monof);font-size:9.5px;color:var(--ink-soft);margin-left:4px;white-space:nowrap}
+  .ci-hist i{width:8px;height:8px;border-radius:2px;display:block}
+  .ci-hist i.y{background:var(--mark-call)}
+  .ci-hist i.n{background:var(--mark-missed);opacity:.45}
+  .ci-hist i.na{background:var(--fill-strong)}
+  .ci-hist span{font-size:11px;color:var(--ink-soft);margin-left:4px;white-space:nowrap}
 
-  /* heatmap */
-  .heat-legend{display:flex;gap:16px;font-family:var(--monof);font-size:10px;letter-spacing:.04em;color:var(--ink-soft);margin-bottom:14px;flex-wrap:wrap}
+  /* ═══ standards heatmap ═══ the same squares as the hub's boards */
+  .heat-legend{display:flex;gap:16px;font-size:12px;color:var(--ink-soft);margin-bottom:14px;flex-wrap:wrap}
   .heat-legend span{display:flex;align-items:center;gap:6px}
   .sw{width:12px;height:12px;border-radius:3px}
-  .sw.all{background:var(--good)}.sw.some{background:var(--warn)}.sw.miss{background:var(--bad)}.sw.none{background:var(--line-soft);border:1px solid var(--line)}
-  .heat-scroll{overflow-x:auto;border:1px solid var(--line);border-radius:12px;background:var(--card);box-shadow:0 1px 2px rgba(28,23,18,.04)}
+  .sw.all,.box.all{background:var(--mark-call)}
+  .sw.some,.box.some{background:var(--mark-open)}
+  .sw.miss,.box.miss{background:var(--mark-missed)}
+  .sw.none,.box.none{background:var(--fill-strong)}
   .heat{border-collapse:separate;border-spacing:0;width:100%;min-width:760px}
-  .heat th{font-family:var(--monof);font-size:9px;letter-spacing:.06em;color:var(--ink-soft);font-weight:500;padding:10px 0 7px;text-align:center;border-bottom:1.5px solid rgba(28,23,18,.65)}
-  .heat th.name,.heat td.name{text-align:left;padding-left:16px;white-space:nowrap;font-size:12px}
-  .heat td.name{font-weight:500}
-  .heat td.pct{font-family:var(--monof);font-size:10.5px;text-align:right;padding-right:16px;font-variant-numeric:tabular-nums;color:var(--ink-soft)}
+  .heat th{font-size:11px;font-weight:600;color:var(--ink-soft);padding:12px 0 8px;text-align:center;border-bottom:1px solid var(--line-strong);font-variant-numeric:tabular-nums}
+  .heat th.name{font-size:11px;letter-spacing:.06em;text-transform:uppercase}
+  .heat th.name,.heat td.name{text-align:left;padding-left:16px;white-space:nowrap}
+  .heat td.name{font-size:13px;font-weight:500;padding-right:12px}
+  .heat td.pct{font-size:12px;text-align:right;padding-right:16px;font-variant-numeric:tabular-nums;color:var(--ink-soft)}
   .heat th.pct{text-align:right;padding-right:16px}
-  .heat tbody tr:nth-child(even){background:var(--card-raised)}
-  .cell{width:20px;height:20px;padding:2px}
+  .heat tbody tr:nth-child(even){background:var(--band)}
+  .cell{width:20px;height:22px;padding:2px}
   .cell .box{width:100%;height:16px;border-radius:3px;margin:0 auto}
-  .box.all{background:var(--good)}.box.some{background:var(--warn)}.box.miss{background:var(--bad)}.box.none{background:var(--line-soft)}
 
-  /* channel mix */
+  /* ═══ channel mix ═══ */
   .mix{display:grid;gap:10px}
   .mix-row{display:grid;grid-template-columns:160px 1fr 120px;align-items:center;gap:14px}
-  .mix-lab{font-size:12.5px;color:var(--ink-soft)}
-  .mix-track{height:9px;background:var(--line-soft);border-radius:99px;overflow:hidden}
+  .mix-lab{font-size:13px;color:var(--ink-soft)}
+  .mix-track{height:8px;background:var(--fill);border-radius:99px;overflow:hidden}
   .mix-fill{height:100%;border-radius:99px;background:var(--accent)}
-  .mix-val{font-family:var(--monof);font-size:10.5px;text-align:right;font-weight:500;font-variant-numeric:tabular-nums}
-  .mix-val.await{color:var(--warn)}
+  .mix-val{font-size:12px;text-align:right;font-weight:600;font-variant-numeric:tabular-nums}
+  .mix-val.await{color:var(--warn-ink);font-weight:500}
 
-  .rep-pick{display:flex;align-items:center;gap:12px;margin:30px 0 4px;flex-wrap:wrap}
-  .rep-pick select{font-size:13px;padding:10px 36px 10px 14px;min-width:240px}
+  /* ═══ the mentee picker + context chips ═══ */
+  .rep-pick{display:flex;align-items:center;gap:12px;margin:32px 0 4px;flex-wrap:wrap}
+  .rep-pick select{font-size:14px;padding:9px 36px 9px 14px;min-width:240px}
   .rep-context{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
-  .chip{font-family:var(--monof);font-size:10px;letter-spacing:.04em;border:1px solid var(--line);border-radius:999px;padding:5px 12px;color:var(--ink-soft);background:var(--card)}
+  .chip{font-family:var(--sans);font-size:12px;font-weight:500;letter-spacing:0;border:0;border-radius:999px;padding:3px 10px;
+    color:var(--ink-soft);background:var(--fill);white-space:nowrap}
   .chip b{color:var(--ink);font-weight:600}
-  .chip.tier{border-color:var(--accent);color:var(--accent);background:var(--accent-soft)}
-  .chip.new{border-color:#D9C17E;color:#7A5E06;background:var(--warn-bg)}
+  .chip.tier{color:var(--accent-ink);background:var(--accent-soft)}
+  .chip.tier b{color:var(--accent-ink)}
+  .chip.new{color:var(--warn-ink);background:var(--warn-bg)}
 
-  /* rep hero — one dark anchor + ruled satellites */
+  /* ═══ rep hero ═══ one anchor in the cover's material, ruled satellites beside it.
+     The cover stays dark in both themes; in the dark it gets a hairline edge so it
+     doesn't sink into the paper. */
   .hero{display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:14px 24px;margin-top:20px;align-items:stretch}
-  .hero-big{background:linear-gradient(180deg,var(--shell-hi),var(--shell));color:var(--shell-text);border-radius:14px;padding:20px;
-    box-shadow:inset 0 1px 0 rgba(255,255,255,.07),0 14px 34px -18px rgba(18,13,7,.5)}
-  .hero-big .lab{font-family:var(--monof);font-size:9.5px;letter-spacing:.15em;text-transform:uppercase;color:var(--shell-mut)}
-  .hero-big .val{font-family:var(--serif);font-size:38px;font-weight:520;letter-spacing:-.02em;margin-top:10px;line-height:1}
-  .hero-big .meta{font-family:var(--monof);font-size:10px;color:var(--shell-mut);margin-top:9px}
-  .mini{border-top:2px solid var(--ink);padding:11px 0 2px;background:none}
-  .mini .lab{font-family:var(--monof);font-size:9.5px;letter-spacing:.15em;text-transform:uppercase;color:var(--ink-soft)}
-  .mini .val{font-family:var(--serif);font-size:26px;font-weight:520;letter-spacing:-.02em;margin-top:8px;line-height:1}
-  .mini .val.muted{color:var(--line-strong)}
-  .mini .meta{font-size:11px;color:var(--ink-faint);margin-top:5px}
-  .mini .meta.await{color:var(--warn)}
+  .hero-big,.plan-hero{background:linear-gradient(180deg,var(--shell-hi),var(--shell));color:var(--shell-text);border-radius:14px;padding:20px;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,.06),0 0 0 var(--hair) var(--shell-edge)}
+  .hero-big .lab,.plan-hero .lab{font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--shell-mut)}
+  .hero-big .val{font-family:var(--sans);font-size:40px;font-weight:600;letter-spacing:-.024em;margin-top:10px;line-height:1;font-variant-numeric:tabular-nums}
+  .hero-big .meta,.plan-hero .meta{font-size:12px;color:var(--shell-mut);margin-top:9px}
 
+  /* ═══ performance summary ═══ */
   .summary{display:grid;grid-template-columns:1fr 1fr;gap:24px}
-  .sum-col h3{font-family:var(--monof);font-size:10px;letter-spacing:.17em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:12px}
-  .sum-item{display:flex;gap:10px;align-items:flex-start;font-size:13px;margin-bottom:10px;line-height:1.5}
-  .sum-item .pip{flex:none;width:6px;height:6px;border-radius:50%;margin-top:7px}
+  .sum-col h3{font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:12px}
+  .sum-item{display:flex;gap:10px;align-items:flex-start;font-size:14px;margin-bottom:10px;line-height:1.5}
+  .sum-item .pip{flex:none;width:6px;height:6px;border-radius:50%;margin-top:8px}
   .pip.good{background:var(--good)}.pip.warn{background:var(--bad)}
-  .sum-empty{font-size:12px;color:var(--ink-faint);font-style:italic}
+  .sum-empty{font-size:13px;color:var(--ink-soft)}
 
-  .chart-card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:20px;box-shadow:0 1px 2px rgba(28,23,18,.04)}
-  .chart-legend{display:flex;gap:18px;font-family:var(--monof);font-size:10px;letter-spacing:.04em;color:var(--ink-soft);margin-bottom:8px;flex-wrap:wrap}
+  /* ═══ weekly trend ═══ */
+  .chart-card{border-radius:var(--radius);padding:20px}
+  .chart-legend{display:flex;gap:18px;font-size:12px;color:var(--ink-soft);margin-bottom:8px;flex-wrap:wrap}
   .chart-legend span{display:flex;align-items:center;gap:6px}
   .lg-line{width:16px;height:2px;background:var(--accent)}
   .lg-base{width:16px;height:0;border-top:2px dashed var(--ink-soft)}
@@ -198,337 +363,302 @@
 
   .grid5{display:grid;grid-template-columns:repeat(5,1fr);gap:14px 24px}
   .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px 24px}
-  .bucket{border-top:2px solid var(--ink);padding:11px 0 2px;background:none}
-  .bucket .lab{font-family:var(--monof);font-size:9.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--ink-soft)}
-  .bucket .val{font-family:var(--serif);font-size:23px;font-weight:520;letter-spacing:-.015em;margin-top:8px;line-height:1}
-  .bucket .val.muted{color:var(--line-strong)}
-  .bucket .meta{font-size:10.5px;color:var(--ink-faint);margin-top:6px}
-  .bucket .meta.await{color:var(--warn)}
-
-  .ctable{width:100%;border-collapse:collapse;background:var(--card);border:1px solid var(--line);border-radius:12px;overflow:hidden}
-  .ctable th{font-family:var(--monof);font-size:9.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--ink-soft);font-weight:500;text-align:right;padding:12px 16px 9px;border-bottom:1.5px solid rgba(28,23,18,.65)}
-  .ctable th:first-child{text-align:left}
-  .ctable td{font-size:13px;text-align:right;padding:11px 16px;border-bottom:1px solid var(--line-soft);font-variant-numeric:tabular-nums}
-  .ctable td.cn{text-align:left;color:var(--ink-soft)}
-  .ctable td.cn .evt{font-family:var(--monof);font-size:9px;color:var(--accent);border:1px solid var(--accent-soft);background:var(--accent-soft);border-radius:5px;padding:1px 5px;margin-left:6px}
-  .ctable tfoot td{font-weight:600;border-top:1.5px solid rgba(28,23,18,.65);border-bottom:none;background:var(--card-raised)}
-  .ctable tfoot td.cn{color:var(--ink)}
-  .aw{color:var(--warn);font-size:11px}
   .strip{display:flex;gap:4px;flex-wrap:wrap;margin-top:4px}
-  .strip .box{width:22px;height:22px;border-radius:4px;display:grid;place-items:center;font-size:9px;color:rgba(255,255,255,.85)}
+  .strip .box{width:24px;height:24px;border-radius:5px;display:grid;place-items:center;font-size:11px;font-weight:600;color:var(--on-mark);font-variant-numeric:tabular-nums}
+  .strip .box.some{color:var(--mark-open-ink)}
+  .strip .box.none{color:var(--ink-soft)}
 
-  .notes .note{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px;box-shadow:0 1px 2px rgba(28,23,18,.04)}
-  .note .wk{font-family:var(--monof);font-size:9.5px;color:var(--accent);letter-spacing:.13em;text-transform:uppercase}
-  .note .row{font-size:12.5px;margin-top:6px;color:var(--ink-soft);line-height:1.55}
+  /* ═══ notes ═══ */
+  .note{border-radius:var(--radius);padding:14px 16px}
+  .note.latest{background:color-mix(in oklab,var(--accent) 6%,var(--card))}
+  .note .wk{font-size:11px;font-weight:600;color:var(--accent);letter-spacing:.06em;text-transform:uppercase}
+  .note .row{font-size:13px;margin-top:6px;color:var(--ink-soft);line-height:1.55}
   .note .row b{color:var(--ink);font-weight:600}
 
   .hidden{display:none}
 
   /* ── embed mode: the hub's Performance tab loads this page in an iframe with
-     ?embed=1 — no masthead, no footer, no grain (the hub provides all three).
-     The Team/Rep toggle + status + form link move into a light toolbar. ── */
+     ?embed=1 — no masthead, no footer (the hub provides both). The Team/Rep
+     toggle + status + form link move into a toolbar. The page sits on the
+     hub's own paper (transparent), and its edges line up with the hub's. ── */
+  html:has(body.embed),body.embed{background:transparent}
   body.embed{padding-bottom:26px}
   body.embed header,body.embed .foot{display:none}
-  body.embed::after{display:none}
-  body.embed .period{padding-top:10px}
+  body.embed .wrap{max-width:none;padding:0}
+  body.embed .period{padding-top:20px}
   .embed-bar{display:none}
-  body.embed .embed-bar{display:flex;gap:9px;align-items:center;flex-wrap:wrap;padding:16px 0 0}
-  body.embed .embed-bar .head-right{margin-left:0;display:flex;align-items:center;gap:11px;flex-wrap:wrap;width:100%}
-  body.embed .embed-bar .status{color:var(--ink-faint);margin-left:auto;order:3}
-  body.embed .embed-bar .dot{box-shadow:none}
-  body.embed .toggle{border-color:var(--line);background:var(--paper-deep)}
-  body.embed .toggle button{color:var(--ink-soft)}
-  body.embed .toggle button:hover{color:var(--ink)}
-  body.embed .toggle button.on{background:var(--card-raised);color:var(--ink);
-    box-shadow:0 1px 3px rgba(28,23,18,.14),inset 0 0 0 1px var(--line)}
-  .foot{margin-top:60px;border-top:1px solid var(--line);padding-top:20px;font-family:var(--monof);font-size:10px;letter-spacing:.03em;color:var(--ink-faint);line-height:1.8}
-  .foot b{color:var(--ink-soft)}
-
-  /* type roles & interaction (shared) */
-  .lb-val,.ctable td,.kpi .val,.mini .val,.bucket .val,.hero-big .val{font-variant-numeric:tabular-nums}
-  .lb-row:not(.h){transition:background .12s ease}
-  .lb-row:not(.h):hover{background:var(--paper-deep)}
-  .ci-item{transition:transform .12s ease,box-shadow .12s ease}
-  .ci-item:hover{transform:translateY(-1px);box-shadow:0 6px 16px -10px rgba(28,23,18,.25)}
-  select:hover{border-color:var(--ink-faint)}
-  select:focus{border-color:var(--accent);outline:none}
+  body.embed .embed-bar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;padding:24px 0 0}
+  body.embed .embed-bar .head-right{margin-left:0;display:flex;align-items:center;gap:10px;flex-wrap:wrap;width:100%}
+  body.embed .embed-bar .status{color:var(--ink-soft);margin-left:auto;order:3}
+  .foot{margin-top:64px;border-top:var(--hair) solid var(--line-strong);padding-top:20px;font-size:12px;color:var(--ink-soft);line-height:1.7}
+  .foot b{color:var(--ink);font-weight:600}
   .foot-grid{display:flex;justify-content:space-between;gap:24px;flex-wrap:wrap;align-items:baseline}
-  .foot a{text-decoration:none;border-bottom:1px solid var(--accent-soft)}
+  .foot a{text-decoration:none}
+  .foot a:hover{text-decoration:underline}
 
-  /* ── coaching call card (rep) ── */
-  .call-card{border-radius:14px;padding:20px;border:1px solid var(--line);background:var(--card);display:flex;gap:16px;align-items:center;flex-wrap:wrap;box-shadow:0 1px 2px rgba(28,23,18,.04)}
+  /* ── coaching call card (rep) ── the state is the card's tint, not an outline */
+  .call-card{border-radius:14px;padding:20px;display:flex;gap:16px;align-items:center;flex-wrap:wrap}
   .call-card .cc-dot{width:12px;height:12px;border-radius:50%;flex:none}
-  .call-card.s-none{border-color:#DFBEAC;background:var(--bad-bg)}
+  .call-card.s-none{background:var(--bad-bg)}
   .call-card.s-none .cc-dot{background:var(--bad)}
   .call-card.s-booked .cc-dot{background:var(--ink-soft)}
-  .call-card.s-survey{border-color:#DFD0A0;background:var(--warn-bg)}
+  .call-card.s-survey{background:var(--warn-bg)}
   .call-card.s-survey .cc-dot{background:var(--warn)}
-  .call-card.s-done{border-color:#B9CFBB;background:var(--good-bg)}
+  .call-card.s-done{background:var(--good-bg)}
   .call-card.s-done .cc-dot{background:var(--good)}
   .call-card .cc-main{flex:1;min-width:220px}
-  .call-card .cc-title{font-family:var(--serif);font-size:18px;font-weight:560;letter-spacing:-.008em}
-  .call-card .cc-sub{font-size:12px;color:var(--ink-soft);margin-top:4px}
+  .call-card .lab{font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-soft)}
+  .call-card .cc-title{font-family:var(--serif);font-size:18px;font-weight:600;letter-spacing:-.011em}
+  .call-card .cc-sub{font-size:13px;color:var(--ink-soft);margin-top:4px}
   .cc-notes{margin-top:10px;display:grid;gap:8px}
-  .cc-note{font-size:12.5px;background:rgba(255,253,246,.7);border:1px solid var(--line-soft);border-radius:10px;padding:10px 12px;line-height:1.5}
-  .cc-note b{font-family:var(--monof);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft);display:block;margin-bottom:2px}
+  .cc-note{font-size:13px;background:var(--card-raised);border-radius:10px;padding:10px 12px;line-height:1.5}
+  .cc-note b{font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-soft);display:block;margin-bottom:2px}
 
   /* ═══ weekly card + assignment pills (rep page) ═══ */
-  .wk-card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px 20px;box-shadow:0 1px 2px rgba(28,23,18,.04)}
-  .wk-title{font-family:var(--serif);font-size:22px;font-weight:560;letter-spacing:-.01em;margin:6px 0 10px}
-  .wk-row{display:grid;grid-template-columns:14px minmax(0,1fr) auto;gap:12px;align-items:start;padding:11px 0;border-top:1px solid var(--line-soft)}
+  .wk-card{border-radius:14px;padding:18px 20px}
+  .wk-title{font-family:var(--serif);font-size:22px;font-weight:600;letter-spacing:-.015em;margin:6px 0 10px}
+  .wk-row{display:grid;grid-template-columns:14px minmax(0,1fr) auto;gap:12px;align-items:start;padding:12px 0;border-top:var(--hair) solid var(--line)}
   .wk-row .wd{width:9px;height:9px;border-radius:50%;margin-top:6px}
-  .wd.good{background:var(--good);box-shadow:0 0 0 3px var(--good-bg)}
-  .wd.warn{background:var(--warn);box-shadow:0 0 0 3px var(--warn-bg)}
-  .wd.bad{background:var(--bad);box-shadow:0 0 0 3px var(--bad-bg)}
-  .wd.brass{background:var(--brass);box-shadow:0 0 0 3px #EFE7D2}
-  .wk-row .wl{font-family:var(--monof);font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-soft)}
+  .wd.good{background:var(--good)}
+  .wd.warn{background:var(--warn)}
+  .wd.bad{background:var(--bad)}
+  .wd.brass{background:var(--brass)}
+  .wk-row .wl{font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-soft)}
   .wk-row .wt{font-weight:600;margin-top:2px}
-  .wk-row .ws{font-size:12.5px;color:var(--ink-soft)}
+  .wk-row .ws{font-size:13px;color:var(--ink-soft)}
   .wk-btns{display:flex;flex-direction:column;gap:8px;align-items:stretch}
-  button.form-btn{cursor:pointer}
-  .form-btn.ghost{background:transparent;color:var(--accent)}
-  .form-btn.ghost:hover{background:var(--accent-soft)}
   .al{display:flex;justify-content:space-between;gap:10px;padding:4px 0;font-size:13px;cursor:pointer}
   .al:hover{color:var(--accent)}
-  .al .ad{color:var(--ink-soft);white-space:nowrap;font-family:var(--monof);font-size:11px}
-  .pill{display:inline-block;font-family:var(--monof);font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;border-radius:999px;padding:2px 8px;margin-left:6px;font-weight:500;vertical-align:middle}
-  .pill.open{background:var(--warn-bg);color:var(--warn)}
+  .al .ad{color:var(--ink-soft);white-space:nowrap;font-size:12px}
+  /* status: sentence case, the colour of the state */
+  .pill{display:inline-block;font-size:11px;font-weight:600;letter-spacing:0;border-radius:999px;padding:1px 8px;margin-left:6px;vertical-align:1px;white-space:nowrap}
+  .pill::first-letter{text-transform:uppercase}
+  .pill.open{background:var(--warn-bg);color:var(--warn-ink)}
   .pill.late{background:var(--bad-bg);color:var(--bad)}
   .pill.waiting,.pill.revise,.pill.approved{background:var(--good-bg);color:var(--good)}
-  .pill.na{background:var(--line-soft);color:var(--ink-faint)}
-  /* group-call attendance — the hub's rolls, read-only here. Same squares as the hub's board. */
+  .pill.na{background:var(--fill);color:var(--ink-soft)}
+  /* group-call attendance — the hub's rolls, read-only here. The hub's squares. */
   .gc-sum{font-size:14px;margin-bottom:12px;line-height:1.5}
   .gc-list{display:grid;gap:6px}
-  .gc-row{display:grid;grid-template-columns:24px minmax(0,1fr) auto;gap:12px;align-items:center;padding:9px 12px;background:var(--card);border:1px solid var(--line);border-radius:10px;font-size:13px}
-  .gc-row.jump{cursor:pointer}
-  .gc-row.jump:hover{border-color:var(--ink-soft)}
-  .gc-sq{width:22px;height:22px;border-radius:6px;display:grid;place-items:center;font-family:var(--monof);font-size:11px;font-weight:600;color:#F4EEDF}
-  .gc-sq.on{background:#2E7D4F}
-  .gc-sq.drop{background:#2E7D4F;box-shadow:0 0 0 2px var(--card),0 0 0 3.5px #2E7D4F}
-  .gc-sq.miss{background:#C0392B}
-  .gc-sq.x{background:#1C1712}
+  .gc-row{display:grid;grid-template-columns:24px minmax(0,1fr) auto;gap:12px;align-items:center;padding:10px 12px;border-radius:10px;font-size:13px}
+  .gc-row.jump{cursor:pointer;transition:background-color .2s var(--ease-out)}
+  .gc-row.jump:hover{background:var(--card-raised);box-shadow:0 0 0 1px var(--line-strong);transition-duration:0s}
+  .gc-sq{width:22px;height:22px;border-radius:6px;display:grid;place-items:center;font-size:12px;font-weight:600;color:var(--on-mark)}
+  .gc-sq.on{background:var(--mark-call)}
+  .gc-sq.drop{background:var(--mark-call);box-shadow:0 0 0 2px var(--card),0 0 0 3.5px var(--mark-call)}
+  .gc-sq.miss{background:var(--mark-missed)}
+  .gc-sq.x{background:var(--mark-off);box-shadow:0 0 0 1px var(--mark-off-ring)}
   .gc-t{font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-  .gc-d{font-family:var(--monof);font-size:10.5px;color:var(--ink-soft);margin-top:2px}
+  .gc-d{font-size:12px;color:var(--ink-soft);margin-top:2px}
   .gc-p{text-align:right}
   .gc-p .pill{margin:2px 0 2px 6px}
   @media (max-width:560px){.gc-row .gc-p{grid-column:2/4;text-align:left}.gc-p .pill{margin:2px 6px 2px 0}.gc-t{white-space:normal}}
 
-  /* ═══ assignments section ═══ */
-  .as-card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px;box-shadow:0 1px 2px rgba(28,23,18,.04)}
-  .as-card.s-late{border-color:#DFBEAC}
-  .as-card.s-revise{border-color:var(--accent)}
+  /* ═══ assignments ═══ */
+  .as-card{border-radius:var(--radius);padding:14px 16px}
+  .as-card.s-late{background:color-mix(in oklab,var(--bad) 6%,var(--card))}
+  .as-card.s-revise{background:color-mix(in oklab,var(--accent) 6%,var(--card))}
   .as-head{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:flex-start}
-  .as-title{font-family:var(--serif);font-size:17px;font-weight:560;letter-spacing:-.008em}
-  .as-meta{font-family:var(--monof);font-size:10.5px;color:var(--ink-soft);margin-top:4px;display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-  .as-prog{font-family:var(--monof);font-size:9px;letter-spacing:.08em;text-transform:uppercase;border:1px solid var(--line-strong);border-radius:5px;padding:1px 6px;color:var(--ink-soft)}
+  .as-title{font-family:var(--serif);font-size:18px;font-weight:600;letter-spacing:-.011em}
+  .as-meta{font-size:12px;color:var(--ink-soft);margin-top:4px;display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+  .as-meta .pill{margin-left:0}
+  /* the program: the hub's tier chip — Dojo green · Path rust · Masters indigo */
+  .as-prog{font-size:11px;font-weight:600;letter-spacing:.01em;border:1px solid var(--line-strong);border-radius:999px;padding:0 8px;color:var(--ink-soft)}
   .as-prog.dojo{border-color:var(--good);color:var(--good)}
   .as-prog.path{border-color:var(--accent);color:var(--accent)}
-  .as-prog.masters{border-color:#6B62B8;color:#6B62B8}
+  .as-prog.masters{border-color:var(--tier3);color:var(--tier3)}
   .as-instr{font-size:13px;color:var(--ink-soft);margin-top:8px;white-space:pre-wrap;line-height:1.55}
-  .as-instr.clip{max-height:44px;overflow:hidden}
-  .as-more{font-family:var(--monof);font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--accent);background:none;border:none;cursor:pointer;padding:4px 0}
+  .as-instr.clip{max-height:40px;overflow:hidden}
+  .as-more{font-family:var(--sans);font-size:13px;font-weight:600;color:var(--accent);background:none;border:none;cursor:pointer;padding:4px 0;border-radius:6px}
+  .as-more:hover{color:var(--accent-ink)}
   .as-thread{margin-top:10px;display:grid;gap:8px}
-  .as-ver{background:rgba(255,253,246,.7);border:1px solid var(--line-soft);border-radius:10px;padding:10px 12px;font-size:12.5px;line-height:1.5}
-  .as-ver .vh{font-family:var(--monof);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:4px}
+  .as-ver{background:var(--card-raised);border-radius:10px;padding:10px 12px;font-size:13px;line-height:1.5}
+  .as-ver .vh{font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:4px}
   .as-ver .vt{white-space:pre-wrap}
-  .as-fb{margin-top:8px;border-left:3px solid var(--accent);padding:6px 10px;background:var(--accent-soft);border-radius:0 8px 8px 0}
+  .as-fb{margin-top:8px;padding:8px 10px;background:var(--accent-soft);border-radius:8px}
   .as-fb .vh{color:var(--accent-ink)}
-  .as-form{background:var(--card);border:1px solid var(--line-strong);border-radius:12px;padding:14px 16px;display:grid;gap:10px}
-  .as-form label{font-family:var(--monof);font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft);display:block}
-  .as-form label .as-msg{display:block;margin-top:5px;font-family:var(--sans);font-size:12.5px;letter-spacing:0;text-transform:none;color:var(--ink-soft)}
-  .as-form select,.as-form input[type=url],.as-form textarea{width:100%;margin-top:4px;font-family:var(--sans);font-size:13px;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:var(--paper);color:var(--ink)}
+  .as-form{border-radius:var(--radius);padding:14px 16px;display:grid;gap:10px}
+  .as-form label{font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-soft);display:block}
+  .as-form label .as-msg{display:block;margin-top:5px;font-family:var(--sans);font-size:13px;font-weight:400;letter-spacing:0;text-transform:none;color:var(--ink-soft)}
+  .as-form select,.as-form input[type=url],.as-form textarea{width:100%;margin-top:4px;padding:8px 12px}
+  .as-form select{padding-right:30px}
   .as-form textarea{min-height:110px;resize:vertical}
-  .as-msg{font-size:12.5px;color:var(--ink-soft)}
+  .as-msg{font-size:13px;color:var(--ink-soft)}
   .as-msg.err{color:var(--bad)}
   .as-msg.ok{color:var(--good)}
   .as-actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
 
   /* ── planner ── */
   .plan-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px 24px;margin-bottom:16px;align-items:stretch}
-  .plan-hero{grid-column:span 2;background:linear-gradient(180deg,var(--shell-hi),var(--shell));color:var(--shell-text);border-radius:14px;padding:16px;
-    box-shadow:inset 0 1px 0 rgba(255,255,255,.07),0 14px 34px -18px rgba(18,13,7,.5)}
-  .plan-hero .lab{font-family:var(--monof);font-size:9.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--shell-mut)}
-  .plan-hero .val{font-family:var(--serif);font-size:27px;font-weight:520;margin-top:8px;letter-spacing:-.015em}
-  .plan-hero .meta{font-family:var(--monof);font-size:10px;color:var(--shell-mut);margin-top:6px}
-  .plan-hero.ahead{background:var(--good)}
-  .plan-hero.ahead .lab,.plan-hero.ahead .meta{color:rgba(244,238,223,.75)}
-  .plan-hero.behind{background:var(--accent)}
-  .plan-hero.behind .lab,.plan-hero.behind .meta{color:rgba(255,249,241,.78)}
-  .ptable{width:100%;border-collapse:collapse;background:var(--card);border:1px solid var(--line);border-radius:12px;overflow:hidden;box-shadow:0 1px 2px rgba(28,23,18,.04)}
-  .ptable th{font-family:var(--monof);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft);font-weight:500;text-align:right;padding:11px 14px 8px;border-bottom:1.5px solid rgba(28,23,18,.65)}
-  .ptable th:first-child,.ptable td:first-child{text-align:left}
-  .ptable td{font-size:12.5px;text-align:right;padding:10px 14px;border-bottom:1px solid var(--line-soft);font-variant-numeric:tabular-nums}
-  .ptable tbody tr:last-child td{border-bottom:none}
-  .ptable td .up{color:var(--good);font-weight:600}
-  .ptable td .down{color:var(--bad);font-weight:600}
-  .ptable .rowbtn,.sk-tools .rowbtn{font-family:var(--monof);font-size:10px;letter-spacing:.05em;text-transform:uppercase;border:1px solid var(--line-strong);background:none;border-radius:7px;padding:3px 9px;cursor:pointer;color:var(--ink-soft);transition:border-color .15s,color .15s}
-  .ptable .rowbtn:hover,.sk-tools .rowbtn:hover{border-color:var(--accent);color:var(--accent)}
-  .camp-pills{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 14px}
-  .camp-pill{font-family:var(--monof);font-size:10px;letter-spacing:.04em;border:1px solid var(--line-strong);background:var(--card);
-    border-radius:999px;padding:4px 12px;cursor:pointer;color:var(--ink-soft);transition:border-color .15s,color .15s}
-  .camp-pill:hover{border-color:var(--accent);color:var(--accent)}
-  .camp-pill.on{background:var(--ink);color:var(--paper);border-color:var(--ink)}
-  .camp-pill .tag{opacity:.6;margin-left:5px;font-size:8px;text-transform:uppercase;letter-spacing:.08em}
-  .plan-empty{font-size:12.5px;color:var(--ink-faint);background:var(--card);border:1px dashed var(--line-strong);border-radius:12px;padding:20px;text-align:center}
+  .plan-hero{grid-column:span 2;padding:16px}
+  .plan-hero .val{font-family:var(--sans);font-size:28px;font-weight:600;margin-top:8px;letter-spacing:-.019em;font-variant-numeric:tabular-nums}
+  /* ahead / behind: the plate takes the state's colour, its text the colour that sits on it */
+  .plan-hero.ahead{background:var(--good);color:var(--on-accent);box-shadow:none}
+  .plan-hero.behind{background:var(--accent);color:var(--on-accent);box-shadow:none}
+  .plan-hero:is(.ahead,.behind) :is(.lab,.meta){color:color-mix(in oklab,var(--on-accent) 76%,transparent)}
+  .camp-pills+.plan-empty,.plan-empty{font-size:13px;color:var(--ink-soft);text-align:center;padding:24px 20px;line-height:1.5}
 
-  /* ═══ skillset tracker ═══
-     The rep view carries two boards now, so it needs its own tab strip. It sits
-     on the paper (the masthead toggle is on the dark shell) and reads as a pair
-     of file tabs rather than buttons. */
-  .subtabs{display:flex;gap:4px;margin:24px 0 0;border-bottom:2px solid var(--ink);padding:0 0 0 2px}
-  .subtabs button{font-family:var(--monof);font-size:11px;letter-spacing:.11em;text-transform:uppercase;
-    border:1px solid transparent;border-bottom:none;background:none;border-radius:9px 9px 0 0;
-    padding:10px 20px 9px;cursor:pointer;color:var(--ink-faint);transition:color .15s,background .15s;
-    position:relative;top:2px}
-  .subtabs button:hover{color:var(--ink-soft)}
-  .subtabs button.on{background:var(--card-raised);border-color:var(--line);color:var(--ink);font-weight:600;
-    box-shadow:0 -1px 2px rgba(28,23,18,.04)}
-  .subtabs button .tcount{font-size:9px;letter-spacing:.06em;color:var(--ink-faint);margin-left:7px;font-weight:400}
-  .subtabs button.on .tcount{color:var(--accent)}
+  /* ═══ the two boards per mentee: Performance · Skillset ═══
+     Tabs like the hub's: the label, and one underline for the row that slides from
+     the tab you were on to the one you picked (placeSubInk). */
+  .subtabs{display:flex;gap:0;margin:20px 0 0;border-bottom:var(--hair) solid var(--line-strong);position:relative;overflow-x:auto;scrollbar-width:none}
+  .subtabs::-webkit-scrollbar{display:none}
+  .subtabs button{font-family:var(--serif);font-size:16px;font-weight:500;letter-spacing:0;
+    padding:12px 2px 11px;margin-right:30px;border:none;background:none;cursor:pointer;color:var(--ink-soft);
+    white-space:nowrap;display:flex;align-items:baseline;gap:8px;position:relative;transition:color .18s}
+  .subtabs button:hover{color:var(--ink)}
+  .subtabs button.on{color:var(--ink);font-weight:600}
+  .subtabs .tl{display:inline-flex;flex-direction:column}
+  .subtabs .tl::after{content:attr(data-label);font-weight:600;height:0;visibility:hidden;overflow:hidden;user-select:none}
+  .subtabs button .tcount{font-family:var(--sans);font-size:12px;font-weight:500;letter-spacing:0;color:var(--ink-soft)}
+  .sub-ink{position:absolute;left:0;bottom:0;width:0;height:3px;border-radius:3px 3px 0 0;background:var(--accent);opacity:0;pointer-events:none;
+    transition:transform var(--spring-dur) var(--spring),width var(--spring-dur) var(--spring),opacity .2s var(--ease-out)}
+  .sub-ink.jump{transition:none}
 
+  /* ═══ skillset tracker ═══ */
   /* the four-up summary above the ratings */
   .sk-top{display:grid;grid-template-columns:repeat(4,1fr);gap:14px 24px;margin:22px 0 4px}
-  .sk-top .kpi .val small{font-family:var(--sans);font-size:13px;font-weight:500;color:var(--ink-faint);letter-spacing:0}
-  .sk-top .kpi .val .nm{font-family:var(--sans);font-size:15px;font-weight:600;letter-spacing:-.01em;line-height:1.25;display:block}
+  .sk-top .kpi .val small,.kpi .val small.u{font-family:var(--sans);font-size:13px;font-weight:500;color:var(--ink-soft);letter-spacing:0}
+  .sk-top .kpi .val .nm{font-family:var(--sans);font-size:16px;font-weight:600;letter-spacing:-.005em;line-height:1.25;display:block}
 
   /* category bars — the whole skillset in six lines */
-  .sk-bars{display:grid;gap:9px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 18px}
-  .sk-bar{display:grid;grid-template-columns:132px 1fr 124px;align-items:center;gap:12px;cursor:pointer}
-  .sk-bar:hover .sk-bl{color:var(--accent)}
+  .sk-bars{display:grid;gap:9px;border-radius:var(--radius);padding:16px 18px}
+  .sk-bar{display:grid;grid-template-columns:132px 1fr 124px;align-items:center;gap:12px;cursor:pointer;border-radius:6px}
+  .sk-bar:hover .sk-bl{color:var(--accent);transition-duration:0s}
   .sk-bar.on .sk-bl{color:var(--accent);font-weight:600}
   .sk-bars.wide .sk-bar{grid-template-columns:190px 1fr 172px;cursor:default}
-  .sk-bl{font-family:var(--monof);font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-soft);
-    transition:color .15s;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-  .sk-btrack{height:8px;background:var(--paper-deep);border-radius:999px;overflow:hidden}
-  .sk-bfill{height:100%;border-radius:999px;transition:width .5s cubic-bezier(.2,.7,.3,1)}
-  .sk-bv{font-family:var(--monof);font-size:11px;text-align:right;font-variant-numeric:tabular-nums;color:var(--ink)}
-  .sk-bv .un{color:var(--ink-faint)}
-  .sk-bv .d{font-size:9.5px;margin-left:5px}
+  .sk-bars.wide .sk-bar:hover .sk-bl{color:var(--ink-soft)}
+  .sk-bl{font-size:13px;font-weight:500;color:var(--ink-soft);
+    transition:color .2s var(--ease-out);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .sk-btrack{height:8px;background:var(--fill);border-radius:999px;overflow:hidden}
+  .sk-bfill{height:100%;border-radius:999px;transition:width .5s var(--ease-out)}
+  .sk-bv{font-size:12px;font-weight:600;text-align:right;font-variant-numeric:tabular-nums;color:var(--ink)}
+  .sk-bv .un{color:var(--ink-soft);font-weight:500}
+  .sk-bv .d{font-size:11px;margin-left:5px}
   .sk-bv .d.up{color:var(--good)} .sk-bv .d.down{color:var(--bad)}
 
   /* the rating list */
-  .sk-grp{margin-top:22px}
+  .sk-grp{margin-top:24px}
   .sk-ghead{display:flex;align-items:baseline;justify-content:space-between;gap:10px;flex-wrap:wrap;
     border-bottom:1px solid var(--line-strong);padding-bottom:7px;margin-bottom:2px}
-  .sk-gname{font-family:var(--serif);font-size:15px;font-weight:600;letter-spacing:-.01em}
-  .sk-gavg{font-family:var(--monof);font-size:10px;letter-spacing:.06em;color:var(--ink-faint);font-variant-numeric:tabular-nums}
+  .sk-gname{font-family:var(--serif);font-size:16px;font-weight:600;letter-spacing:-.005em}
+  .sk-gavg{font-size:12px;color:var(--ink-soft);font-variant-numeric:tabular-nums}
   .sk-row{display:grid;grid-template-columns:1fr auto;align-items:center;gap:10px 16px;
-    padding:9px 2px;border-bottom:1px solid var(--line-soft)}
+    padding:9px 2px;border-bottom:var(--hair) solid var(--line)}
   .sk-row:last-child{border-bottom:none}
-  .sk-row.focus{background:linear-gradient(90deg,var(--accent-soft),transparent 60%);
-    box-shadow:inset 3px 0 0 var(--accent);padding-left:11px;border-radius:3px}
-  .sk-nm{font-size:13px;line-height:1.35;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-  .sk-star{border:none;background:none;cursor:pointer;font-size:12px;line-height:1;padding:2px 3px;
-    color:var(--ink-faint);opacity:0;transition:opacity .15s,color .15s}
-  .sk-row:hover .sk-star,.sk-star.on{opacity:1}
+  /* a focus skill: a tinted row and its rank — no coloured rule down its side */
+  .sk-row.focus{background:var(--accent-tint);padding-left:10px;padding-right:8px;border-radius:8px;border-bottom-color:transparent;margin:2px 0}
+  .sk-row.focus:not(.top){background:var(--band)}
+  .sk-nm{font-size:14px;line-height:1.35;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .sk-star{border:none;background:none;cursor:pointer;font-size:14px;line-height:1;padding:2px 3px;border-radius:5px;
+    color:var(--ink-faint);opacity:0;transition:opacity .2s var(--ease-out),color .2s var(--ease-out)}
+  .sk-row:hover .sk-star,.sk-star:focus-visible,.sk-star.on{opacity:1;transition-duration:0s}
   .sk-star.on{color:var(--accent)}
   .sk-star:hover{color:var(--accent)}
-  .sk-gap{font-family:var(--monof);font-size:8.5px;letter-spacing:.07em;text-transform:uppercase;
-    border:1px solid var(--bad);color:var(--bad);background:var(--bad-bg);border-radius:5px;padding:1px 5px}
-  .sk-coachv{font-family:var(--monof);font-size:9px;letter-spacing:.06em;text-transform:uppercase;
-    border:1px solid var(--line);color:var(--ink-soft);background:var(--card);border-radius:5px;padding:1px 6px}
+  @media (hover:none){.sk-star{opacity:1;color:var(--ink-soft)}}      /* no hover on a phone, so the star is always there to tap */
+  /* the small labels beside a skill: sentence case, 11px */
+  .sk-gap,.sk-coachv,.sk-lvl,.sk-rank,.sk-d{font-size:11px;font-weight:600;letter-spacing:0;border-radius:999px;padding:1px 8px;white-space:nowrap;line-height:16px}
+  .sk-gap{color:var(--bad);background:var(--bad-bg)}
+  .sk-coachv{color:var(--ink-soft);background:var(--fill);font-weight:500}
   .sk-coachv b{color:var(--ink);font-weight:600}
 
   /* 1–10. Ten taps is the whole interaction, so they are real buttons, big
      enough for a thumb, and they read as one continuous ruler. */
   .sk-scale{display:flex;gap:3px}
-  .sk-scale button{font-family:var(--monof);font-size:11px;width:27px;height:27px;padding:0;
-    border:1px solid var(--line);background:var(--card);border-radius:6px;cursor:pointer;color:var(--ink-faint);
-    font-variant-numeric:tabular-nums;transition:border-color .12s,background .12s,color .12s}
-  .sk-scale button:hover{border-color:var(--ink-soft);color:var(--ink)}
-  .sk-scale button.on{color:#FFF9F1;font-weight:600;border-color:transparent}
-  .sk-scale button.lo.on{background:#A33512}
-  .sk-scale button.mid.on{background:#96760A}
-  .sk-scale button.hi.on{background:#3D6B4F}
-  .sk-scale button.top.on{background:#1C1712}
+  .sk-scale button{font-family:var(--sans);font-size:13px;font-weight:500;width:30px;height:30px;padding:0;position:relative;
+    border:0;background:var(--fill);border-radius:7px;cursor:pointer;color:var(--ink-soft);font-variant-numeric:tabular-nums}
+  .sk-scale button:hover{background:var(--fill-hover);color:var(--ink)}
+  .sk-scale button.on{color:var(--on-accent);font-weight:700}
+  .sk-scale button.on:hover{color:var(--on-accent)}
+  .sk-scale button.lo.on{background:var(--accent)}
+  .sk-scale button.mid.on{background:var(--warn)}
+  .sk-scale button.hi.on{background:var(--good)}
+  .sk-scale button.top.on{background:var(--ink);color:var(--paper)}
   .sk-scale.ro button{cursor:default}
-  .sk-scale.ro button:hover{border-color:var(--line);color:var(--ink-faint)}
+  .sk-scale.ro button:not(.on):hover{background:var(--fill);color:var(--ink-soft)}
+  .sk-scale.ro button:active{transform:none}
   .sk-scale.coach button.on{box-shadow:inset 0 0 0 2px var(--card),inset 0 0 0 3px currentColor}
 
-  /* The key: what a 1–10 means. It was one 9.5px line and nobody could rate
-     against it, so now it is four cards you can read from across the table —
-     the range, what that level is called, and what it looks like (Alan,
-     2026-10-06). The how-to folds away under it once a rep has started. */
+  /* The key: what a 1–10 means — four cards you can read from across the table
+     (Alan, 2026-10-06). The range wears its level's colour; the card is plain. */
   .sk-key{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:16px 0 0}
-  .sk-kc{background:var(--card);border:1px solid var(--line);border-top:4px solid var(--band,var(--line-strong));
-    border-radius:10px;padding:12px 14px 13px}
-  .sk-kc .r{font-family:var(--serif);font-size:23px;font-weight:600;letter-spacing:-.01em;line-height:1;color:var(--band,var(--ink))}
-  .sk-kc .n{font-size:14px;font-weight:600;letter-spacing:-.005em;line-height:1.3;margin-top:7px}
+  .sk-kc{border-radius:var(--radius);padding:13px 15px 14px}
+  .sk-kc .r{font-family:var(--serif);font-size:22px;font-weight:600;letter-spacing:-.015em;line-height:1;color:var(--tone,var(--ink))}
+  .sk-kc .n{font-size:14px;font-weight:600;letter-spacing:-.005em;line-height:1.3;margin-top:8px}
   .sk-kc .d{font-size:13px;line-height:1.5;color:var(--ink-soft);margin-top:4px}
-  .sk-howto{margin:10px 0 0;background:var(--card);border:1px solid var(--line);border-radius:10px}
+  .sk-howto{margin:10px 0 0;border-radius:var(--radius)}
   .sk-howto-t{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;
     font-family:var(--sans);font-size:14px;font-weight:600;color:var(--ink);background:none;border:none;
-    padding:11px 14px;cursor:pointer;text-align:left}
-  .sk-howto-t .chev{font-family:var(--monof);font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;
-    color:var(--ink-faint);font-weight:400;white-space:nowrap}
-  .sk-howto-t:hover .chev{color:var(--accent)}
-  .sk-howto ol{margin:0;padding:0 18px 14px 36px;font-size:13.5px;line-height:1.6;color:var(--ink-soft)}
+    padding:12px 15px;cursor:pointer;text-align:left;border-radius:var(--radius)}
+  .sk-howto-t .chev{font-size:13px;font-weight:600;color:var(--accent);white-space:nowrap}
+  .sk-howto-t .chev::first-letter{text-transform:uppercase}
+  .sk-howto-t:hover .chev{color:var(--accent-ink)}
+  .sk-howto ol{margin:0;padding:0 18px 14px 36px;font-size:14px;line-height:1.6;color:var(--ink-soft)}
   .sk-howto li{margin-top:5px;padding-left:2px}
-  .sk-howto li::marker{font-family:var(--monof);font-size:11px;color:var(--accent);font-weight:600}
+  .sk-howto li::marker{font-size:12px;color:var(--accent);font-weight:600}
   /* what a section is, in a line, so "Selling Ultimates" means something to a
      rep in their first month */
   .sk-gdesc{font-size:13px;line-height:1.55;color:var(--ink-soft);margin:7px 0 5px;max-width:78ch}
-  .sk-starhint{font-family:var(--monof);font-size:9.5px;letter-spacing:.06em;text-transform:uppercase;
-    color:var(--ink-faint);text-align:right;margin:9px 2px 0}
-  .sk-desc{display:block;width:100%;max-width:760px;margin:8px 0 6px;font-family:var(--sans);font-size:13px;
-    line-height:1.5;padding:7px 10px;border:1px solid var(--line-strong);border-radius:7px;
-    background:var(--card-raised);color:var(--ink);resize:vertical;min-height:58px}
-  .sk-desc:focus{outline:none;border-color:var(--accent)}
+  .sk-starhint{font-size:12px;color:var(--ink-soft);text-align:right;margin:9px 2px 0}
+  .sk-desc{display:block;width:100%;max-width:760px;margin:8px 0 6px;font-size:13px;line-height:1.5;padding:8px 12px;resize:vertical;min-height:58px}
   /* the level a rating sits in, said in words beside the skill */
-  .sk-lvl{font-family:var(--monof);font-size:9px;letter-spacing:.06em;text-transform:uppercase;
-    border:1px solid currentColor;border-radius:5px;padding:1px 6px;white-space:nowrap}
-  .sk-lvl.lo{color:#A33512} .sk-lvl.mid{color:#7F6408} .sk-lvl.hi{color:#3D6B4F} .sk-lvl.top{color:#1C1712}
+  .sk-lvl{background:var(--fill)}
+  .sk-lvl.lo{color:var(--accent-ink);background:var(--accent-soft)}
+  .sk-lvl.mid{color:var(--warn-ink);background:var(--warn-bg)}
+  .sk-lvl.hi{color:var(--good);background:var(--good-bg)}
+  .sk-lvl.top{color:var(--ink);background:var(--fill-strong)}
 
-  .sk-note{font-size:12.5px;color:var(--ink-soft);background:var(--card);border:1px solid var(--line);
-    border-left:3px solid var(--brass);border-radius:10px;padding:13px 16px;line-height:1.65;margin:16px 0 0}
+  .sk-note{font-size:13px;color:var(--ink-soft);border-radius:var(--radius);padding:13px 16px;line-height:1.65;margin:16px 0 0}
   .sk-note b{color:var(--ink)}
   .sk-note .sk-mini{margin-left:6px;vertical-align:1px}
-  .sk-note.fix{border-left-color:var(--accent);background:var(--accent-soft);color:var(--accent-ink)}
+  .sk-note.fix{background:var(--accent-soft);color:var(--accent-ink)}
   .sk-note.fix b{color:var(--accent-ink)}
+  .sk-note .mono{font-size:12px;background:var(--fill);border-radius:5px;padding:0 5px}
 
   /* ═══ the Save bar ═══
      Ratings used to save themselves behind a 9.5px "saved ✓" in the heading,
-     which had scrolled out of sight by the second skill, so nobody knew
-     whether a board was kept (Alan, 2026-10-06). Now there is a Save button
-     pinned to the bottom of the screen for as long as the skillset is up, and
-     it only says Saved once the sheet has answered with the same numbers. */
-  .sk-savebar{position:fixed;left:0;right:0;bottom:0;z-index:40;background:var(--shell);color:var(--shell-text);
-    border-top:1px solid rgba(142,121,66,.5);box-shadow:0 -12px 26px -16px rgba(18,13,7,.6);
-    padding:10px 26px calc(10px + env(safe-area-inset-bottom))}
-  .sk-savebar .in{max-width:1088px;margin:0 auto;display:flex;align-items:center;gap:10px}
+     which had scrolled out of sight by the second skill (Alan, 2026-10-06). Now
+     there is a Save button pinned to the bottom of the screen for as long as the
+     skillset is up, and it only says Saved once the sheet has answered with the
+     same numbers. It is the cover's material — dark in both themes, the page
+     blurred under it, a hairline at its edge — and Save is the one lit button. */
+  .sk-savebar{position:fixed;left:0;right:0;bottom:0;z-index:40;color:var(--shell-text);
+    background:color-mix(in oklab,var(--shell) 92%,transparent);
+    -webkit-backdrop-filter:saturate(1.6) blur(20px);backdrop-filter:saturate(1.6) blur(20px);
+    border-top:var(--hair) solid var(--shell-edge);
+    padding:10px 28px calc(10px + env(safe-area-inset-bottom))}
+  .sk-savebar .in{max-width:1164px;margin:0 auto;display:flex;align-items:center;gap:10px}
   .sk-savebar .msg{flex:1;min-width:0;font-size:14px;line-height:1.35}
   .sk-savebar .msg b{font-weight:600}
-  .sk-savebar .msg small{display:block;font-family:var(--monof);font-size:9.5px;letter-spacing:.07em;
-    text-transform:uppercase;color:var(--shell-mut);margin-top:2px}
-  .sk-savebar button{font-family:var(--monof);font-size:11.5px;font-weight:600;letter-spacing:.09em;
-    text-transform:uppercase;border-radius:9px;padding:0 22px;min-height:42px;cursor:pointer;white-space:nowrap;
-    border:1px solid var(--accent);background:var(--accent);color:#FFF9F1;transition:background .15s,border-color .15s}
-  .sk-savebar button:hover{background:var(--accent-deep);border-color:var(--accent-deep)}
-  .sk-savebar button.ghost{background:transparent;border-color:rgba(244,238,223,.35);color:var(--shell-text)}
-  .sk-savebar button.ghost:hover{border-color:var(--shell-text);background:transparent}
-  .sk-savebar button:disabled{background:transparent;border-color:rgba(244,238,223,.22);color:var(--shell-dim);cursor:default}
-  .sk-savebar.dirty{border-top:2px solid var(--accent)}
-  .sk-savebar.ok .msg b{color:#BFDCC4}
-  .sk-savebar.err{border-top:2px solid #E0704A}
-  .sk-savebar.err .msg b{color:#F3B9A2}
+  .sk-savebar .msg small{display:block;font-size:12px;color:var(--shell-mut);margin-top:2px}
+  .sk-savebar button{font-family:var(--sans);font-size:13px;line-height:18px;font-weight:600;letter-spacing:0;
+    border:0;border-radius:10px;padding:0 20px;min-height:40px;cursor:pointer;white-space:nowrap;
+    background:var(--accent);color:var(--on-accent)}
+  .sk-savebar button:hover{background:var(--accent-deep)}
+  .sk-savebar button.ghost{background:var(--shell-fill);color:var(--shell-btn)}
+  .sk-savebar button.ghost:hover{background:var(--shell-fill-hover);color:var(--shell-text)}
+  .sk-savebar button:disabled{background:var(--shell-fill);color:var(--shell-dim);cursor:default}
+  /* the cover is dark in both themes, so its state colours are fixed light tints */
+  .sk-savebar.ok .msg b{color:var(--dot-ok)}
+  .sk-savebar.err .msg b{color:color-mix(in oklab,var(--mark-missed) 50%,var(--shell-text))}
+  .sk-savebar.dirty .msg b{color:var(--shell-text)}
   body.sk-bar-on{padding-bottom:160px}
   /* Inside the hub the page is one tall frame that never scrolls, so "fixed"
      would pin the bar to the foot of 137 skills. There it floats instead, and
      skBarPlace() keeps it at the bottom of what the hub is showing. If the
      hub's scroll can't be read it sits above the board, in the flow. */
-  body.embed .sk-savebar{position:absolute;bottom:auto;left:26px;right:26px;border:1px solid rgba(142,121,66,.5);
-    border-radius:12px;padding:10px 16px;box-shadow:0 14px 30px -14px rgba(18,13,7,.6)}
+  body.embed .sk-savebar{position:absolute;bottom:auto;left:0;right:0;border:0;
+    border-radius:14px;padding:10px 12px 10px 18px;box-shadow:var(--elev-2)}
   body.embed .sk-savebar.inflow{position:static;margin:18px 0 0}
   body.embed.sk-bar-on{padding-bottom:96px}
 
   /* coach's team board */
   .sk-team{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px}
-  .sk-tc{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:13px 15px;cursor:pointer;
-    transition:border-color .15s,transform .15s}
-  .sk-tc:hover{border-color:var(--accent);transform:translateY(-1px)}
-  .sk-tc .n{font-size:13.5px;font-weight:600;letter-spacing:-.01em}
-  .sk-tc .m{font-family:var(--monof);font-size:9.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-faint);margin-top:5px}
-  .sk-tc .s{font-family:var(--serif);font-size:23px;font-weight:560;margin-top:7px;line-height:1}
+  .sk-tc{border-radius:var(--radius);padding:13px 15px;cursor:pointer;transition:background-color .2s var(--ease-out),box-shadow .2s var(--ease-out)}
+  .sk-tc:hover{background:var(--card-raised);box-shadow:0 0 0 1px var(--line-strong);transition-duration:0s}
+  .sk-tc .n{font-size:14px;font-weight:600;letter-spacing:-.005em}
+  .sk-tc .m{font-size:12px;color:var(--ink-soft);margin-top:5px}
+  .sk-tc .s{font-family:var(--sans);font-size:22px;font-weight:600;margin-top:7px;line-height:1;font-variant-numeric:tabular-nums}
   .sk-tc.none .s{color:var(--ink-faint)}
 
   @media(max-width:860px){
@@ -538,81 +668,61 @@
     .sk-bars.wide .sk-bar{grid-template-columns:130px 1fr 150px}
   }
   @media(max-width:620px){
-    .subtabs button{padding:9px 13px;font-size:10px;letter-spacing:.07em}
+    .subtabs button{font-size:16px;margin-right:24px}
     .sk-row{grid-template-columns:1fr}
-    .sk-scale{gap:2px;justify-content:space-between}
-    .sk-scale button{width:100%;max-width:34px;height:31px}
-    .sk-bar,.sk-bars.wide .sk-bar{grid-template-columns:1fr;gap:4px}
-    .sk-bv{text-align:left}
+    .sk-scale{gap:3px;justify-content:space-between}
+    .sk-scale button{width:100%;max-width:36px;height:34px}
+    .sk-bar,.sk-bars.wide .sk-bar{grid-template-columns:1fr auto;gap:4px 10px}
+    .sk-bar .sk-btrack{grid-column:1 / -1;grid-row:2}
+    .sk-bv{text-align:right}
     /* the key on a phone: one card per line, the range beside the words */
     .sk-key{grid-template-columns:1fr;gap:7px}
-    .sk-kc{display:grid;grid-template-columns:54px 1fr;column-gap:10px;border-top:1px solid var(--line);
-      border-left:4px solid var(--band,var(--line-strong));padding:10px 12px}
-    .sk-kc .r{grid-row:1 / span 2;font-size:20px;align-self:center}
+    .sk-kc{display:grid;grid-template-columns:54px 1fr;column-gap:10px;padding:11px 13px}
+    .sk-kc .r{grid-row:1 / span 2;font-size:18px;align-self:center}
     .sk-kc .n{margin-top:0}
     .sk-kc .d{margin-top:2px}
-    .sk-savebar{padding-left:14px;padding-right:14px}
+    .sk-savebar{padding-left:16px;padding-right:16px}
     .sk-savebar button{padding:0 16px}
-    .sk-savebar .msg{font-size:13.5px}
-    body.embed .sk-savebar{left:14px;right:14px}
+    .sk-savebar .msg{font-size:13px}
+    body.embed .sk-savebar{left:0;right:0}
   }
 
   /* ═══ skillset: versions, ranked focus, sorting, the catalog editor ═══ */
-  .mono{font-family:var(--monof);font-size:11px}
-  .sk-note.shut{border-left-color:var(--ink-faint);color:var(--ink-faint)}
-  .sk-foot{margin-top:26px;font-family:var(--monof);font-size:9.5px;letter-spacing:.06em;
-    text-transform:uppercase;color:var(--ink-faint)}
-  .kpi .val small.u{font-family:var(--sans);font-size:13px;color:var(--ink-faint);font-weight:500;letter-spacing:0}
+  .sk-note.shut{color:var(--ink-soft)}
+  .sk-foot{margin-top:26px;font-size:12px;color:var(--ink-soft)}
 
   /* the strip over the ratings: which category, how it's sorted, the editor */
-  .sk-toolbar{display:flex;align-items:center;justify-content:space-between;gap:14px;
+  .sk-toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px 14px;
     flex-wrap:wrap;margin:32px 0 6px}
   .sk-tools{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-  .sk-tools select{font-size:11px;padding:6px 28px 6px 11px}
-  .sk-tools .rowbtn{padding:6px 11px}
-  .rowbtn.on{border-color:var(--accent);color:var(--accent);background:var(--accent-soft)}
-  .camp-pill.add{border-style:dashed;color:var(--ink-faint)}
 
-  /* focus is ranked now — #1 to #5, and the top three carry the weight */
-  .sk-rank{font-family:var(--monof);font-size:9px;letter-spacing:.06em;border-radius:5px;padding:1px 6px;
-    border:1px solid var(--line-strong);color:var(--ink-soft);background:var(--card)}
-  .sk-rank.top{border-color:var(--accent);color:#FFF9F1;background:var(--accent);font-weight:600}
-  .sk-row.focus.top{box-shadow:inset 3px 0 0 var(--accent)}
-  .sk-row.focus:not(.top){background:linear-gradient(90deg,rgba(241,223,210,.45),transparent 60%);
-    box-shadow:inset 3px 0 0 var(--line-strong)}
+  /* focus is ranked — #1 to #5, and the top three carry the weight */
+  .sk-rank{color:var(--ink-soft);background:var(--fill);font-variant-numeric:tabular-nums}
+  .sk-rank.top{color:var(--on-accent);background:var(--accent)}
   .sk-mv{display:inline-flex;gap:2px;margin-left:2px}
-  .sk-mv button{font-size:10px;line-height:1;padding:2px 5px;border:1px solid var(--line);
-    background:var(--card);border-radius:5px;cursor:pointer;color:var(--ink-soft)}
-  .sk-mv button:hover{border-color:var(--accent);color:var(--accent)}
+  .sk-mv button{font-size:12px;line-height:1;padding:4px 7px;border:0;position:relative;
+    background:var(--fill);border-radius:6px;cursor:pointer;color:var(--ink-soft)}
+  .sk-mv button:hover{background:var(--fill-hover);color:var(--ink)}
 
   /* a sorted list dissolves its blocks, so each row says where it came from */
-  .sk-sub{display:block;font-family:var(--monof);font-size:9px;letter-spacing:.06em;
-    text-transform:uppercase;color:var(--ink-faint);margin-top:3px}
-  .sk-d{font-family:var(--monof);font-size:9px;letter-spacing:.04em;border-radius:5px;padding:1px 5px;
-    border:1px solid currentColor}
+  .sk-sub{display:block;font-size:12px;color:var(--ink-soft);margin-top:2px}
+  .sk-d{background:none;padding:1px 4px}
   .sk-d.up{color:var(--good)} .sk-d.down{color:var(--bad)}
 
   /* catalog editor */
   .sk-cathead{display:flex;align-items:center;gap:10px;margin:26px 0 4px}
-  .sk-ren{font-family:var(--sans);font-size:13px;padding:6px 10px;border:1px solid var(--line-strong);
-    border-radius:7px;background:var(--card-raised);color:var(--ink);min-width:200px;flex:1;max-width:420px}
-  .sk-ren.big{font-family:var(--serif);font-size:17px;font-weight:600}
-  .sk-ren:focus{outline:none;border-color:var(--accent)}
-  .sk-mini{font-family:var(--monof);font-size:9.5px;letter-spacing:.06em;text-transform:uppercase;
-    border:1px solid var(--line-strong);background:none;border-radius:6px;padding:4px 9px;cursor:pointer;
-    color:var(--ink-soft);white-space:nowrap}
-  .sk-mini:hover{border-color:var(--accent);color:var(--accent)}
-  .sk-mini.danger:hover{border-color:var(--bad);color:var(--bad)}
+  .sk-ren{padding:7px 12px;min-width:200px;flex:1;max-width:420px}
+  .sk-ren.big{font-family:var(--serif);font-size:18px;font-weight:600}
   .sk-row.ed{grid-template-columns:1fr}
   .sk-row.ed .sk-nm{gap:10px}
   .sk-row.arch{opacity:.5}
 
   /* team cards carry their movement and their top focus */
   .sk-tc .s{display:flex;align-items:baseline;gap:8px}
-  .sk-tc .s .dd{font-family:var(--monof);font-size:10px;font-weight:500}
+  .sk-tc .s .dd{font-size:12px;font-weight:600}
   .sk-tc .s .dd.up{color:var(--good)} .sk-tc .s .dd.down{color:var(--bad)}
-  .sk-tc .f{margin-top:8px;display:grid;gap:2px;border-top:1px solid var(--line-soft);padding-top:7px}
-  .sk-tc .f span{font-size:11px;color:var(--ink-soft);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .sk-tc .f{margin-top:8px;display:grid;gap:2px;border-top:var(--hair) solid var(--line);padding-top:7px}
+  .sk-tc .f span{font-size:12px;color:var(--ink-soft);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 
   @media(max-width:620px){
     .sk-toolbar{align-items:stretch}
@@ -622,66 +732,68 @@
 
   /* ── admin calls board ── */
   .calls-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:8px}
-  .call-row{display:flex;align-items:center;gap:9px;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 13px;font-size:12.5px;font-weight:500}
+  .call-row{display:flex;align-items:center;gap:9px;border-radius:10px;padding:10px 13px;font-size:13px;font-weight:500}
   .call-row .st{width:8px;height:8px;border-radius:50%;flex:none}
   .call-row.s-none .st{background:var(--bad)}
   .call-row.s-part .st{background:var(--warn)}
   .call-row.s-booked .st{background:var(--ink-soft)}
   .call-row.s-survey .st{background:var(--warn)}
   .call-row.s-done .st{background:var(--good)}
-  .call-row.od{background:var(--bad-bg);border-color:#DFBEAC}
-  .call-row .cr-lab{margin-left:auto;font-family:var(--monof);font-size:9px;letter-spacing:.06em;text-transform:uppercase;font-weight:600;color:var(--ink-soft);text-align:right}
+  .call-row.od{background:var(--bad-bg)}
+  .call-row .cr-lab{margin-left:auto;font-size:12px;font-weight:600;color:var(--ink-soft);text-align:right}
+  .call-row.od .cr-lab{color:var(--bad)}
   /* the name stays on one line; a long label ("1 of 2 done · next not booked") wraps under itself */
   .call-row{white-space:nowrap}
   .call-row .cr-lab{white-space:normal;text-wrap:balance}
-  .call-row .linkbtn{font-size:11px;border:none;background:none;cursor:pointer;color:var(--ink-soft);padding:2px}
-  .call-row .linkbtn:hover{color:var(--accent)}
+  .call-row .linkbtn{font-size:13px;border:none;background:none;cursor:pointer;color:var(--ink-soft);padding:2px 4px;border-radius:5px;position:relative}
+  .call-row .linkbtn:hover{color:var(--accent);background:var(--accent-soft)}
 
-  /* ── coach's radar ── */
+  /* ── coach's radar ── who needs you today; the colour of the reason */
   .radar{display:flex;gap:8px;flex-wrap:wrap}
-  .rchip{display:flex;align-items:center;gap:8px;font-family:var(--monof);font-size:11px;letter-spacing:.02em;color:var(--ink);border:1px solid var(--line-strong);background:var(--card);border-radius:999px;padding:8px 14px;cursor:pointer;transition:transform .12s ease,border-color .15s}
-  .rchip:hover{transform:translateY(-1px);border-color:var(--ink-faint)}
+  .rchip{display:flex;align-items:center;gap:8px;font-family:var(--sans);font-size:13px;font-weight:500;letter-spacing:0;color:var(--ink);
+    border:0;background:var(--fill);border-radius:999px;padding:7px 14px;cursor:pointer}
+  .rchip:hover{background:var(--fill-hover)}
   .rchip .dot2{width:8px;height:8px;border-radius:50%;flex:none}
-  .rchip.bad{border-color:#DFBEAC;background:var(--bad-bg)}
+  .rchip.bad{background:var(--bad-bg)}
+  .rchip.bad:hover{background:color-mix(in oklab,var(--bad) 22%,transparent)}
   .rchip.bad .dot2{background:var(--bad)}
-  .rchip.warn{border-color:#DFD0A0;background:var(--warn-bg)}
+  .rchip.warn{background:var(--warn-bg)}
+  .rchip.warn:hover{background:color-mix(in oklab,var(--warn) 24%,transparent)}
   .rchip.warn .dot2{background:var(--warn)}
-  .rchip.ok{border-color:#B9CFBB;background:var(--good-bg);cursor:default}
+  .rchip.ok{background:var(--good-bg);cursor:default}
   .rchip.ok .dot2{background:var(--good)}
-  .prep-note{font-size:12px;line-height:1.55;color:var(--ink);margin-top:2px}
+  .prep-note{font-size:13px;line-height:1.55;color:var(--ink);margin-top:2px}
   .prep-call{margin-top:12px}
-  .prep-head{font-size:12.5px;color:var(--ink-soft);margin:0 0 8px 2px}
+  .prep-head{font-size:13px;color:var(--ink-soft);margin:0 0 8px 2px}
   .prep-call.latest .prep-head{color:var(--ink)}
   .prep-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
-  .prep-list{margin:0;padding-left:18px;font-size:12.5px;line-height:1.5;color:var(--ink)}
+  .prep-list{margin:0;padding-left:18px;font-size:13px;line-height:1.5;color:var(--ink)}
   .prep-list li{margin:0 0 3px}
   .prep-more{margin-top:10px}
-  .prep-more summary{cursor:pointer;font-size:12px;color:var(--ink-soft)}
+  .prep-more summary{cursor:pointer;font-size:13px;font-weight:500;color:var(--accent)}
   @media(max-width:880px){.prep-grid{grid-template-columns:1fr}}
 
   /* ── planner v2: assumptions + weekly grid ── */
   .assume{display:grid;grid-template-columns:1.1fr 1.6fr 1.6fr 1fr;gap:10px;margin-bottom:14px}
-  .ag{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:13px;box-shadow:0 1px 2px rgba(28,23,18,.04)}
-  .ag .ah{font-family:var(--monof);font-size:9.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:9px;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
-  .chip-auto{font-family:var(--monof);font-size:8px;letter-spacing:.04em;border:1px solid var(--good);color:var(--good);background:var(--good-bg);border-radius:5px;padding:1px 5px}
+  .ag{border-radius:var(--radius);padding:13px}
+  .ag .ah{font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:9px;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+  .ag .ah .hint{text-transform:none;letter-spacing:0;font-weight:500}
+  .chip-auto{font-size:11px;font-weight:600;letter-spacing:0;text-transform:none;color:var(--good);background:var(--good-bg);border-radius:999px;padding:1px 8px}
   .ag .arow{display:flex;gap:8px}
-  .ag label{font-family:var(--monof);font-size:8.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-soft);display:block;flex:1;min-width:0}
-  .ag input{width:100%;font-family:var(--monof);font-size:12.5px;padding:6px 8px;margin-top:3px;border:1px solid var(--line);border-radius:7px;background:var(--paper);color:var(--ink);transition:border-color .15s}
-  .ag input:focus{border-color:var(--accent);outline:none;box-shadow:0 0 0 3px rgba(174,59,21,.1)}
-  .ag input::placeholder{color:var(--good);opacity:.9}
-  .a-real{display:block;font-family:var(--monof);font-size:9px;letter-spacing:.02em;color:var(--good);margin-top:3px;cursor:pointer;text-transform:none;white-space:nowrap}
+  .ag label{font-size:11px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--ink-soft);display:block;flex:1;min-width:0}
+  .ag input{width:100%;font-size:13px;padding:7px 9px;margin-top:3px;font-variant-numeric:tabular-nums}
+  .ag input::placeholder{color:var(--good);opacity:1}
+  .a-real{display:block;font-size:11px;font-weight:500;letter-spacing:0;color:var(--good);margin-top:3px;cursor:pointer;text-transform:none;white-space:nowrap}
   .a-real:hover{text-decoration:underline}
-  .pw-in{width:100%;max-width:70px;font-family:var(--monof);font-size:12px;padding:5px 6px;border:1px solid var(--line);border-radius:6px;background:var(--paper);color:var(--ink);text-align:right}
-  .pw-in:focus{border-color:var(--accent);outline:none}
+  .pw-in{width:100%;max-width:72px;font-size:13px;padding:6px 8px;text-align:right;font-variant-numeric:tabular-nums}
   .ptable td.pw-exp,.ptable td.pw-act{font-weight:600}
-  .ptable tr.wk-now td{background:var(--accent-soft)}
   @media(max-width:880px){.assume{grid-template-columns:1fr 1fr}}
   @media(max-width:430px){.assume{grid-template-columns:1fr}}
 
-  /* page entrance — once per view switch */
-  @keyframes pageIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
-  .pane-in{animation:pageIn .38s cubic-bezier(.16,.68,.32,1)}
-  @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+  /* page entrance — once per view switch. A quick crossfade, like the hub's:
+     switching boards is navigation, not a show, so nothing slides in. */
+  @keyframes pageIn{from{opacity:0}}
+  .pane-in{animation:pageIn .2s var(--ease-out) both}
 
   /* first load — a loading card instead of an empty coach board with "Seed data"
      on it (what a rep used to see for the whole wait). init() takes body.booting off. */
@@ -690,7 +802,49 @@
   body.booting #view-team,body.booting #view-rep,body.booting .toggle{display:none}
   @keyframes bootPulse{0%,100%{opacity:1;transform:none}50%{opacity:.5;transform:scale(.92)}}
   #loading .mark{animation:bootPulse 1.6s ease-in-out infinite}
+  /* the full-page states (loading, dead link, offline, not launched yet) */
+  .gate-t{font-family:var(--serif);font-size:28px;font-weight:600;letter-spacing:-.019em;line-height:1.15}
+  .gate-l{font-size:14px;color:var(--ink-soft);margin-top:10px;line-height:1.7}
 
+  /* ═══ how things answer your hand (the hub's) ═══
+     A press lands instantly and springs back on release; a hover lights up
+     instantly and fades when you leave. */
+  :is(.form-btn,.rowbtn,.sk-mini,.toggle button,.camp-pill,.sk-scale button,.sk-mv button,.rchip,.sk-savebar button,.as-more,.linkbtn){
+    transition:background-color .2s var(--ease-out),color .2s var(--ease-out),box-shadow .2s var(--ease-out),transform var(--spring-dur) var(--spring)}
+  :is(.form-btn,.rowbtn,.sk-mini,.toggle button,.camp-pill,.sk-scale button,.sk-mv button,.rchip,.sk-savebar button,.as-more,.linkbtn):hover{transition-duration:0s,0s,0s,var(--spring-dur)}
+  :is(.form-btn,.rowbtn,.sk-mini,.toggle button,.camp-pill,.sk-scale button,.sk-mv button,.rchip,.sk-savebar button):active:not([disabled]){transform:scale(.96);transition-duration:0s}
+  @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+
+  /* hit areas: the small controls take a click a few pixels beyond what they draw,
+     and on a touch screen a full 44pt (reps open their ?rep= link on a phone).
+     The ten rating buttons share a phone's width, so they get the height (44pt)
+     and every pixel of the row across. */
+  :is(.sk-star,.sk-mv button,.linkbtn,.as-more){position:relative}
+  :is(.sk-star,.sk-mv button,.linkbtn,.as-more)::after{content:"";position:absolute;inset:-5px}
+  @media (pointer:coarse){
+    :is(.sk-star,.sk-mv button,.linkbtn,.as-more)::after{inset:auto;left:50%;top:50%;width:max(100%,44px);height:max(100%,44px);transform:translate(-50%,-50%)}
+    .sk-mv{gap:10px;margin-left:6px}
+    .form-btn{padding-top:13px;padding-bottom:13px}
+    header .form-btn{padding-top:7px;padding-bottom:7px;position:relative}
+    header .form-btn::after{content:"";position:absolute;left:50%;top:50%;width:max(100%,44px);height:max(100%,44px);transform:translate(-50%,-50%)}
+    .rowbtn,.sk-mini{padding-top:10px;padding-bottom:10px}
+    .toggle button,.camp-pill{padding-top:11px;padding-bottom:11px}
+    header .toggle button{padding-top:6px;padding-bottom:6px}
+    .subtabs button{padding-top:14px;padding-bottom:13px}
+    select{padding-top:12px;padding-bottom:12px}
+    :is(.as-form select,.as-form input[type=url],.ag input,.pw-in,.sk-ren){padding-top:12px;padding-bottom:12px}
+    .rchip{padding-top:12px;padding-bottom:12px}
+    .sk-howto-t{padding-top:14px;padding-bottom:14px}
+    .sk-scale button{height:40px}
+    .sk-scale button::after{content:"";position:absolute;left:-2px;right:-2px;top:-2px;bottom:-2px}
+    .sk-savebar button{min-height:44px}
+    .al{padding:10px 0}
+  }
+
+  @media(max-width:1024px){
+    .wrap{padding:0 22px}
+    .head-inner{padding:14px 22px 13px}
+  }
   @media(max-width:880px){
     .plan-grid{grid-template-columns:1fr 1fr}
     .plan-hero{grid-column:span 2}
@@ -700,24 +854,50 @@
     .grid5{grid-template-columns:1fr 1fr}
     .lb-row{grid-template-columns:28px 1fr 74px}.lb-bar-wrap{display:none}
     .mix-row{grid-template-columns:110px 1fr 90px}
-    .kpi .val{font-size:26px}
-    .period{padding-top:28px}
+    .period{padding-top:32px}
+  }
+  @media(max-width:760px){
+    .wrap{padding:0 18px}
+    .head-inner{padding:12px 18px 11px}
+    .brand{gap:11px}
+    .mark{width:36px;height:36px;font-size:18px;border-radius:9px}
+    .brand h1{font-size:16px}
+    .brand .sub{font-size:11px;margin-top:2px}
+    .section-head .hint{margin-left:0;flex-basis:100%;order:3}
+    .section-head select{margin-left:0}
+    .subtabs{-webkit-mask-image:linear-gradient(90deg,#000 calc(100% - 28px),transparent);mask-image:linear-gradient(90deg,#000 calc(100% - 28px),transparent)}
+    /* a long segmented row scrolls sideways on a phone instead of wrapping into a box */
+    .camp-pills{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;max-width:100%}
+    .camp-pills::-webkit-scrollbar{display:none}
+    .camp-pill{flex:none}
+    /* ...except the skillset's categories: they're the board's own navigation, so all six stay in view */
+    .sk-toolbar .camp-pills{flex-wrap:wrap;overflow:visible}
   }
   @media(max-width:600px){
-    .wrap{padding:0 18px}
     /* inline 4-up grids (team pulse, prep cards) can't fit a phone — override them */
     #team-kpis-rep,#prep-cards{grid-template-columns:repeat(2,1fr)!important}
-    .kpi{min-width:0}
-    .head-inner{padding:11px 18px 10px;gap:8px 9px}
-    .brand{gap:10px}
-    .mark{width:34px;height:34px;font-size:17px;border-radius:8px}
-    .brand h1{font-size:15.5px;white-space:nowrap}
+    .head-inner{flex-wrap:nowrap;gap:10px}
+    .brand h1{white-space:nowrap}
     .brand .sub{display:none}
     .status{display:none}
-    .head-right{gap:7px}
-    .toggle button{padding:6px 10px;font-size:10px}
-    .form-btn{padding:7px 10px;font-size:9.5px;white-space:nowrap}
-    .hero-big .val{font-size:32px}
+    .head-right{gap:6px;flex-wrap:nowrap}
+    header .form-btn{padding:7px 12px;font-size:12px;line-height:16px}
+    header .toggle button{padding:5px 10px;font-size:12px}
+    .hero-big .val{font-size:28px}
+    /* the week card: a row's buttons go under its words, full width, so the words keep the room */
+    .wk-row{grid-template-columns:14px minmax(0,1fr)}
+    .wk-btns{grid-column:2;flex-direction:row;flex-wrap:wrap}
+    .wk-btns .form-btn{flex:1 1 auto}
+    .wk-btns .form-btn.ghost{flex:0 0 auto}
+  }
+
+  /* print: always the light board (the dark set is screen-only); cards get a hairline edge back on white paper */
+  @media print{
+    body{padding:0;background:#fff}
+    header,.embed-bar,.sk-savebar,.subtabs .sub-ink{display:none!important}
+    .wrap{max-width:100%;padding:0}
+    :is(.lb,.heat-scroll,.chart-card,.note,.call-card,.wk-card,.as-card,.as-form,.ag,.sk-bars,.sk-kc,.sk-howto,.sk-note,.sk-tc,.ci-item,.call-row,.gc-row,.ctable,.ptable){border:.5pt solid var(--line)!important;box-shadow:none!important}
+    .hero-big,.plan-hero{box-shadow:none}
   }
 </style>
 </head>
@@ -839,14 +1019,15 @@
     <div class="rep-pick">
       <div class="eyebrow">Mentee</div>
       <select id="rep-select" onchange="renderRep()"></select>
-      <div class="serif hidden" id="rep-name-lock" style="font-size:26px;font-weight:600;letter-spacing:-.01em"></div>
+      <div class="serif hidden" id="rep-name-lock" style="font-size:28px;font-weight:600;letter-spacing:-.019em;line-height:1.15"></div>
     </div>
 
     <!-- Two boards per mentee, each on its own tab. The skillset is 137 rows —
          on the performance page it would bury the numbers reps come here for. -->
     <div class="subtabs" id="rep-tabs">
-      <button type="button" data-tab="perf" class="on" onclick="setRepTab('perf')">Performance</button>
-      <button type="button" data-tab="skills" onclick="setRepTab('skills')">Skillset<span class="tcount" id="sk-tabcount"></span></button>
+      <button type="button" data-tab="perf" class="on" onclick="setRepTab('perf')"><span class="tl" data-label="Performance">Performance</span></button>
+      <button type="button" data-tab="skills" onclick="setRepTab('skills')"><span class="tl" data-label="Skillset">Skillset</span><span class="tcount" id="sk-tabcount"></span></button>
+      <span class="sub-ink" aria-hidden="true"></span>
     </div>
 
     <div id="rep-pane-perf">
@@ -882,9 +1063,9 @@
 
     <!-- brand-new reps: one friendly card instead of seven empty sections -->
     <div class="section hidden" id="starter-sec" style="margin-top:24px">
-      <div class="call-card" style="border-style:dashed">
+      <div class="call-card">
         <div class="cc-main">
-          <div class="lab" style="font-family:'Spline Sans Mono';font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft)">Your stats build here</div>
+          <div class="lab">Your stats build here</div>
           <div class="cc-title" style="margin-top:6px">First check-in unlocks this page</div>
           <div class="cc-sub">After your first weekly check-in, this fills with your sales, weekly trend, channel breakdowns, and standards — all computed from what you report. Two minutes each Tuesday, due by Wednesday.</div>
         </div>
@@ -1001,8 +1182,8 @@
   <!-- loading: shown until the first data load lands (body.booting) -->
   <div id="loading" role="status" aria-live="polite">
     <div class="mark serif" style="margin:0 auto 18px;width:52px;height:52px;font-size:24px">忍</div>
-    <div class="serif" style="font-size:26px;font-weight:600" id="loading-title">Loading your dashboard&hellip;</div>
-    <div style="font-size:13px;color:var(--ink-soft);margin-top:10px;line-height:1.7" id="loading-sub">
+    <div class="gate-t" id="loading-title">Loading your dashboard&hellip;</div>
+    <div class="gate-l" id="loading-sub">
       Pulling in your latest numbers &mdash; just a few seconds.
     </div>
   </div>
@@ -1010,8 +1191,8 @@
   <!-- lockout: unknown ?rep= id -->
   <div id="lockout" class="hidden" style="text-align:center;padding:90px 20px">
     <div class="mark serif" style="margin:0 auto 18px;width:52px;height:52px;font-size:24px">忍</div>
-    <div class="serif" style="font-size:26px;font-weight:600">This link isn't active</div>
-    <div style="font-size:13px;color:var(--ink-soft);margin-top:10px;line-height:1.7">
+    <div class="gate-t">This link isn't active</div>
+    <div class="gate-l">
       We couldn't match this link to an active mentee.<br>
       Try a hard refresh first &mdash; <b>Ctrl+Shift+R</b> on Windows, <b>Cmd+Shift+R</b> on Mac.<br>
       If it still says this, text Alan for a fresh link.
@@ -1021,8 +1202,8 @@
   <!-- offline: data unreachable before the first load — retried automatically -->
   <div id="offline" class="hidden" style="text-align:center;padding:90px 20px">
     <div class="mark serif" style="margin:0 auto 18px;width:52px;height:52px;font-size:24px">忍</div>
-    <div class="serif" style="font-size:26px;font-weight:600">Connecting to your dashboard&hellip;</div>
-    <div style="font-size:13px;color:var(--ink-soft);margin-top:10px;line-height:1.7">
+    <div class="gate-t">Connecting to your dashboard&hellip;</div>
+    <div class="gate-l">
       We can't reach the data right now. This page retries on its own every minute &mdash;<br>
       check your connection, and text Alan if it still won't load.
     </div>
@@ -1031,8 +1212,8 @@
   <!-- gated: personal rep dashboards aren't launched yet (CONFIG.REP_LINKS_LIVE) -->
   <div id="gated" class="hidden" style="text-align:center;padding:90px 20px">
     <div class="mark serif" style="margin:0 auto 18px;width:52px;height:52px;font-size:24px">忍</div>
-    <div class="serif" style="font-size:26px;font-weight:600">Your dashboard is almost ready</div>
-    <div style="font-size:13px;color:var(--ink-soft);margin-top:10px;line-height:1.7">
+    <div class="gate-t">Your dashboard is almost ready</div>
+    <div class="gate-l">
       Personal dashboards haven't launched yet &mdash; Alan will text you<br>
       your link the moment they go live. Keep those check-ins coming. 🥷
     </div>
@@ -1776,6 +1957,7 @@ function setView(v){
   $("btn-team").classList.toggle("on",v==="team");
   $("btn-rep").classList.toggle("on",v==="rep");
   paneIn($("view-"+v));
+  placeSubInk();
   skBar();
 }
 /* replay the entrance on the pane being shown — view switches only, never on data refreshes */
@@ -2002,7 +2184,7 @@ function renderRepPlanner(r){
   const p=plannerFor(r);
   PLAN_REP=r.id;
   PLAN_AUTO=p.auto; PLAN_WEEKS=p.weeks;
-  const aChip=(n)=>n>=PLAN_MIN_ENTRIES?`<span class="chip-auto">AUTO · ${n} check-ins</span>`:`<span class="hint" style="font-size:9px">auto at 6 (${n}/6)</span>`;
+  const aChip=(n)=>n>=PLAN_MIN_ENTRIES?`<span class="chip-auto">Auto · ${n} check-ins</span>`:`<span class="hint">auto at 6 (${n}/6)</span>`;
   /* once a section clears 6 check-ins, the rep's REAL stat shows in small green
      under the field — tap it to use it, or type any number to play with scenarios */
   const aIn=(f,man,autoVal,ph,isMoney)=>{
@@ -2016,7 +2198,7 @@ function renderRepPlanner(r){
   html+=`<div class="assume">
     <div class="ag"><div class="ah">Campaign Goal</div><div class="arow">
       ${aIn("goal",p.cpoGoal,null,"CPO Goal $",true)}</div>
-      <div class="hint" style="font-size:10px;margin-top:6px">week ${p.wkNow} of ${p.weeks} · starts ${p.start.toLocaleDateString(undefined,{month:"numeric",day:"numeric"})}</div></div>
+      <div class="hint" style="margin-top:6px">week ${p.wkNow} of ${p.weeks} · starts ${p.start.toLocaleDateString(undefined,{month:"numeric",day:"numeric"})}</div></div>
     <div class="ag"><div class="ah">Demos ${aChip(p.auto.demo.n)}</div><div class="arow">
       ${aIn("dc",p.manual.dc,p.auto.demo.comp,"Completion %")}
       ${aIn("dcl",p.manual.dcl,p.auto.demo.close,"Closing %")}
@@ -2037,7 +2219,7 @@ function renderRepPlanner(r){
     const dts=`${w.ws.getMonth()+1}/${w.ws.getDate()}–${w.we.getMonth()+1}/${w.we.getDate()}`;
     const cell=k=>`<td><input class="pw-in" data-wk="${w.wk}" data-k="${k}" type="number" min="0" value="${w.plan[k]??""}" placeholder="—" oninput="planEdit()"></td>`;
     html+=`<tr class="${w.current?'wk-now':''}"><td style="font-weight:600">${w.wk}</td>`+
-      `<td style="text-align:left;color:var(--ink-soft);font-size:11px">${dts}</td>`+
+      `<td style="text-align:left;color:var(--ink-soft);font-size:12px">${dts}</td>`+
       cell("sh")+cell("da")+cell("sa")+
       `<td class="pw-exp" id="pexp-${w.wk}">${w.exp==null?awc:money(w.exp)}</td>`+
       `<td class="pw-act">${w.actual==null?awc:money(w.actual)}</td>`+
@@ -2365,7 +2547,7 @@ function assignCardHtml(x){
     <div class="as-head"><div><div class="as-title">${esc(a.Title)}</div>
       <div class="as-meta">${progs.map(p=>`<span class="as-prog ${p.toLowerCase()}">${p}</span>`).join("")}<span>${due}</span><span class="pill ${x.state}">${STATE_LABEL[x.state]}</span></div></div>${btn}</div>
     ${instr?`<div class="as-instr${long?" clip":""}" id="asi-${id}">${esc(instr)}</div>${long?`<button class="as-more" onclick="const e=document.getElementById('asi-${id}');e.classList.toggle('clip');this.textContent=e.classList.contains('clip')?'more':'less'">more</button>`:""}`:""}
-    ${a.MaterialsURL?`<div style="margin-top:6px;font-size:12.5px"><a href="${esc(a.MaterialsURL)}" target="_blank" rel="noopener">Materials ↗</a></div>`:""}
+    ${a.MaterialsURL?`<div style="margin-top:6px;font-size:13px"><a href="${esc(a.MaterialsURL)}" target="_blank" rel="noopener">Materials ↗</a></div>`:""}
     ${thread?`<div class="as-thread">${thread}</div>`:""}
   </div>`;
 }
@@ -2503,11 +2685,13 @@ function renderWeekCard(r){
   if(nc)rows.push({dot:"brass",lab:"Next group call",title:`${nc.when} · ${nc.topic}`,sub:[nc.presenter?"with "+nc.presenter:"",nc.extra?`${nc.extra} more call${nc.extra>1?"s":""} that week`:""].filter(Boolean).join(" · "),btns:[]});
   // 6 · Design Your Life — a standing tool, no status: its answers live on the rep's device, never reach us
   rows.push({dot:"brass",lab:"Plan your hours",title:"Does your week fit?",sub:"Budget your hours, your floors and your Power Hour.",btns:[{lab:"Design your week ↗",url:CONFIG.DYL_URL,ghost:true}]});   // ghost: always there, never urgent
+  let lead=false;    // the hub's rule: at most one primary on the page, and it's the first thing to do
+  const cls=(b,i)=>{if(i||b.ghost)return " ghost"; if(lead)return ""; lead=true; return " primary";};
   $("week-card").innerHTML=`<div class="wk-card">
     <div class="eyebrow">Your week · ${esc(currentCampaign())} · Week ${campaignWeekNo()}</div>
     <div class="wk-title">${esc(String(r.name).split(" ")[0])}, here's your week</div>
     ${rows.map(x=>`<div class="wk-row"><span class="wd ${x.dot}"></span><div><div class="wl">${x.lab}</div>${x.html||`<div class="wt">${x.title}</div><div class="ws">${x.sub||""}</div>`}</div>${
-      x.btns.length?`<div class="wk-btns">${x.btns.map((b,i)=>b.url?`<a class="form-btn${i||b.ghost?" ghost":""}" href="${b.url}" target="_blank" rel="noopener">${b.lab}</a>`:`<button class="form-btn ghost" onclick="${b.js}">${b.lab}</button>`).join("")}</div>`:""}</div>`).join("")}
+      x.btns.length?`<div class="wk-btns">${x.btns.map((b,i)=>b.url?`<a class="form-btn${cls(b,i)}" href="${b.url}" target="_blank" rel="noopener">${b.lab}</a>`:`<button class="form-btn ghost" onclick="${b.js}">${b.lab}</button>`).join("")}</div>`:""}</div>`).join("")}
   </div>`;
 }
 /* ═══════════════ GROUP-CALL ATTENDANCE (the hub's Call Attendance rolls) ═══════════════
@@ -2663,23 +2847,33 @@ function renderSummary(r){
   $("sum-good").innerHTML=good.length?good.slice(0,4).map(t=>`<div class="sum-item"><span class="pip good"></span><span>${t}</span></div>`).join(""):`<div class="sum-empty">No standout strengths flagged this period.</div>`;
   $("sum-warn").innerHTML=warn.length?warn.slice(0,3).map(t=>`<div class="sum-item"><span class="pip warn"></span><span>${t}</span></div>`).join(""):`<div class="sum-empty">Nothing flagged — steady.</div>`;
 }
+let CHART_W=0;
+function watchChartWidth(){
+  const el=$("chart"); if(!el||!window.ResizeObserver)return;
+  new ResizeObserver(()=>{const w=el.clientWidth;
+    if(w>0&&Math.abs(w-CHART_W)>4&&el.querySelector("svg")&&currentRep())renderChart();}).observe(el);
+}
 function renderChart(){
   const r=currentRep(), metric=$("chart-metric").value;
   const series = metric==="sales"? r.sales.map(x=>x) : r.acct.map(x=>x);
   if(!series.some(x=>x!=null)){
-    $("chart").innerHTML=`<div style="padding:36px 20px;text-align:center;font-size:12.5px;color:var(--ink-soft)">Your weekly trend draws here after your first check-in.</div>`;
+    $("chart").innerHTML=`<div style="padding:36px 20px;text-align:center;font-size:13px;color:var(--ink-soft)">Your weekly trend draws here after your first check-in.</div>`;
     return;
   }
   const base = metric==="sales"? teamAvgWeekly(x=>x.sales) : teamAvgWeekly(x=>x.acct);
-  const W=940,H=300,padL=46,padR=14,padT=14,padB=28,n=PERIOD.weeks;
+  /* drawn at the width it's shown at, so the labels are a real 11px on a phone too
+     (a fixed 940-wide drawing shrank them to 3–4px there); watchChartWidth redraws it */
+  const cw=$("chart").clientWidth;
+  const W=cw>0?Math.round(cw):940,H=Math.round(Math.max(200,Math.min(300,W*.32))),padL=46,padR=14,padT=14,padB=28,n=PERIOD.weeks;
+  CHART_W=W;
   const allVals=[...series.filter(x=>x!=null),...base];
   const maxV=Math.max(...allVals, metric==="standards"?1:1), minV=Math.min(...allVals,0);
   const x=i=>padL+(W-padL-padR)*(i/(n-1));
   const y=v=>padT+(H-padT-padB)*(1-(v-minV)/(maxV-minV||1));
   const fmtY=v=>metric==="sales"?"$"+(v>=1000?(v/1000).toFixed(0)+"k":Math.round(v)):v.toFixed(1);
   let grid="";for(let i=0;i<=4;i++){const v=minV+(maxV-minV)*i/4,yy=y(v);
-    grid+=`<line x1="${padL}" y1="${yy}" x2="${W-padR}" y2="${yy}" stroke="var(--line-soft)"/><text x="${padL-8}" y="${yy+4}" text-anchor="end" font-size="10" fill="var(--ink-soft)" font-family="Spline Sans Mono">${fmtY(v)}</text>`;}
-  let xlab="";for(let i=0;i<n;i+=2)xlab+=`<text x="${x(i)}" y="${H-8}" text-anchor="middle" font-size="9.5" fill="var(--ink-soft)" font-family="Spline Sans Mono">w${i+1}</text>`;
+    grid+=`<line x1="${padL}" y1="${yy}" x2="${W-padR}" y2="${yy}" stroke="var(--line-soft)"/><text x="${padL-8}" y="${yy+4}" text-anchor="end" font-size="11" fill="var(--ink-soft)" font-family="Hanken Grotesk,sans-serif">${fmtY(v)}</text>`;}
+  let xlab="";for(let i=0;i<n;i+=(W<520?4:2))xlab+=`<text x="${x(i)}" y="${H-8}" text-anchor="middle" font-size="11" fill="var(--ink-soft)" font-family="Hanken Grotesk,sans-serif">w${i+1}</text>`;
   const baseLine=base.map((v,i)=>`${i?'L':'M'}${x(i)},${y(v)}`).join(" ");
   let repPath="",started=false,dots="";
   series.forEach((v,i)=>{if(v==null){started=false;return;}repPath+=(started?"L":"M")+x(i)+","+y(v)+" ";started=true;dots+=`<circle cx="${x(i)}" cy="${y(v)}" r="3" fill="var(--accent)"/>`;});
@@ -2737,7 +2931,7 @@ function renderStandards(r){
   // current streak of "all" from the latest non-null week backward
   let streak=0;for(let i=r.acct.length-1;i>=0;i--){const s=stStatus(r.acct[i]);if(s==null)continue;if(s==="all")streak++;else break;}
   const p=stMetPct(r);
-  const strip=r.acct.map((v,i)=>{const s=stStatus(v)||"none";const col=s==="all"?"var(--good)":s==="some"?"var(--warn)":s==="miss"?"var(--bad)":"var(--line-soft)";return `<div class="box" style="background:${col}" title="Week ${i+1}: ${s}">${i+1}</div>`;}).join("");
+  const strip=r.acct.map((v,i)=>{const s=stStatus(v)||"none";return `<div class="box ${s}" title="Week ${i+1}: ${s}">${i+1}</div>`;}).join("");   // the heatmap's squares: .box.all/.some/.miss/.none
   $("standards-block").innerHTML=`
     <div class="grid3" style="margin-bottom:16px">
       <div class="bucket"><div class="lab">All-met rate</div><div class="val">${p==null?"—":Math.round(p*100)+"%"}</div><div class="meta">${counts.all} of ${counts.all+counts.some+counts.miss} weeks</div></div>
@@ -2770,7 +2964,7 @@ function renderCallNotes(r){
   $("call-notes").innerHTML=mine.map((s,i)=>{
     const mp=String(s.Month||"").split("-");
     const mLab=mp.length===2?new Date(+mp[0],+mp[1]-1,1).toLocaleDateString(undefined,{month:"long",year:"numeric"}):(s.Month||"");
-    return `<div class="note"${i===0?' style="border-color:var(--accent)"':''}>`+
+    return `<div class="note${i===0?" latest":""}">`+
       `<div class="wk">${mLab} · ${s.t.toLocaleDateString(undefined,{month:"short",day:"numeric"})}${i===0?" · latest call":""}</div>`+
       `<div class="row"><b>Takeaways:</b> ${s.Takeaways||"—"}</div>`+
       `<div class="row"><b>Action steps before next call:</b> ${s.ActionSteps||"—"}</div></div>`;
@@ -2790,7 +2984,7 @@ function renderGoalsStrip(r){
      meta:"what your week-by-week plan adds up to"}
   ];
   el.classList.remove("hidden");
-  el.innerHTML=tiles.map(t=>`<div class="kpi"><div class="lab">${t.lab}</div><div class="val" style="font-size:20px">${t.val}</div><div class="meta">${t.meta}</div></div>`).join("");
+  el.innerHTML=tiles.map(t=>`<div class="kpi"><div class="lab">${t.lab}</div><div class="val" style="font-size:22px">${t.val}</div><div class="meta">${t.meta}</div></div>`).join("");
 }
 /* ── CALL PREP notes (2026-09-29) ─────────────────────────────────────────
    After every 1-on-1, call_prep.py on the Mac mini has Claude write the
@@ -3130,11 +3324,12 @@ const SK_WINDOW_DAYS=7;    // a version stays editable for a week
 /* The bands, in Alan's words (2026-10-06; before that they were Ben's
    "Learning it / Adequate / Strong / Master"). n is the name on the key, s the
    short form a rated row wears, d what that level looks like. */
+/* hex: the level's colour — a hub token now, so it follows light and dark */
 const SK_BANDS=[
-  {lo:1,hi:3, k:"lo",  n:"New Rep / New to You",s:"New",      d:"Still memorizing it. Not getting results with it yet.",hex:"#A33512"},
-  {lo:4,hi:6, k:"mid", n:"Varsity / Adequate",  s:"Varsity",  d:"Getting results. Probably your second year using this skill.",hex:"#96760A"},
-  {lo:7,hi:8, k:"hi",  n:"CSP Level",           s:"CSP Level",d:"You're a pro at this. You can do it at the level of someone who sells $300k+ a year.",hex:"#3D6B4F"},
-  {lo:9,hi:10,k:"top", n:"Elite CSP",           s:"Elite CSP",d:"You could give a national-level talk on this topic.",hex:"#1C1712"}
+  {lo:1,hi:3, k:"lo",  n:"New Rep / New to You",s:"New",      d:"Still memorizing it. Not getting results with it yet.",hex:"var(--accent)"},
+  {lo:4,hi:6, k:"mid", n:"Varsity / Adequate",  s:"Varsity",  d:"Getting results. Probably your second year using this skill.",hex:"var(--warn)"},
+  {lo:7,hi:8, k:"hi",  n:"CSP Level",           s:"CSP Level",d:"You're a pro at this. You can do it at the level of someone who sells $300k+ a year.",hex:"var(--good)"},
+  {lo:9,hi:10,k:"top", n:"Elite CSP",           s:"Elite CSP",d:"You could give a national-level talk on this topic.",hex:"var(--ink)"}
 ];
 /* How to use it: the lines under the key. The last one is only true once the
    storage script can correct a version in place, so it only shows then. */
@@ -3640,7 +3835,7 @@ function skBarPlace(){
 document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="hidden")skSave({leaving:true});});
 window.addEventListener("pagehide",()=>{skSave({leaving:true});});
 window.addEventListener("beforeunload",e=>{if(SK_FIX&&skPendCount(SK_FIX.repId)){e.preventDefault();e.returnValue="";}});
-window.addEventListener("resize",()=>{skBarPlace();});
+window.addEventListener("resize",()=>{skBarPlace();placeSubInk();});
 
 /* ── stats ─────────────────────────────────────────────────────────────
    Ben: the overall is the average of the SECTION averages, not of every
@@ -3885,6 +4080,7 @@ function setRepTab(t){
   $("rep-pane-perf").classList.toggle("hidden",REP_TAB!=="perf");
   $("rep-pane-skills").classList.toggle("hidden",REP_TAB!=="skills");
   document.querySelectorAll("#rep-tabs button").forEach(b=>b.classList.toggle("on",b.dataset.tab===REP_TAB));
+  placeSubInk();
   if(REP_TAB==="skills"){
     paneIn($("rep-pane-skills"));
     renderSkills();
@@ -3892,6 +4088,19 @@ function setRepTab(t){
   } else paneIn($("rep-pane-perf"));
   try{history.replaceState(null,"",skShareUrl(null,REP_TAB));}catch(e){}
   skBar();
+}
+/* one underline for the Performance · Skillset row, outside the buttons, so it slides
+   from the tab you were on to the one you picked (the hub's placeInk). The first
+   placement, and any while the row is hidden, lands without the slide. */
+function placeSubInk(){
+  const row=$("rep-tabs"), ink=row&&row.querySelector(".sub-ink"), on=row&&row.querySelector("button.on");
+  if(!ink||!on||!row.offsetWidth)return;
+  const fresh=!ink.style.width;
+  if(fresh)ink.classList.add("jump");
+  ink.style.width=on.offsetWidth+"px";
+  ink.style.transform="translateX("+on.offsetLeft+"px)";
+  ink.style.opacity="1";
+  if(fresh){void ink.offsetWidth;ink.classList.remove("jump");}
 }
 function skShareUrl(repId,tab){
   const u=new URL(location.href);
@@ -4004,14 +4213,14 @@ function renderSkills(){
     </div>`;
 
   /* versions — the history, not a reset */
-  h+=`<div class="camp-pills">`+(all.length?all.map(v=>{
+  h+=`<div class="sk-verrow">`+(all.length?`<div class="camp-pills">`+all.map(v=>{
       const on=ver&&v.VersionID===ver.VersionID;
       return `<button class="camp-pill ${on?"on":""}" onclick="setSkillVersion('${v.VersionID}')">${skDay(v.CreatedAt)}${
         verOpen(v)?`<span class="tag">open</span>`:verEdited(v)?`<span class="tag">edited ${skDay(v.UpdatedAt)}</span>`:""}</button>`;
-    }).join(""):`<span class="hint">no versions yet — ${isRep?"your first rating starts one":"their first rating starts one"}</span>`)
-    +(isRep?"":`<span style="flex:1"></span>`
+    }).join("")+`</div>`:`<span class="hint">no versions yet — ${isRep?"your first rating starts one":"their first rating starts one"}</span>`)
+    +(isRep?"":`<div class="camp-pills">`
       +`<button class="camp-pill ${SK_LENS==="self"?"on":""}" onclick="setSkillLens('self')" title="what they scored themselves">Self rating</button>`
-      +`<button class="camp-pill ${SK_LENS==="coach"?"on":""}" onclick="setSkillLens('coach')" title="your read — they never see it">Coach rating</button>`)
+      +`<button class="camp-pill ${SK_LENS==="coach"?"on":""}" onclick="setSkillLens('coach')" title="your read — they never see it">Coach rating</button></div>`)
     +`</div>`;
 
   if(!skillsLive())
@@ -4086,7 +4295,7 @@ function renderSkills(){
   /* focus, ranked */
   if(focus.length){
     h+=`<div class="section" style="margin-top:34px"><div class="section-head">
-      <h2 class="serif" style="font-size:17px">Focus this campaign</h2>
+      <h2 class="serif" style="font-size:18px">Focus this campaign</h2>
       <span class="hint">ranked · the top ${SK_TOP_FOCUS} are the ones that count · ${focus.length} of ${SK_MAX_FOCUS}</span></div>`;
     h+=focus.map((id,i)=>{
       const sk=SKILL_BY_ID[id]; if(!sk)return "";
@@ -4128,7 +4337,7 @@ function renderSkills(){
   /* gaps — coaches only, by Ben's call */
   if(gaps.length&&!edit){
     h+=`<div class="section" style="margin-top:38px"><div class="section-head">
-      <h2 class="serif" style="font-size:17px">Blind spots</h2>
+      <h2 class="serif" style="font-size:18px">Blind spots</h2>
       <span class="hint">${gaps.length} skill${gaps.length===1?"":"s"} where self and coach are 3+ apart</span></div>`
       +gaps.sort((a,b)=>Math.abs(selfMap[b.id]-coachMap[b.id])-Math.abs(selfMap[a.id]-coachMap[a.id]))
         .slice(0,12).map(s=>skRowHtml(s,{self:selfMap[s.id],coach:coachMap[s.id],
@@ -4151,7 +4360,7 @@ function skKeyHtml(o){
   const open=SK_HOWTO==null?(o.isRep&&!o.rated):SK_HOWTO;
   const steps=SK_HOWTO_STEPS.concat(skFixOk()?[SK_HOWTO_FIX]:[]);
   return `<div class="sk-key">`+SK_BANDS.map(b=>
-      `<div class="sk-kc" style="--band:${b.hex}"><div class="r">${b.lo}–${b.hi}</div>
+      `<div class="sk-kc" style="--tone:${b.hex}"><div class="r">${b.lo}–${b.hi}</div>
         <div class="n">${esc(b.n)}</div><div class="d">${esc(b.d)}</div></div>`).join("")
     +`</div>
     <div class="sk-howto">
@@ -4206,6 +4415,7 @@ function skTabCount(){
   const v=viewedVersion(r.id);
   const n=v?Object.keys(v.Self||{}).length:0;
   el.textContent=n?n+"/"+SKILL_COUNT:"";
+  placeSubInk();
 }
 
 /* ── the coaches' team board ───────────────────────────────────────────
@@ -4362,6 +4572,9 @@ async function init(){
     clearTimeout(slow);
     document.body.classList.remove("booting");
   }
+  placeSubInk();                                      // the tab row was hidden until now
+  if(document.fonts)document.fonts.ready.then(placeSubInk);   // ...and the labels change width when Fraunces lands
+  watchChartWidth();
   /* the skillset feed is lazy — but a rep's own row is small and makes the tab
      badge honest from the first paint, so fetch it once in the background. */
   if(MODE==="rep"||MODE==="admin")loadSkills().then(()=>{skTabCount();if(REP_TAB==="skills")renderSkills();});

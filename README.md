@@ -355,3 +355,41 @@ the calendar and the check-in board). Only rolls that are in count.
 The counting matches the hub: calls they were on, out of the calls that were for
 them, with excused calls left out. Replays never count as being on a call. A call
 belongs to the campaign its Vector week's Friday falls in.
+
+---
+
+## How it looks
+
+The look is the Master Hub's, so the hub's Performance tab (this page in an
+iframe) reads as one app. The hub is the source of truth: the colour tokens,
+the dark set, the type scale and the motion tokens at the top of this page's
+stylesheet are copied from the top of `sna-master-hub/index.html`, and its
+README's "How it looks" has the rules. Change a token there, change it here.
+
+- **One type scale**, 11 · 12 · 13 · 14 · 16 · 18 · 22 · 28 · 40px, nothing
+  under 11px. Fraunces for titles, Hanken Grotesk for everything else (its
+  figures are tabular, so there is no monospace). All caps only on tiny
+  section labels. Secondary text is `--ink-soft`; `--ink-faint` is decoration.
+- **Cards separate from the paper by fill**, with no outline, no shadow and no
+  coloured stripe down the side. A state is a tint (`--bad-bg`, `--warn-bg`,
+  `--good-bg`), not a border.
+- **Buttons are filled**: grey (`.form-btn`), one ink `.primary` per view (the
+  week card's first thing to do), plain tinted `.ghost` for quiet ones.
+  Segmented controls (Team/Rep, campaigns, versions, categories) are a
+  recessed track with a raised segment.
+- **The squares are the hub's marks**: the standards heatmap and strip, the
+  check-in history and the group-call squares use `--mark-call`,
+  `--mark-open`, `--mark-missed`, `--mark-off`, the same colours as the hub's
+  boards in both themes. Skill levels use `--accent` / `--warn` / `--good` /
+  `--ink`, so they follow the theme too.
+- **Dark mode follows the device** (`prefers-color-scheme`, screen only), the
+  same switch the hub uses, so the frame and the hub around it always match.
+  Printing is always the light page. With `?embed=1` the page is transparent
+  and has no side padding, so it sits on the hub's own paper and lines up
+  with the hub's edges.
+- **44pt on touch.** Reps open their link on a phone: buttons, segments,
+  fields and the small arrows and stars take a 44pt tap. The ten rating
+  buttons share the phone's width, so they get 44pt of height and the whole
+  row across.
+- The masthead and the Save bar are the hub's dark cover in both themes: a
+  blurred material with a hairline edge.
