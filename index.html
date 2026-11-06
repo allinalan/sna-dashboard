@@ -312,6 +312,15 @@
   .heat td.pct{font-size:12px;text-align:right;padding-right:16px;font-variant-numeric:tabular-nums;color:var(--ink-soft)}
   .heat th.pct{text-align:right;padding-right:16px}
   .heat tbody tr:nth-child(even){background:var(--band)}
+  .heat.sm td.smc{font-size:12px;text-align:center;padding:9px 6px;font-variant-numeric:tabular-nums;white-space:nowrap}
+  .heat.sm td.smc small{display:block;font-size:10px;color:var(--ink-soft);margin-top:2px}
+  .heat.sm td.smc.met{background:color-mix(in srgb,var(--mark-call) 26%,transparent)}
+  .heat.sm td.smc.miss{background:color-mix(in srgb,var(--mark-missed) 26%,transparent);font-weight:600}
+  .heat.sm td.smc.open{background:color-mix(in srgb,var(--mark-open) 18%,transparent)}
+  .heat.sm td.smc.skip{color:var(--ink-soft)}
+  .heat.sm td.streak{font-size:12px;text-align:right;padding-right:16px;white-space:nowrap;font-weight:600}
+  .heat.sm td.streak.s2,.heat.sm td.streak.s3{color:var(--mark-missed)}
+  .heat.sm td.prog{font-size:11px;color:var(--ink-soft);letter-spacing:.04em;text-transform:uppercase;padding-right:10px}
   .cell{width:20px;height:22px;padding:2px}
   .cell .box{width:100%;height:16px;border-radius:3px;margin:0 auto}
 
@@ -994,6 +1003,20 @@
         <span><span class="sw none"></span> Not enrolled</span>
       </div>
       <div class="heat-scroll"><table class="heat" id="heat"></table></div>
+    </div>
+
+    <div class="section" id="sales-month-sec">
+      <div class="section-head">
+        <h2 class="serif">Monthly Sales vs Standard</h2>
+        <span class="hint" id="sales-month-hint"></span>
+      </div>
+      <div class="heat-legend">
+        <span><span class="sw all"></span> Hit the standard</span>
+        <span><span class="sw miss"></span> Under it</span>
+        <span><span class="sw some"></span> Month still running</span>
+        <span><span class="sw none"></span> Not judged (joined partway, no check-ins, or no standard)</span>
+      </div>
+      <div class="heat-scroll"><table class="heat sm" id="sales-month"></table></div>
     </div>
 
     <div class="section" id="mix-sec">
@@ -2014,6 +2037,89 @@ function renderLeaderboard(target="leaderboard",selId="lb-metric"){
     return `<div class="lb-row"${me}><div class="lb-rank ${i<3?'top':''}">${i+1}</div><div class="lb-name">${r.name}<span class="tag">${r.tier}</span></div><div class="lb-bar-wrap"><div class="lb-bar" style="width:${Math.max(get(r)/max*100,0)}%"></div></div><div class="lb-val">${fmt(get(r))}</div></div>`;
   }).join("");
   $(target).innerHTML=html;
+}
+/*SALES_MONTH_BEGIN*/
+/* The monthly SALES STANDARD (Ben's ask, Alan's numbers, 2026-11-06): The Dojo $4,000
+   and The Path $6,000 a month; The Masters has none yet. A month is a Vector month: the
+   campaign's 17 Tue–Mon weeks split 4/4/4/5 (Fall 2026: Sep wk 1–4, Oct 5–8, Nov 9–12,
+   Dec 13–17). A month is judged the Thursday after its last week ends (that week's
+   check-ins are due Wednesday), and only for a mentee who was there all month (joined by
+   the end of its first week), filed at least one check-in in it, and has a standard.
+   The texts that follow a miss (1, 2, 3+ in a row) come from sales_standard.py in the
+   sharpninja repo, which keeps this exact rule: change the two together. */
+const SALES_STANDARD={Dojo:4000,Path:6000,Masters:null};
+const SALES_SPLIT=[4,4,4,5], SALES_JUDGE_DAYS=9;
+const SALES_SEASONS=["Spring","Summer","Fall"];
+const SALES_NAMES={Spring:["January","February","March","April"],Summer:["May","June","July","August"],Fall:["September","October","November","December"]};
+const salesTier=t=>{const k=String(t||"").trim().toLowerCase();return k==="dojo"?"Dojo":k==="masters"?"Masters":"Path";};
+const salesDay=(d,n)=>new Date(d.getFullYear(),d.getMonth(),d.getDate()+(n||0));
+function salesStart(c){const [season,y]=c.split(" ");const d=new Date(+y,{Spring:0,Summer:3,Fall:8}[season],{Spring:1,Summer:25,Fall:1}[season]);while(d.getDay()!==2)d.setDate(d.getDate()+1);return d;}
+function salesPrevCampaign(c){const [season,y]=c.split(" "),i=SALES_SEASONS.indexOf(season);return SALES_SEASONS[(i+2)%3]+" "+(i===0?+y-1:+y);}
+function salesMonths(c){
+  const start=salesStart(c),out=[];let from=1;
+  SALES_SPLIT.forEach((n,i)=>{const to=from+n-1,first=salesDay(start,7*(from-1)),last=salesDay(start,7*(to-1));
+    out.push({campaign:c,name:SALES_NAMES[c.split(" ")[0]][i],idx:i,from,to,first,last,judge:salesDay(last,SALES_JUDGE_DAYS)});from=to+1;});
+  return out;
+}
+function salesMonthBefore(m){return m.idx>0?salesMonths(m.campaign)[m.idx-1]:salesMonths(salesPrevCampaign(m.campaign))[3];}
+/* wk: that campaign's weekly sales, index 0 = week 1, null = no check-in. rep: {tier, joined} */
+function salesJudge(m,wk,rep,today){
+  const got=[];for(let w=m.from;w<=m.to;w++){const v=wk&&wk[w-1];if(v!=null)got.push(+v||0);}
+  const std=SALES_STANDARD[salesTier(rep.tier)];
+  const out={sales:got.reduce((a,b)=>a+b,0),reported:got.length,weeks:m.to-m.from+1,std};
+  const j=rep.joined?salesDay(rep.joined):null;
+  if(j&&j>salesDay(m.last,6))return Object.assign(out,{status:"none"});
+  if(j&&j>salesDay(m.first,6))return Object.assign(out,{status:"partial"});
+  if(salesDay(today)<m.judge)return Object.assign(out,{status:"open"});
+  if(std==null)return Object.assign(out,{status:"nostd"});
+  if(!got.length)return Object.assign(out,{status:"noreport"});
+  return Object.assign(out,{status:out.sales>=std?"met":"miss"});
+}
+/* One mentee's weekly sales for one campaign, counting EVERY check-in (index 0 = week 1, null =
+   none). Mentees pick the week number themselves and sometimes pick one twice (in Fall 2026 a
+   "Week 3" came in on 9/22 and another on 9/29, really week 4): a row whose week is already taken goes
+   to the week its timestamp closes (filing opens Monday 18:00), so no sales drop out. rows:
+   the Weekly tab; rowCamp(row) -> its campaign; parseTs(v) -> Date or null. */
+const SALES_CPO=["Demos_CPO","SVC_CPO","Event_CPO","Mktg_CPO","BizGift_CPO"];
+function salesTsWeek(c,t){const k=Math.floor((t.getTime()+6*3600e3-salesStart(c).getTime())/(7*864e5));return Math.max(1,Math.min(17,k));}
+function salesWeekly(rows,rid,c,rowCamp,parseTs){
+  const mine=rows.filter(w=>String(w.RepID)===String(rid)&&rowCamp(w)===c)
+    .map(w=>({t:parseTs(w.Timestamp),wk:Math.floor(+w.Week)||0,v:SALES_CPO.reduce((a,k)=>a+(+String(w[k]??"").replace(/[$,]/g,"")||0),0)}))
+    .sort((a,b)=>(a.t?a.t.getTime():0)-(b.t?b.t.getTime():0));
+  const out=Array(17).fill(null),taken=new Set();
+  mine.forEach(x=>{let wk=x.wk;if(!wk||taken.has(wk)){if(!x.t)return;wk=salesTsWeek(c,x.t);}taken.add(wk);out[wk-1]=(out[wk-1]||0)+x.v;});
+  return out;
+}
+/* months in a row under, ending with m (stops at 3). salesOf(campaign) -> that campaign's weekly array */
+function salesStreak(m,salesOf,rep,today){let n=0,cur=m;while(n<3&&salesJudge(cur,salesOf(cur.campaign),rep,today).status==="miss"){n++;cur=salesMonthBefore(cur);}return n;}
+/*SALES_MONTH_END*/
+function renderSalesMonths(){
+  const sec=$("sales-month-sec"); if(!sec)return;
+  const camp=SELECTED_CAMPAIGN, months=salesMonths(camp), today=new Date();
+  const fmt=v=>"$"+Math.round(v).toLocaleString();
+  $("sales-month-hint").textContent=`Dojo ${fmt(SALES_STANDARD.Dojo)} · Path ${fmt(SALES_STANDARD.Path)} a month, from check-ins · each month is judged the Thursday after it ends · The Masters has no standard yet`;
+  const lastJudged=[...months].reverse().find(m=>m.judge<=salesDay(today));
+  const order={Dojo:0,Path:1,Masters:2};
+  const rows=[...DATA].sort((a,b)=>order[salesTier(a.tier)]-order[salesTier(b.tier)]||String(a.name).localeCompare(String(b.name)));
+  const head=`<thead><tr><th class="name">Mentee</th><th></th>${months.map(m=>`<th>${m.name.slice(0,3)}<br><span style="font-weight:400">wk ${m.from}–${m.to}</span></th>`).join("")}<th class="pct">${lastJudged?"In a row under":""}</th></tr></thead>`;
+  const why={partial:"joined partway",noreport:"no check-ins",nostd:"no standard",none:"not yet on"};
+  let body="<tbody>";
+  rows.forEach(r=>{
+    const rep={tier:r.tier,joined:r.joined||null};
+    const salesOf=c=>WEEKLY_RAW.length?salesWeekly(WEEKLY_RAW,r.id,c,rowCampaign,ciParseDate):(c===camp?r.sales:[]);
+    body+=`<tr><td class="name">${esc(r.name)}</td><td class="prog">${salesTier(r.tier)}</td>`;
+    months.forEach(m=>{
+      const j=salesJudge(m,salesOf(camp),rep,today);
+      const cls=j.status==="met"||j.status==="miss"||j.status==="open"?j.status:"skip";
+      const amt=j.reported?fmt(j.sales):"—";
+      const sub=j.status==="open"?(j.reported?"so far":"running"):why[j.status]||(j.std!=null?`${j.reported}/${j.weeks} wks · ${j.status==="met"?"hit":"under"} ${fmt(j.std)}`:"");
+      const tip=j.status==="miss"?`${fmt(j.std-j.sales)} short of ${fmt(j.std)}`:"";
+      body+=`<td class="smc ${cls}"${tip?` title="${tip}"`:""}>${j.status==="none"?"":amt}<small>${sub}</small></td>`;
+    });
+    const n=lastJudged?salesStreak(lastJudged,salesOf,rep,today):0;
+    body+=`<td class="streak s${n}">${n?(n>=3?"3+":n)+" month"+(n>1?"s":""):""}</td></tr>`;
+  });
+  $("sales-month").innerHTML=head+body+"</tbody>";
 }
 function renderHeat(){
   const rows=[...DATA].sort((a,b)=>totalSales(b)-totalSales(a));
@@ -4557,7 +4663,7 @@ function renderAll(){
     return;
   }
   renderCampaignSelect();
-  renderPeriod();renderKPIs();renderRadar();renderCheckins();renderLeaderboard();renderHeat();renderMix();
+  renderPeriod();renderKPIs();renderRadar();renderCheckins();renderLeaderboard();renderHeat();renderSalesMonths();renderMix();
   renderAdminPlanner();renderAdminCalls();renderSkillsTeam();
   fillRepSelect();renderRep();
 }
