@@ -276,6 +276,27 @@ status dot of its own — the worksheet saves on the rep's phone, so the dashboa
 never tell whether it's been done — and its button is outlined, not solid, so it
 never outshouts a check-in or a 1-on-1 that's actually due.
 
+### Monthly sales vs standard
+
+Coach view only, under the standards heatmap (Ben's ask, Alan's numbers, 2026-11-06).
+One row per mentee, one column per Vector month of the campaign (Fall 2026: Sep wk 1–4,
+Oct 5–8, Nov 9–12, Dec 13–17), each cell that month's sales from the check-ins against
+the program's monthly standard: **The Dojo $4,000 · The Path $6,000**. The Masters has
+no standard yet, so its rows show the dollars and are never judged.
+
+- **Green** hit it, **red** under it, **amber** the month is still running. A month is
+  judged on the **Thursday after its last week ends**, once that week's check-ins are in.
+- **Grey** = not judged: joined after the month's first week, filed no check-in that
+  month, or no standard for the program.
+- **In a row under** counts back from the last judged month, across campaigns, up to 3+.
+- **Every check-in counts.** Mentees pick the week number themselves and sometimes pick one
+  twice: the second goes to the week its timestamp closes. The weekly charts elsewhere on
+  the page still keep only the first.
+
+The texts that follow a miss (1, 2, 3+ months in a row, each sent only after Alan approves
+the month's review in Slack) come from the private sharpninja repo, which keeps the same
+rule. `tests/sales-month.test.js` pins this copy: change the two together.
+
 ### Coaching calls
 
 **Coaching Calls — [month]** counts each mentee's formal 1-on-1s for the month
