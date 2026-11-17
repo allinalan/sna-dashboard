@@ -15,6 +15,9 @@
 //   SKILLS_URL     → /__skills  the real SNA-Skills-Sync.gs, running on in-memory fakes
 //   WEBAPP_URL     → /__off     the check-in script is never called
 //   HUB_SYNC_URL   → /__off     neither is the hub's feed
+// and fills the Scripts tab with the sample library below (SCRIPTS_RAW / SCRIPT_FOLDERS_RAW),
+// the rows the hub's Scripts tab writes: a hidden one, a removed one and a Masters-only one
+// must not show for r01 (Path); http://localhost:8822/?rep=r01&tab=scripts
 // It refuses to start if any of the five can't be found, rather than serve a
 // page that talks to the real backends.
 //
@@ -46,12 +49,32 @@ const REWRITES = [
   [/SKILLS_URL:\s*"[^"]*"/, 'SKILLS_URL: "/__skills"'],
   [/WEBAPP_URL:\s*"[^"]*"/, 'WEBAPP_URL: "/__off"'],
   [/HUB_SYNC_URL:\s*"[^"]*"/, 'HUB_SYNC_URL: "/__off"'],
+  [/let SCRIPTS_RAW=\[\], SCRIPT_FOLDERS_RAW=\[\];/, () => "let SCRIPTS_RAW=" + JSON.stringify(SAMPLE_SCRIPTS) + ", SCRIPT_FOLDERS_RAW=" + JSON.stringify(SAMPLE_FOLDERS) + ";"],
+];
+/* the script library as the hub writes it (the check-in script's SCRIPTS block): folders, then scripts */
+const fold = (FolderID, Name, ParentID, Order, Removed = "") => ({FolderID, Name, ParentID, Order, Removed});
+const SAMPLE_FOLDERS = [fold("f1", "Booth Scripts", "", 1), fold("f2", "New Customer", "f1", 1), fold("f3", "Past Customer", "f1", 2), fold("f4", "Cookware", "f1", 3),
+  fold("f7", "Demo Scripts", "", 2), fold("f8", "New Customer", "f7", 1), fold("f13", "Phoning Scripts", "", 3),
+  fold("f14", "Service Call Scripts", "", 4), fold("f15", "Cookware", "f14", 1), fold("f19", "Other Scripts", "", 5), fold("f20", "Old stuff", "", 6, "Y")];
+const daysAgo = n => new Date(Date.now() - n * 864e5).toISOString();
+const scr = (ScriptID, FolderID, Title, o = {}) => Object.assign({ScriptID, FolderID, Title, Note:"", Kind:"link", URL:"", FileID:"", FileName:"", MimeType:"",
+  Programs:"Dojo,Path,Masters", Hidden:"", Order:1, AddedAt:daysAgo(30), AddedBy:"Alan", UpdatedAt:"", Removed:""}, o);
+const SAMPLE_SCRIPTS = [
+  scr("sc1", "f2", "Booth opener: first-time customer", {Kind:"file", FileID:"devfile1", URL:"https://drive.google.com/file/d/devfile1/view", FileName:"booth-opener.pdf", MimeType:"application/pdf", Note:"The first 20 seconds at the table", AddedAt:daysAgo(2)}),
+  scr("sc2", "f3", "Welcome back, past customer", {URL:"https://docs.google.com/document/d/devdoc2/edit", Note:"Thank them first, then the new piece"}),
+  scr("sc3", "f4", "Cookware at the booth", {URL:"https://docs.google.com/presentation/d/devslides3/edit", Order:1}),
+  scr("sc4", "f8", "Demo intro (Masters only)", {URL:"https://docs.google.com/document/d/devdoc4/edit", Programs:"Masters"}),
+  scr("sc5", "f13", "Phoning past customers", {URL:"https://docs.google.com/document/d/devdoc5/edit", Note:"Service-call booking script", AddedAt:daysAgo(5)}),
+  scr("sc6", "f15", "Service call: cookware check", {Kind:"file", FileID:"devfile6", URL:"https://drive.google.com/file/d/devfile6/view", FileName:"svc-cookware.docx", MimeType:"application/vnd.openxmlformats-officedocument.wordprocessingml.document"}),
+  scr("sc7", "f19", "Not ready yet", {URL:"https://docs.google.com/document/d/devdoc7/edit", Hidden:"Y"}),
+  scr("sc8", "f19", "Retired script", {URL:"https://docs.google.com/document/d/devdoc8/edit", Removed:"Y"}),
+  scr("sc9", "f19", "Cutco product guide", {URL:"https://www.cutco.com/", Note:"A plain web link opens in a new tab"}),
 ];
 function page(){
   let html = fs.readFileSync(path.join(ROOT, "index.html"), "utf8");
   for(const [re, to] of REWRITES){
     if(!re.test(html)) throw new Error("dev-server: can't find " + re + " in index.html — refusing to serve a page wired to the real backends");
-    html = html.replace(re, to);
+    html = html.replace(re, typeof to === "function" ? to() : to);
   }
   return html;
 }

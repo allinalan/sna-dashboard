@@ -256,6 +256,22 @@ the top of `tools/dev-server.js`.
 
 ---
 
+## Scripts
+
+The third tab beside Performance and Skillset: the coaches' script library, uploaded on the
+hub's **Scripts** tab. It reads the **ScriptFolders** and **Scripts** tabs of this sheet (both
+optional: until the hub has written them the tab says "No scripts yet") and shows every script
+that isn't hidden or removed and is ticked for the mentee's program, by category and
+sub-folder, with a search box, a pill per category, and **New** for 14 days. A tap opens the
+script in Drive's own viewer in a sheet over the page (Escape or **Close** shuts it, **Open ↗**
+goes to Drive or Docs); a link that isn't a Google Doc, Slides, Sheet or Drive file just opens.
+`?rep=r01&tab=scripts` opens straight onto it. The rules for adding and moving scripts live in
+the hub's README (Scripts).
+
+`node tools/dev-server.js` fills the tab with a sample library, including a hidden, a removed
+and a Masters-only script that must not show for `r01` (Path):
+`http://localhost:8822/?rep=r01&tab=scripts`.
+
 ## The rest of the page
 
 The performance board is unchanged: campaign snapshot, standards heatmap,
