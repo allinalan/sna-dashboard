@@ -524,6 +524,42 @@
     transition:transform var(--spring-dur) var(--spring),width var(--spring-dur) var(--spring),opacity .2s var(--ease-out)}
   .sub-ink.jump{transition:none}
 
+  /* ═══ scripts: the coaches' library, by category, and one script open over the page ═══ */
+  .scr-head{margin-top:26px}
+  .scr-bar{display:grid;gap:12px;margin:0 0 6px}
+  .scr-search{font-family:var(--sans);font-size:14px;padding:10px 14px;border:0;border-radius:10px;background:var(--fill);color:var(--ink);width:100%;max-width:420px}
+  .scr-search:focus{outline:2px solid var(--accent);outline-offset:1px}
+  .scr-cats:empty{display:none}
+  .scr-cat{margin:22px 0 8px}
+  .scr-ch{font-size:22px;font-weight:600;letter-spacing:-.015em;margin:0 0 10px}
+  .scr-sub{font-family:var(--sans);font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-soft);margin:18px 0 8px}
+  .scr-list{display:grid;gap:8px}
+  .scr-row{display:grid;grid-template-columns:auto minmax(0,1fr) auto auto;gap:14px;align-items:center;width:100%;text-align:left;
+    background:var(--card);border:0;border-radius:var(--radius);padding:13px 14px;cursor:pointer;color:var(--ink);font:inherit}
+  .scr-row:hover{background:var(--card-raised);box-shadow:0 0 0 1px var(--line-strong)}
+  .scr-row:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+  .scr-kind{font-family:var(--sans);font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;width:52px;padding:5px 0;text-align:center;
+    border-radius:6px;background:var(--brass-soft);color:var(--brass)}
+  .scr-mid{display:grid;gap:3px;min-width:0}
+  .scr-t{font-family:var(--serif);font-size:16px;font-weight:600;letter-spacing:-.01em}
+  .scr-note{font-family:var(--sans);font-size:13px;color:var(--ink-soft);line-height:1.4}
+  .scr-go{font-size:20px;color:var(--ink-soft);line-height:1}
+  .scr-empty{padding:28px 4px;display:grid;gap:6px;justify-items:start;font-size:13px;color:var(--ink-soft)}
+  .scr-empty .t{font-size:16px;font-weight:600;color:var(--ink)}
+  .scr-viewer{position:fixed;inset:0;z-index:60;display:flex;flex-direction:column;background:var(--paper)}
+  .scr-viewer.hidden{display:none}
+  .scr-v-head{display:flex;align-items:center;gap:10px;padding:12px 16px;border-bottom:var(--hair) solid var(--line-strong);background:var(--card)}
+  .scr-v-tt{flex:1;min-width:0}
+  .scr-v-path{font-family:var(--sans);font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-soft)}
+  .scr-v-title{font-size:18px;font-weight:600;letter-spacing:-.01em;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+  .scr-viewer iframe{flex:1;width:100%;border:0;background:var(--card)}
+  body.scr-open{overflow:hidden}
+  @media (max-width:640px){
+    .scr-row{grid-template-columns:minmax(0,1fr) auto auto;gap:10px}
+    .scr-kind{display:none}
+    .scr-search{max-width:none}
+  }
+
   /* ═══ skillset tracker ═══ */
   /* the four-up summary above the ratings */
   .sk-top{display:grid;grid-template-columns:repeat(4,1fr);gap:14px 24px;margin:22px 0 4px}
@@ -1041,7 +1077,7 @@
     <!-- who we're looking at comes first, then which of their boards -->
     <div class="rep-pick">
       <div class="eyebrow">Mentee</div>
-      <select id="rep-select" onchange="renderRep()"></select>
+      <select id="rep-select" onchange="renderRep();renderScriptsTab()"></select>
       <div class="serif hidden" id="rep-name-lock" style="font-size:28px;font-weight:600;letter-spacing:-.019em;line-height:1.15"></div>
     </div>
 
@@ -1050,6 +1086,7 @@
     <div class="subtabs" id="rep-tabs">
       <button type="button" data-tab="perf" class="on" onclick="setRepTab('perf')"><span class="tl" data-label="Performance">Performance</span></button>
       <button type="button" data-tab="skills" onclick="setRepTab('skills')"><span class="tl" data-label="Skillset">Skillset</span><span class="tcount" id="sk-tabcount"></span></button>
+      <button type="button" data-tab="scripts" onclick="setRepTab('scripts')"><span class="tl" data-label="Scripts">Scripts</span><span class="tcount" id="scr-tabcount"></span></button>
       <span class="sub-ink" aria-hidden="true"></span>
     </div>
 
@@ -1198,8 +1235,27 @@
 
     <!-- ════ SKILLSET ════ built by renderSkills() ════ -->
     <div id="rep-pane-skills" class="hidden"></div>
+
+    <!-- ════ SCRIPTS ════ the coaches' script library, filled by renderScriptsTab() ════ -->
+    <div id="rep-pane-scripts" class="hidden">
+      <div class="section-head scr-head"><h2 class="serif" id="scr-title">Scripts</h2><span class="hint" id="scr-hint"></span></div>
+      <div class="scr-bar">
+        <input id="scr-q" class="scr-search" type="search" placeholder="Search scripts" aria-label="Search scripts" autocomplete="off" oninput="SCR_Q=this.value;renderScriptsTab()">
+        <div class="camp-pills scr-cats" id="scr-cats" role="group" aria-label="Script categories"></div>
+      </div>
+      <div id="scr-list"></div>
+    </div>
     <!-- the Save bar — filled by skBar(), moved to <body> on first use so nothing above it can clip it -->
     <div id="sk-savebar" class="sk-savebar hidden" role="status" aria-live="polite"></div>
+    <!-- one script, read on the page: Drive's own viewer in a sheet over everything -->
+    <div id="scr-viewer" class="scr-viewer hidden" role="dialog" aria-modal="true" aria-labelledby="scr-v-title">
+      <div class="scr-v-head">
+        <div class="scr-v-tt"><div class="scr-v-path" id="scr-v-path"></div><div class="scr-v-title serif" id="scr-v-title"></div></div>
+        <a class="form-btn ghost" id="scr-v-open" href="#" target="_blank" rel="noopener">Open ↗</a>
+        <button type="button" class="form-btn" id="scr-v-close" onclick="closeScript()" aria-label="Close the script">Close</button>
+      </div>
+      <iframe id="scr-v-frame" title="Script" src="about:blank" allow="autoplay" referrerpolicy="no-referrer"></iframe>
+    </div>
   </div>
 
   <!-- loading: shown until the first data load lands (body.booting) -->
@@ -1265,6 +1321,8 @@ const CONFIG = {
   ASSIGN_TAB: "Assignments",            // catalog — spec §5.1
   OVERRIDE_TAB: "AssignmentOverrides",  // per-rep due date / NA — §5.2
   SUBMISSION_TAB: "Submissions",        // one row per version — §5.3
+  SCRIPT_TAB: "Scripts",                // the script library: one row a script (hub ▸ Scripts writes it)
+  SCRIPT_FOLDER_TAB: "ScriptFolders",   // its folders: category › sub-folder
   WEEKLY_FORM_URL: "https://docs.google.com/forms/d/e/1FAIpQLSdIAf_SaV1m2ASTN4YzEBeVxp7o-gkIBXqhCCbO5vmuNh7cTQ/viewform",
   HUB_URL: "https://allinalan.github.io/sna-master-hub/",
   HUB_SYNC_URL: "https://script.google.com/macros/s/AKfycbyw7ngyqNuO9AHQnCeb1paTfoDRWX1sTkJMlhC2zB9BKDuo_O-SF9XWke2e1QiA_Y9A/exec?token=sharpninja", // the hub's calendar feed (token already public in the hub source)
@@ -1463,6 +1521,7 @@ const SEED = [
 /* ═══════════════ DATA LOAD — one fetch feeds every view ═══════════════ */
 let DATA=[], ROSTER_RAW=[], CALLS_RAW=[], SURVEY_RAW=[], PLANNER_RAW=[];
 let ASSIGN_RAW=[], OVERRIDE_RAW=[], SUB_RAW=[];   // assignments — spec §5
+let SCRIPTS_RAW=[], SCRIPT_FOLDERS_RAW=[];         // the script library — hub ▸ Scripts
 let HUB_CAL=null;                                 // {calendar,topicTiers,callTime,checkins,attendance} from the hub, or null
 let ASSIGN_CAMPAIGN=null;                         // campaign shown in the Assignments section (defaults to current)
 let HAVE_DATA=false; // a trusted load happened (live fetch, or seed by config)
@@ -1500,13 +1559,17 @@ async function loadData(){
       tab(CONFIG.PLANNER_TAB,true),
       tab(CONFIG.ASSIGN_TAB,true),
       tab(CONFIG.OVERRIDE_TAB,true),
-      tab(CONFIG.SUBMISSION_TAB,true)
+      tab(CONFIG.SUBMISSION_TAB,true),
+      tab(CONFIG.SCRIPT_TAB,true),
+      tab(CONFIG.SCRIPT_FOLDER_TAB,true)
     ])]);
     const nonEmpty=rows=>rows.filter(o=>Object.values(o).some(v=>v!=null&&String(v).trim()!==""));
     [ROSTER_RAW,WEEKLY_RAW,CALLS_RAW,SURVEY_RAW,PLANNER_RAW]=raw;
     ASSIGN_RAW=nonEmpty(raw[5]);
     OVERRIDE_RAW=nonEmpty(raw[6]);
     SUB_RAW=nonEmpty(raw[7]);
+    SCRIPTS_RAW=nonEmpty(raw[8]);
+    SCRIPT_FOLDERS_RAW=nonEmpty(raw[9]);
     applyCampaign();
     HAVE_DATA=true;
     setSource(true);
@@ -4175,9 +4238,115 @@ function catReset(){
   catSave("Back to the sheet");
 }
 
+/* ═══════════════ SCRIPTS ═══════════════
+   The coaches' script library (2026-11-17): booth, demo, phoning and service-call
+   scripts, uploaded on the hub's Scripts tab into the ScriptFolders + Scripts tabs of
+   this sheet. A mentee sees every script that isn't hidden or removed and is ticked
+   for their program; a coach looking at a mentee sees what that mentee sees. A tap
+   opens the script in Drive's own viewer on the page (Open ↗ for the full app). */
+const SCR_PROGS=["Dojo","Path","Masters"], SCR_NEW_DAYS=14;
+let SCR_Q="", SCR_CAT="all", SCR_BACK=null;
+const scrOn=v=>/^(y|yes|true|1)$/i.test(String(v??"").trim());
+function scrProgs(v){
+  const out=String(v??"").split(/[,;\/]+/).map(p=>{const k=p.trim().toLowerCase().replace(/^the\s+/,"");return k==="dojo"?"Dojo":k==="path"?"Path":k==="masters"?"Masters":"";});
+  return SCR_PROGS.filter(p=>out.includes(p));
+}
+function scrTier(rep){
+  const k=String(rep&&rep.tier||"").trim().toLowerCase().replace(/^the\s+/,"");
+  return k==="dojo"?"Dojo":k==="masters"?"Masters":k==="path"?"Path":"";
+}
+/* the library one mentee sees: live folders in order, and their visible scripts */
+function scrLib(tier){
+  const ord=(a,b)=>(+a.Order||0)-(+b.Order||0);
+  const folders=SCRIPT_FOLDERS_RAW.filter(f=>f.FolderID&&!scrOn(f.Removed)).sort(ord);
+  const ids=new Set(folders.map(f=>String(f.FolderID)));
+  const scripts=SCRIPTS_RAW.filter(s=>s.ScriptID&&!scrOn(s.Removed)&&!scrOn(s.Hidden)&&ids.has(String(s.FolderID))&&(s.URL||s.FileID)
+    &&(!tier||scrProgs(s.Programs).includes(tier))).sort(ord);
+  return {folders,scripts};
+}
+function scrPreview(s){
+  if(s.FileID)return "https://drive.google.com/file/d/"+encodeURIComponent(s.FileID)+"/preview";
+  const u=String(s.URL||""); let m;
+  if((m=u.match(/docs\.google\.com\/(document|presentation|spreadsheets)\/(?:u\/\d+\/)?d\/([\w-]+)/)))return "https://docs.google.com/"+m[1]+"/d/"+m[2]+"/preview";
+  if((m=u.match(/drive\.google\.com\/(?:file\/d\/|open\?id=)([\w-]+)/)))return "https://drive.google.com/file/d/"+m[1]+"/preview";
+  return "";
+}
+function scrKind(s){
+  const u=String(s.URL||""), n=String(s.FileName||"").toLowerCase(), t=String(s.MimeType||"");
+  if(String(s.Kind)!=="file")return /docs\.google\.com\/document/.test(u)?"Doc":/docs\.google\.com\/presentation/.test(u)?"Slides":/docs\.google\.com\/spreadsheets/.test(u)?"Sheet":/drive\.google\.com/.test(u)?"Drive":"Link";
+  return /pdf/.test(t)||/\.pdf$/.test(n)?"PDF":/word|\.docx?$/.test(t+n)?"Word":/image\//.test(t)?"Image":/presentation|\.pptx?$/.test(t+n)?"Slides":"File";
+}
+const scrIsNew=s=>{const d=new Date(s.AddedAt);return !isNaN(d)&&Date.now()-d.getTime()<SCR_NEW_DAYS*864e5;};
+function renderScriptsTab(){
+  const pane=$("rep-pane-scripts"); if(!pane)return;
+  const rep=currentRep(), tier=scrTier(rep), lib=scrLib(tier);
+  const byId=Object.fromEntries(lib.folders.map(f=>[String(f.FolderID),f]));
+  const cats=lib.folders.filter(f=>!f.ParentID||!byId[String(f.ParentID)]);
+  const kids=id=>lib.folders.filter(f=>String(f.ParentID)===String(id));
+  const inF=id=>lib.scripts.filter(s=>String(s.FolderID)===String(id));
+  const catOf=s=>{const f=byId[String(s.FolderID)];return f&&f.ParentID&&byId[String(f.ParentID)]?byId[String(f.ParentID)]:f;};
+  const path=s=>{const f=byId[String(s.FolderID)];return f?(f.ParentID&&byId[String(f.ParentID)]?byId[String(f.ParentID)].Name+" › ":"")+f.Name:"";};
+  const count=c=>inF(c.FolderID).length+kids(c.FolderID).reduce((n,k)=>n+inF(k.FolderID).length,0);
+  const tc=$("scr-tabcount"); if(tc)tc.textContent=lib.scripts.length?String(lib.scripts.length):"";
+  const first=rep&&rep.name?String(rep.name).split(" ")[0]:"";
+  $("scr-title").textContent=MODE==="rep"?"Your scripts":"Scripts";
+  $("scr-hint").textContent=MODE==="rep"?(lib.scripts.length?"Tap one to read it. Alan and Ben keep these up to date.":"")
+    :(first?"What "+first+" sees"+(tier?" · The "+tier:"")+". Add and edit them on the hub's Scripts tab.":"");
+  const live=cats.filter(c=>count(c));
+  if(SCR_CAT!=="all"&&!live.some(c=>String(c.FolderID)===SCR_CAT))SCR_CAT="all";
+  $("scr-cats").innerHTML=live.length>1?[{id:"all",n:"All"}].concat(live.map(c=>({id:String(c.FolderID),n:c.Name.replace(/\s+Scripts$/i,"")})))
+    .map(c=>`<button type="button" class="camp-pill${SCR_CAT===c.id?" on":""}" aria-pressed="${SCR_CAT===c.id}" onclick="SCR_CAT='${esc(c.id)}';renderScriptsTab()">${esc(c.n)}</button>`).join(""):"";
+  const q=SCR_Q.trim().toLowerCase();
+  const row=(s,withPath)=>`<button type="button" class="scr-row" onclick="openScript('${esc(String(s.ScriptID))}')">
+      <span class="scr-kind">${scrKind(s)}</span>
+      <span class="scr-mid"><span class="scr-t">${esc(s.Title)}</span>${s.Note?`<span class="scr-note">${esc(s.Note)}</span>`:""}${withPath?`<span class="scr-note">${esc(path(s))}</span>`:""}</span>
+      ${scrIsNew(s)?`<span class="chip new">New</span>`:""}<span class="scr-go" aria-hidden="true">›</span></button>`;
+  const list=rows=>`<div class="scr-list">${rows.join("")}</div>`;
+  let h="";
+  if(!lib.scripts.length){
+    h=`<div class="scr-empty"><div class="t">No scripts yet</div><div>${MODE==="rep"?"Alan and Ben are adding them. They'll show up here as soon as they do.":"Nothing on the hub's Scripts tab is set for "+(first?esc(first):"this mentee")+" yet."}</div></div>`;
+  } else if(q){
+    const hits=lib.scripts.filter(s=>(s.Title+" "+(s.Note||"")+" "+path(s)).toLowerCase().includes(q));
+    h=hits.length?list(hits.map(s=>row(s,true)))
+      :`<div class="scr-empty"><div class="t">Nothing matches “${esc(SCR_Q.trim())}”</div><div>Try one word, like a product or “booth”.</div>
+          <button type="button" class="form-btn ghost" onclick="SCR_Q='';$('scr-q').value='';renderScriptsTab()">Clear search</button></div>`;
+  } else {
+    live.filter(c=>SCR_CAT==="all"||String(c.FolderID)===SCR_CAT).forEach(c=>{
+      h+=`<section class="scr-cat"><h3 class="scr-ch serif">${esc(c.Name)}</h3>`;
+      if(inF(c.FolderID).length)h+=list(inF(c.FolderID).map(s=>row(s)));
+      kids(c.FolderID).filter(k=>inF(k.FolderID).length).forEach(k=>{h+=`<div class="scr-sub">${esc(k.Name)}</div>`+list(inF(k.FolderID).map(s=>row(s)));});
+      h+=`</section>`;
+    });
+  }
+  $("scr-list").innerHTML=h;
+  if($("scr-q")&&$("scr-q").value!==SCR_Q)$("scr-q").value=SCR_Q;
+  $("scr-q").parentElement.classList.toggle("hidden",!lib.scripts.length);
+}
+function openScript(id){
+  const s=SCRIPTS_RAW.find(x=>String(x.ScriptID)===String(id)); if(!s)return;
+  const view=scrPreview(s), url=String(s.URL||"")||(s.FileID?"https://drive.google.com/file/d/"+encodeURIComponent(s.FileID)+"/view":"");
+  if(!view){if(url)window.open(url,"_blank","noopener");return;}           // a plain web link: just go there
+  const f=SCRIPT_FOLDERS_RAW.find(x=>String(x.FolderID)===String(s.FolderID)), p=f&&SCRIPT_FOLDERS_RAW.find(x=>String(x.FolderID)===String(f.ParentID));
+  $("scr-v-title").textContent=s.Title;
+  $("scr-v-path").textContent=f?(p?p.Name+" › ":"")+f.Name:"";
+  $("scr-v-open").href=url||view;
+  $("scr-v-frame").src=view;
+  SCR_BACK=document.activeElement;
+  const v=$("scr-viewer"); if(v.parentElement!==document.body)document.body.appendChild(v);   // nothing above it may clip it
+  v.classList.remove("hidden"); document.body.classList.add("scr-open");
+  $("scr-v-close").focus();
+}
+function closeScript(){
+  const v=$("scr-viewer"); if(!v||v.classList.contains("hidden"))return;
+  v.classList.add("hidden"); document.body.classList.remove("scr-open");
+  $("scr-v-frame").src="about:blank";
+  if(SCR_BACK&&SCR_BACK.focus)try{SCR_BACK.focus();}catch(e){}
+}
+document.addEventListener("keydown",e=>{if(e.key==="Escape")closeScript();});
+
 /* ── tabs ── */
 function setRepTab(t){
-  const next=t==="skills"?"skills":"perf";
+  const next=t==="skills"?"skills":t==="scripts"?"scripts":"perf";
   if(REP_TAB==="skills"&&next!=="skills"){
     if(!skLeaveFix())return;
     skSave();                 // walking away from the board is leaving it
@@ -4185,13 +4354,15 @@ function setRepTab(t){
   REP_TAB=next;
   $("rep-pane-perf").classList.toggle("hidden",REP_TAB!=="perf");
   $("rep-pane-skills").classList.toggle("hidden",REP_TAB!=="skills");
+  $("rep-pane-scripts").classList.toggle("hidden",REP_TAB!=="scripts");
   document.querySelectorAll("#rep-tabs button").forEach(b=>b.classList.toggle("on",b.dataset.tab===REP_TAB));
   placeSubInk();
   if(REP_TAB==="skills"){
     paneIn($("rep-pane-skills"));
     renderSkills();
     loadSkills().then(()=>{if(REP_TAB==="skills")renderSkills();});
-  } else paneIn($("rep-pane-perf"));
+  } else if(REP_TAB==="scripts"){paneIn($("rep-pane-scripts"));renderScriptsTab();}
+  else paneIn($("rep-pane-perf"));
   try{history.replaceState(null,"",skShareUrl(null,REP_TAB));}catch(e){}
   skBar();
 }
@@ -4211,7 +4382,7 @@ function placeSubInk(){
 function skShareUrl(repId,tab){
   const u=new URL(location.href);
   if(repId)u.searchParams.set("rep",repId);
-  if(tab==="skills")u.searchParams.set("tab","skills"); else u.searchParams.delete("tab");
+  if(tab==="skills"||tab==="scripts")u.searchParams.set("tab",tab); else u.searchParams.delete("tab");
   return u.pathname+u.search+u.hash;
 }
 function openRepSkills(repId){
@@ -4648,7 +4819,7 @@ function applyMode(){
 let LAST_PAINT="";
 function dataStamp(){
   return JSON.stringify([MODE,REP_LINKS,HAVE_DATA,SELECTED_CAMPAIGN,new Date().toDateString(),
-    ROSTER_RAW,WEEKLY_RAW,CALLS_RAW,SURVEY_RAW,PLANNER_RAW,ASSIGN_RAW,OVERRIDE_RAW,SUB_RAW,HUB_CAL]);
+    ROSTER_RAW,WEEKLY_RAW,CALLS_RAW,SURVEY_RAW,PLANNER_RAW,ASSIGN_RAW,OVERRIDE_RAW,SUB_RAW,HUB_CAL,SCRIPTS_RAW,SCRIPT_FOLDERS_RAW]);
 }
 function renderAll(){
   LAST_PAINT=dataStamp();
@@ -4657,6 +4828,7 @@ function renderAll(){
   if(MODE==="locked"||MODE==="offline"||MODE==="gated")return;
   if(MODE==="rep"){
     renderRep();
+    renderScriptsTab();
     renderTeamKpisRep();
     renderLeaderboard("leaderboard-rep","lb-metric-rep");
     renderMix("mix-rep");
@@ -4665,7 +4837,7 @@ function renderAll(){
   renderCampaignSelect();
   renderPeriod();renderKPIs();renderRadar();renderCheckins();renderLeaderboard();renderHeat();renderSalesMonths();renderMix();
   renderAdminPlanner();renderAdminCalls();renderSkillsTeam();
-  fillRepSelect();renderRep();
+  fillRepSelect();renderRep();renderScriptsTab();
 }
 async function init(){
   if(!REP_PARAM)$("loading-title").textContent="Loading the team board…";
@@ -4685,6 +4857,7 @@ async function init(){
      badge honest from the first paint, so fetch it once in the background. */
   if(MODE==="rep"||MODE==="admin")loadSkills().then(()=>{skTabCount();if(REP_TAB==="skills")renderSkills();});
   if(TAB_PARAM.indexOf("skill")===0){if(MODE!=="rep")setView("rep");setRepTab("skills");}
+  else if(TAB_PARAM.indexOf("script")===0){if(MODE!=="rep")setView("rep");setRepTab("scripts");}
   paneIn(MODE==="locked" ? $("lockout") : MODE==="offline" ? $("offline") : MODE==="gated" ? $("gated") : $("view-"+(MODE==="rep"?"rep":"team")));
   if(CONFIG.USE_LIVE_DATA)setInterval(refreshTick,CONFIG.REFRESH_MS);
 }
